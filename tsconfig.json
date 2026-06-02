@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@next/third-parties/*": ["./node_modules/@next/third-parties/dist/*"]
     }
   },
   "include": [
