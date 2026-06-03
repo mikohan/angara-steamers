@@ -18,7 +18,7 @@ export interface ServicePage extends StrapiBase {
   hero_image: StrapiMedia; // required single image
   video?: StrapiMedia | null; // optional single video
 
-  faqs: ServiceFaq[]; // repeatable component
+  faq: ServiceFaq[]; // repeatable component
 
   seo_text: string; // richtext → string
 

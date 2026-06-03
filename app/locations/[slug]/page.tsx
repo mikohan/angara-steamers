@@ -1,35 +1,22 @@
 import { fetchStrapi } from "@/lib/strapi";
 import { LocationPage, StrapiResponse } from "@/types";
 import { generateWeaponsGradeSeo } from "@/lib/meta-bones";
-
 import { generateBreadcrumbs } from "@/lib/jsonBreadcrumbs";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
+
+const getQuery = (slug: string) => ({
+  filters: { slug: { $eq: slug } },
+  populate: ["state", "region", "og_image", "faq", "map_component", "projects"],
+});
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-
-  // Define the query object matching your URL parameters
-  const query = {
-    filters: {
-      slug: {
-        $eq: slug,
-      },
-    },
-    populate: [
-      "state",
-      "region",
-      "og_image",
-      "faq",
-      "map_component",
-      "projects",
-    ],
-  };
-
-  const rawResponse: StrapiResponse<LocationPage> = await fetchStrapi(
+  const rawResponse = await fetchStrapi<LocationPage>(
     "location-pages",
-    query,
+    getQuery(slug),
   );
 
   const { metadata } = generateWeaponsGradeSeo(
@@ -40,74 +27,50 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function Location({ params }: PageProps) {
-  let data = null;
-  let error = null;
   const { slug } = await params;
   const pathname = `/locations/${slug}`;
+  const fullUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}${pathname}`;
 
-  // Now pass this to your breadcrumb helper
-  const schema = generateBreadcrumbs(pathname);
+  let rawResponse: StrapiResponse<LocationPage>;
 
-  // Define the query object matching your URL parameters
-  const query = {
-    filters: {
-      slug: {
-        $eq: slug,
-      },
-    },
-    populate: [
-      "state",
-      "region",
-      "og_image",
-      "faq",
-      "map_component",
-      "projects",
-    ],
-  };
-
-  const rawResponse: StrapiResponse<LocationPage> = await fetchStrapi(
-    "location-pages",
-    query,
-  );
-  console.log(rawResponse);
-
-  const { jsonLd } = generateWeaponsGradeSeo(
-    rawResponse,
-    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/locations/${slug}`,
-  );
-
-  // 2. Data fetching happens outside the JSX return
+  // 1. Fetch data safely outside of the return statement
   try {
-    const response = await fetchStrapi<LocationPage>("location-pages", query);
-    data = response.data;
-  } catch (e) {
-    error = e instanceof Error ? e.message : "Unknown error";
+    rawResponse = await fetchStrapi<LocationPage>(
+      "location-pages",
+      getQuery(slug),
+    );
+  } catch (error) {
+    console.error(error);
+    return (
+      <main className="p-10 text-red-500">Error loading page content.</main>
+    );
   }
 
-  // 3. Simple UI rendering based on the result
-  if (error) {
-    return <main className="p-10 text-red-500">Error: {error}</main>;
+  // 2. Handle empty state
+  if (!rawResponse?.data) {
+    return <main className="p-10">No data found for this location.</main>;
   }
 
-  if (!data) {
-    return <main className="p-10">Loading or No Data...</main>;
-  }
+  // 3. Generate data needed for rendering
+  const { jsonLd } = generateWeaponsGradeSeo(rawResponse, fullUrl);
+  const schema = generateBreadcrumbs(pathname);
+  const combinedSchema = JSON.stringify(
+    [...jsonLd, schema].filter(Boolean),
+    null,
+    2,
+  );
 
+  // 4. Return the JSX
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([...jsonLd, schema].filter(Boolean)),
-        }}
+        dangerouslySetInnerHTML={{ __html: combinedSchema }}
       />
 
       <main className="p-10">
-        {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-        <pre>
-          {JSON.stringify([...jsonLd, schema].filter(Boolean), null, 2)}
-        </pre>
-        {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+        {/* <pre>{JSON.stringify(combinedSchema, null, 2)}</pre> */}
+        <pre>{combinedSchema}</pre>
       </main>
     </>
   );

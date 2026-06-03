@@ -53,17 +53,17 @@ export interface LocationPage extends StrapiBase, SeoPageData {
 // Strapi API Response Wrapper
 // ===============================
 
-export interface StrapiResponse<T> {
-  data: T;
-  meta?: {
-    pagination?: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
-}
+// export interface StrapiResponse<T> {
+//   data: T;
+//   meta?: {
+//     pagination?: {
+//       page: number;
+//       pageSize: number;
+//       pageCount: number;
+//       total: number;
+//     };
+//   };
+// }
 export interface StrapiRegion {
   id: number;
   slug: string;
