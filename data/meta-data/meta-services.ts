@@ -1,5 +1,5 @@
 import { ServicePage, StrapiResponse } from "@/types";
-import { BUSINESS_CONFIG } from "@/lib/meta-bones"; // Ensure your config path is correct
+import { BUSINESS_CONFIG } from "@/data/business-config"; // Ensure your config path is correct
 
 export function generateServicesListSeo(
   services: StrapiResponse<ServicePage>,
@@ -66,7 +66,7 @@ export function generateServicesListSeo(
       provider: {
         "@type": "ProfessionalService",
         name: BUSINESS_CONFIG.business_name,
-        image: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
+        image: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/logo.png`,
         telephone: BUSINESS_CONFIG.phone,
         email: BUSINESS_CONFIG.email,
         address: {

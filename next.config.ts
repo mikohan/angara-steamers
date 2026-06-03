@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "http", // Since your error shows http://cms.angaracleaning.com
+        hostname: "cms.angaracleaning.com",
+        port: "",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

@@ -1,6 +1,24 @@
 // Define a specific interface for your pagination or metadata
 import { StrapiRegion } from "@/types";
 
+export interface FormatRecord {
+  ext: string;
+  url: string;
+  hash: string;
+  mime: string;
+  name: string;
+  size: number;
+  width: number;
+  height: number;
+  sizeinBytes: number;
+}
+export interface MediaFormat {
+  large: FormatRecord;
+  medium: FormatRecord;
+  small: FormatRecord;
+  thumbnail: FormatRecord;
+}
+
 export interface StrapiMeta {
   pagination?: {
     page: number;
@@ -42,7 +60,7 @@ export interface StrapiMedia {
   height?: number;
   alternativeText?: string | null;
   caption?: string | null;
-  formats?: Record<string, unknown>;
+  formats?: MediaFormat;
 }
 export interface StrapiBase {
   id: number;

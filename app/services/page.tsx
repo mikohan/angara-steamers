@@ -1,4 +1,4 @@
-import { generateServicesListSeo } from "@/lib/meta-services";
+import { generateServicesListSeo } from "@/data/meta-data/meta-services";
 import { fetchStrapi } from "@/lib/strapi";
 import { ServicePage, StrapiResponse } from "@/types";
 

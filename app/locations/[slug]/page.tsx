@@ -1,7 +1,7 @@
 import { fetchStrapi } from "@/lib/strapi";
 import { LocationPage, StrapiResponse } from "@/types";
-import { generateWeaponsGradeSeo } from "@/lib/meta-bones";
-import { generateBreadcrumbs } from "@/lib/jsonBreadcrumbs";
+import { generateWeaponsGradeSeo } from "@/data/meta-data/meta-bones";
+import { generateBreadcrumbs } from "@/data/meta-data/jsonBreadcrumbs";
 
 interface PageProps {
   params: Promise<{ slug: string }>;

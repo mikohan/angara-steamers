@@ -24,7 +24,7 @@ export async function fetchStrapi<T>(
 
     // Add &publicationState=preview to the URL string
     const url = `${STRAPI_URL}/api/${sanitizedPath}${queryString ? `?${queryString}` : ""}`;
-    console.log(url);
+    // console.log(url);
 
     const mergedOptions: RequestInit = {
       ...options,

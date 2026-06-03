@@ -1,6 +1,6 @@
-import { LocationPage, StrapiResponse } from "./../types/index";
+import { LocationPage, StrapiResponse } from "../../types/index";
 import { Metadata } from "next";
-import { BUSINESS_CONFIG } from "./meta-bones";
+import { BUSINESS_CONFIG } from "@/data/business-config";
 import OG_IMAGE from "@/public/images/og_image.jpg";
 
 /**

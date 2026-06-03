@@ -1,6 +1,6 @@
-import { generateServicePageSeo } from "@/lib/meta-service";
+import { generateServicePageSeo } from "@/data/meta-data/meta-service";
 import { fetchStrapi } from "@/lib/strapi";
-import { ServicePage, StrapiResponse } from "@/types";
+import { LocationPage, ServicePage, State, StrapiResponse } from "@/types";
 
 const getQuery = (slug: string) => ({
   filters: {
@@ -41,9 +41,12 @@ export default async function ServicePagePage({
     "service-pages",
     getQuery(slug),
   );
+
+  const statesData: StrapiResponse<State> = await fetchStrapi("states");
   const { combinedJsonLd } = generateServicePageSeo(
     data,
     `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${slug}`,
+    statesData,
   );
 
   return (

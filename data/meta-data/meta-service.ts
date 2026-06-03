@@ -1,13 +1,17 @@
-import { ServicePage, StrapiResponse } from "../types/index";
-import { BUSINESS_CONFIG } from "./meta-bones";
+import { ServicePage, State, StrapiResponse } from "../../types/index";
+import { BUSINESS_CONFIG } from "@/data/business-config";
 import { Metadata } from "next";
 
 export function generateServicePageSeo(
   response: StrapiResponse<ServicePage>,
   baseUrl: string,
+  states?: StrapiResponse<State>,
 ) {
   const data = response.data[0];
   const canonical = baseUrl;
+  const statesData = states
+    ? states.data
+    : [{ name: "California" }, { name: "Nevada" }];
 
   function generateSafeFaqSchema(faq: ServicePage["faq"]) {
     // 1. Safety Check: Ensure faqs exists and has at least one item
@@ -76,9 +80,11 @@ export function generateServicePageSeo(
       },
       {
         "@type": "ProfessionalService",
-        "@id": "https://www.angaracleaning.com/#business",
+        "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#business",
         name: BUSINESS_CONFIG.business_name,
-        provider: { "@id": "https://www.angaracleaning.com/#organization" },
+        provider: {
+          "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#organization",
+        },
         image: process.env.NEXT_PUBLIC_STRAPI_URL + data.hero_image.url,
         priceRange: "$$",
         description: data.meta_description,
@@ -90,16 +96,18 @@ export function generateServicePageSeo(
           bestRating: 5,
           worstRating: 1,
         },
-        areaServed: [
-          { "@type": "State", name: "California" },
-          { "@type": "State", name: "Nevada" },
-        ],
+        areaServed: statesData.map((state) => ({
+          "@type": "State",
+          name: state.name,
+        })),
       },
       {
         "@type": "Service",
-        "@id": `${canonical}#service`,
+        "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#service",
         name: data.title,
-        provider: { "@id": "https://www.angaracleaning.com/#business" },
+        provider: {
+          "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#business",
+        },
         serviceType: data.title,
         description: data.meta_description,
         areaServed: { "@type": "State", name: "California" },

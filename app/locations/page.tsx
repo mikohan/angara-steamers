@@ -1,4 +1,4 @@
-import { generateLocationsListSeo } from "@/lib/locations-meta"; // Adjust path accordingly
+import { generateLocationsListSeo } from "@/data/meta-data/locations-meta"; // Adjust path accordingly
 import { fetchStrapi } from "@/lib/strapi"; // Your fetch utility
 import { LocationPage } from "@/types";
 
