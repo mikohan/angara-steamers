@@ -60,7 +60,7 @@ export function Hero() {
             transition={{ delay: 0.4 }}
           >
             <Link
-              href="/contact"
+              href="/upholstery"
               className="rounded-full bg-primary px-8 py-3 text-white font-medium touch-feedback hover:opacity-90"
             >
               Book Now

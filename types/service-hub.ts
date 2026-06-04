@@ -13,11 +13,11 @@ export interface ServiceHub extends StrapiBase {
   title: string;
   slug: string;
 
-  h1_heading: string;
-  h2_subheading: string;
+  h1_heading?: string;
+  h2_subheading?: string;
 
-  meta_title: string;
-  meta_description: string;
+  meta_title?: string;
+  meta_description?: string;
 
   image?: StrapiMedia | null; // single image
   video?: StrapiMedia | null; // single video
@@ -26,7 +26,7 @@ export interface ServiceHub extends StrapiBase {
 
   order?: number | null;
 
-  og_image: StrapiMedia; // required single image
+  og_image?: StrapiMedia; // required single image
 
-  service_pages: ServicePage[]; // one-to-many
+  service_pages?: ServicePage[]; // one-to-many
 }

@@ -5,3 +5,4 @@ export * from "./project";
 export * from "./service-hub";
 export * from "./service";
 export * from "./state";
+export * from "./navbar";

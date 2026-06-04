@@ -41,4 +41,5 @@ export const BUSINESS_CONFIG = {
   ],
   rating: "4.9",
   review_count: "597",
+  priceRange: "$$",
 };

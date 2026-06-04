@@ -1,6 +1,28 @@
 import { generateServicePageSeo } from "@/data/meta-data/meta-service";
 import { fetchStrapi } from "@/lib/strapi";
-import { LocationPage, ServicePage, State, StrapiResponse } from "@/types";
+import { ServicePage, State, StrapiResponse } from "@/types";
+import { notFound } from "next/navigation";
+
+// 1. Tell Next.js which paths to pre-render at build time
+// app/[pillar]/[slug]/page.tsx
+
+export async function generateStaticParams() {
+  // 1. Fetch all services from Strapi
+  const services: StrapiResponse<ServicePage> = await fetchStrapi(
+    "service-pages",
+    {
+      populate: ["service_hub"],
+    },
+  );
+
+  // 2. Filter out items where service_hub is missing and map safely
+  return services.data
+    .filter((service) => service.service_hub?.slug) // Ensure hub and slug exist
+    .map((service) => ({
+      pillar: service.service_hub!.slug, // ! tells TS "we checked this above"
+      slug: service.slug,
+    }));
+}
 
 const getQuery = (slug: string) => ({
   filters: {
@@ -41,6 +63,9 @@ export default async function ServicePagePage({
     "service-pages",
     getQuery(slug),
   );
+  if (!data?.data?.length) {
+    notFound();
+  }
 
   const statesData: StrapiResponse<State> = await fetchStrapi("states");
   const { combinedJsonLd } = generateServicePageSeo(

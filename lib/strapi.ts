@@ -14,7 +14,7 @@ interface FetchOptions extends RequestInit {
 export async function fetchStrapi<T>(
   path: string,
   urlParamsObject: Record<string, unknown> = {},
-  options: FetchOptions = { cache: "no-store" },
+  options: FetchOptions = { next: { revalidate: 3600, tags: ["navigation"] } },
 ): Promise<StrapiResponse<T>> {
   try {
     const sanitizedPath = path.startsWith("/") ? path.slice(1) : path;
