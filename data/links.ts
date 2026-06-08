@@ -12,4 +12,8 @@ export const STATIC_PAGES: ServiceHub[] = [
     slug: "contact",
     title: "Contact",
   },
+  {
+    slug: "projects",
+    title: "Projects",
+  },
 ];

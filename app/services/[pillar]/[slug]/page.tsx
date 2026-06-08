@@ -37,18 +37,33 @@ const getQuery = (slug: string) => ({
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ pillar: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const data: StrapiResponse<ServicePage> = await fetchStrapi(
-    `service-pages`,
+  const { pillar, slug } = await params;
+
+  // 1. Ignore collision routes
+  if (pillar === "projects") return {};
+
+  // 2. Fetch Data
+  const response: StrapiResponse<ServicePage> = await fetchStrapi(
+    "service-pages",
     getQuery(slug),
   );
 
+  // 3. Fail-Safe: If no data, return empty metadata instead of crashing
+  if (!response?.data?.[0]) {
+    console.error(
+      `[SEO CRASH PREVENTION]: No service found for /${pillar}/${slug}`,
+    );
+    return { title: "Page Not Found" };
+  }
+
+  // 4. Generate Metadata
   const { metadata } = generateServicePageSeo(
-    data,
+    response,
     `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${slug}`,
   );
+
   return metadata;
 }
 

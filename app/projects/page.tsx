@@ -11,9 +11,20 @@ export async function generateMetadata() {
 }
 
 export default async function ProjectsPage() {
+  const getQuery = () => ({
+    // populate: ["media_gallery", "video", "location_page"],
+    populate: {
+      location_page: {
+        fields: ["slug"],
+      },
+      media_gallery: true,
+      video: true,
+    },
+  });
   const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/projects`;
   const response: StrapiResponse<Project> = await fetchStrapi(
-    "/projects?populate=media_gallery",
+    "/projects",
+    getQuery(),
   );
   const projects = response.data;
 
@@ -67,7 +78,7 @@ export default async function ProjectsPage() {
                   {project.seo_text.substring(0, 100)}...
                 </p>
                 <a
-                  href={`/projects/${project.slug}`}
+                  href={`/projects/${project.location_page?.slug}/${project.slug}`}
                   className="text-blue-600 font-semibold hover:underline"
                 >
                   View Case Study &rarr;

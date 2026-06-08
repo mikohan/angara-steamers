@@ -13,7 +13,11 @@ import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { NavbarProps } from "@/types";
 import { motion } from "framer-motion";
 
-export function MobileMenu({ navItems = [], currentHubSlug }: NavbarProps) {
+export function MobileMenu({
+  navItems = [],
+  currentHubSlug,
+  staticItems = [],
+}: NavbarProps) {
   const activeHub = navItems.find((h) => h.slug === currentHubSlug);
 
   return (
@@ -52,6 +56,16 @@ export function MobileMenu({ navItems = [], currentHubSlug }: NavbarProps) {
           {/* Main Links */}
           <div className="flex flex-col gap-8 mb-12">
             {(navItems || []).map((item) => (
+              <SheetClose asChild key={item.slug}>
+                <Link
+                  href={`/services/${item.slug}`}
+                  className="text-3xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
+                >
+                  {item.title}
+                </Link>
+              </SheetClose>
+            ))}
+            {(staticItems || []).map((item) => (
               <SheetClose asChild key={item.slug}>
                 <Link
                   href={`/${item.slug}`}

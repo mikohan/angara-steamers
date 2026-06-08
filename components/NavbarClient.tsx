@@ -16,7 +16,6 @@ export function NavbarClient({ navItems }: NavbarProps) {
   const safeNavData = Array.isArray(navItems) ? navItems : [];
 
   // Merge dynamic Strapi hubs with static pages
-  const allNavItems = [...safeNavData, ...STATIC_PAGES];
 
   const currentHub = safeNavData.find((hub) =>
     pathname?.startsWith(`/${hub.slug}`),
@@ -46,7 +45,16 @@ export function NavbarClient({ navItems }: NavbarProps) {
 
         {/* Desktop Navigation */}
         <nav className="hidden sm:flex items-center gap-6 text-sm font-medium">
-          {allNavItems.map((item) => (
+          {safeNavData.map((item) => (
+            <Link
+              key={item.slug}
+              href={`/services/${item.slug}`}
+              className="hover:text-primary transition-colors text-lg"
+            >
+              {item.title}
+            </Link>
+          ))}
+          {STATIC_PAGES.map((item) => (
             <Link
               key={item.slug}
               href={`/${item.slug}`}
@@ -60,7 +68,11 @@ export function NavbarClient({ navItems }: NavbarProps) {
           </div>
         </nav>
 
-        <MobileMenu navItems={allNavItems} currentHubSlug={currentHub?.slug} />
+        <MobileMenu
+          navItems={safeNavData}
+          staticItems={STATIC_PAGES}
+          currentHubSlug={currentHub?.slug}
+        />
       </div>
 
       {/* Dynamic Sub-menu */}

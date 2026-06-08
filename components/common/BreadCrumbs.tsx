@@ -5,11 +5,8 @@ import { usePathname } from "next/navigation";
 
 export function Breadcrumbs() {
   const pathname = usePathname();
-
-  // Split path into segments
   const segments = pathname.split("/").filter((segment) => segment !== "");
 
-  // Don't show breadcrumbs on the home page
   if (segments.length === 0) return null;
 
   return (
@@ -21,6 +18,10 @@ export function Breadcrumbs() {
           </Link>
         </li>
         {segments.map((segment, index) => {
+          // Logic: Skip if this segment is the location (the child of 'projects')
+          const isLocationSegment = segments[index - 1] === "projects";
+          if (isLocationSegment) return null;
+
           const href = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
 

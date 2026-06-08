@@ -8,6 +8,7 @@ export function generateProjectPageSeo(
 ) {
   const data = response.data[0];
   const canonical = baseUrl;
+  const loc = data.location_page;
 
   // 1. Full Metadata Configuration
   const metadata: Metadata = {
@@ -17,13 +18,13 @@ export function generateProjectPageSeo(
     openGraph: {
       type: "article",
       url: canonical,
-      title: data.title,
+      title: data.meta_title,
       description: data.meta_description,
       siteName: BUSINESS_CONFIG.business_name,
       images: data.media_gallery.map((img) => ({
         url:
           process.env.NEXT_PUBLIC_STRAPI_URL +
-          (img.formats ? img.formats?.medium.url : img.url),
+          (img.formats?.medium?.url || img.url),
         width: 1200,
         height: 630,
         alt: img.alternativeText || data.title,
@@ -36,7 +37,6 @@ export function generateProjectPageSeo(
     "@context": "https://schema.org",
     "@graph": [
       {
-        // Entity: Organization
         "@type": "Organization",
         "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#organization`,
         name: BUSINESS_CONFIG.business_name,
@@ -54,7 +54,6 @@ export function generateProjectPageSeo(
         },
       },
       {
-        // Entity: Professional Service
         "@type": "ProfessionalService",
         "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#business`,
         name: BUSINESS_CONFIG.business_name,
@@ -69,9 +68,26 @@ export function generateProjectPageSeo(
           ratingValue: BUSINESS_CONFIG.rating,
           reviewCount: BUSINESS_CONFIG.review_count,
         },
+        // Dynamically inject location/geo data if it exists
+        ...(loc && {
+          areaServed: { "@type": "City", name: loc.city_name },
+          location: {
+            "@type": "PostalAddress",
+            addressLocality: loc.city_name,
+            addressRegion: "CA",
+            addressCountry: "US",
+          },
+          ...(loc.map_component.latitude &&
+            loc.map_component.longitude && {
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: loc.map_component.latitude,
+                longitude: loc.map_component.longitude,
+              },
+            }),
+        }),
       },
       {
-        // Entity: Project/TechArticle
         "@type": "TechArticle",
         "@id": `${canonical}#article`,
         headline: data.meta_title,
@@ -79,7 +95,7 @@ export function generateProjectPageSeo(
         datePublished: data.completion_date,
         image: data.media_gallery.map(
           (img: StrapiMedia) =>
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}${img.formats ? img.formats.small.url : img.url}`,
+            `${process.env.NEXT_PUBLIC_STRAPI_URL}${img.formats?.small?.url || img.url}`,
         ),
         author: {
           "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#organization`,
@@ -90,7 +106,6 @@ export function generateProjectPageSeo(
         mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
       },
       {
-        // Entity: Breadcrumbs
         "@type": "BreadcrumbList",
         itemListElement: [
           {

@@ -7,6 +7,7 @@ export interface NavItem extends ServiceHub {
 
 export interface NavbarProps {
   navItems: ServiceHub[] | NavItem[];
+  staticItems: ServiceHub[] | NavItem[];
   isUpholstery?: boolean;
   isLocations?: boolean;
   isCarpet?: boolean;
