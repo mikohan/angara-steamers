@@ -63,9 +63,9 @@ export interface StrapiMedia {
   formats?: MediaFormat;
 }
 export interface StrapiBase {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
+  id?: number;
+  createdAt?: string;
+  updatedAt?: string;
   publishedAt?: string | null;
 }
 

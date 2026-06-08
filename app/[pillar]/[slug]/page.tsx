@@ -84,7 +84,7 @@ export default async function ServicePagePage({
 
       <h1>{data.data[0].title}</h1>
       {/* Rest of your page content */}
-      <pre>{JSON.stringify(combinedJsonLd, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(combinedJsonLd, null, 2)}</pre> */}
     </main>
   );
 }

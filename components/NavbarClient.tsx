@@ -4,56 +4,77 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
-import { ServiceHub } from "@/types";
+import { NavbarProps } from "@/types";
+import { STATIC_PAGES } from "@/data/links";
+import Image from "next/image";
+import ASLogo from "@/public/images/new_logo_as.webp";
 
-export function NavbarClient({ navData }: { navData: ServiceHub[] }) {
+// Define your static pages here
+
+export function NavbarClient({ navItems }: NavbarProps) {
   const pathname = usePathname();
+  const safeNavData = Array.isArray(navItems) ? navItems : [];
 
-  // Defensive check: Ensure navData exists before processing
-  const safeNavData = Array.isArray(navData) ? navData : [];
+  // Merge dynamic Strapi hubs with static pages
+  const allNavItems = [...safeNavData, ...STATIC_PAGES];
 
-  // Safe path checks
-  const isUpholstery = pathname?.startsWith("/upholstery") ?? false;
-  const isLocations = pathname?.startsWith("/carpet") ?? false;
+  const currentHub = safeNavData.find((hub) =>
+    pathname?.startsWith(`/${hub.slug}`),
+  );
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur shadow-xl shadow-primary/20">
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md shadow-sm ">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="font-bold text-xl">
-          Angara
-        </Link>
+        <div className="flex gap-4 items-center">
+          <div className="relative h-8 w-16">
+            <Image
+              src={ASLogo}
+              fill
+              priority
+              alt="Angara Steamers Logo"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          </div>
+
+          <Link
+            href="/"
+            className="font-bold text-2xl tracking-tight text-primary"
+          >
+            Angara
+          </Link>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden sm:flex items-center gap-6 text-sm font-medium">
-          {safeNavData.map((item) => (
+          {allNavItems.map((item) => (
             <Link
-              key={item?.slug}
-              href={`/${item?.slug ?? ""}`}
-              className="hover:text-primary"
+              key={item.slug}
+              href={`/${item.slug}`}
+              className="hover:text-primary transition-colors text-lg"
             >
-              {item?.title ?? "Service"}
+              {item.title}
             </Link>
           ))}
-          <ThemeToggle />
+          <div className="pl-2 border-l border-muted/20">
+            <ThemeToggle />
+          </div>
         </nav>
 
-        {/* Mobile Menu - Pass safe data */}
-        <MobileMenu
-          navItems={safeNavData}
-          isUpholstery={isUpholstery}
-          isLocations={isLocations}
-        />
+        <MobileMenu navItems={allNavItems} currentHubSlug={currentHub?.slug} />
       </div>
 
-      {/* Upholstery Sub-menu - ONLY renders on Upholstery pages */}
-      {isUpholstery && (
-        <div className="hidden sm:flex border-t bg-background/50 px-6 py-2 gap-6 text-xs">
-          <Link href="/upholstery" className="hover:text-primary">
-            Sofa Cleaning
-          </Link>
-          <Link href="/upholstery" className="hover:text-primary">
-            Mattress
-          </Link>
+      {/* Dynamic Sub-menu */}
+      {currentHub?.service_pages && currentHub.service_pages.length > 0 && (
+        <div className="hidden sm:flex border-t bg-background/50 px-6 py-2 gap-6 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+          {currentHub.service_pages.map((page) => (
+            <Link
+              key={page.slug}
+              href={`/${currentHub.slug}/${page.slug}`}
+              className="hover:text-primary transition-colors"
+            >
+              {page.title}
+            </Link>
+          ))}
         </div>
       )}
     </header>

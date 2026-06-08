@@ -1,10 +1,14 @@
-export interface NavItem {
+import { ServiceHub } from "./service-hub";
+
+export interface NavItem extends ServiceHub {
   title: string;
   slug: string;
 }
 
 export interface NavbarProps {
-  navItems: NavItem[];
-  isUpholstery: boolean;
-  isLocations: boolean;
+  navItems: ServiceHub[] | NavItem[];
+  isUpholstery?: boolean;
+  isLocations?: boolean;
+  isCarpet?: boolean;
+  currentHubSlug?: string;
 }

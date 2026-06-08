@@ -70,7 +70,8 @@ export default async function Location({ params }: PageProps) {
 
       <main className="p-10">
         {/* <pre>{JSON.stringify(combinedSchema, null, 2)}</pre> */}
-        <pre>{combinedSchema}</pre>
+        {/* <pre>{combinedSchema}</pre> */}
+        some staff
       </main>
     </>
   );

@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function ServicesPage({
   params,
 }: {
-  params: Promise<{ pillar: string }>;
+  params: { pillar: string };
 }) {
   const { pillar } = await params;
   // console.log(pillar);
@@ -120,9 +120,7 @@ export default async function ServicesPage({
             </div>
           ))}
         </div>
-        <section>
-          <pre>{JSON.stringify(jsonLd, null, 2)}</pre>
-        </section>
+        <section>{/* <pre>{JSON.stringify(jsonLd, null, 2)}</pre> */}</section>
       </main>
     </>
   );

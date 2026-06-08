@@ -1,137 +1,99 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetClose,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { NavbarProps } from "@/types";
+import { motion } from "framer-motion";
 
-export function MobileMenu({
-  navItems = [],
-  isUpholstery,
-  isLocations,
-}: NavbarProps) {
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+export function MobileMenu({ navItems = [], currentHubSlug }: NavbarProps) {
+  const activeHub = navItems.find((h) => h.slug === currentHubSlug);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Control body scroll only when open
-  useEffect(() => {
-    if (mounted) {
-      document.body.style.overflow = open ? "hidden" : "unset";
-    }
-  }, [open, mounted]);
-
-  // Prevent rendering anything until mounted to avoid hydration errors
-  if (!mounted) return null;
-
-  return createPortal(
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        className="p-2 sm:hidden touch-feedback"
-        aria-label="Open Menu"
-      >
+  return (
+    <Sheet>
+      <SheetTrigger className="sm:hidden p-3 rounded-xl touch-feedback hover:bg-muted/10 transition-colors">
         <svg
           className="h-6 w-6"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           viewBox="0 0 24 24"
         >
-          <path d="M4 6h16M4 12h16M4 18h16" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
         </svg>
-      </button>
+      </SheetTrigger>
 
-      <div
-        className={`fixed inset-0 z-25 transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      <SheetContent
+        side="right"
+        className="w-full border-none sm:w-[350px] bg-background border-l-0 p-0 shadow-2xl"
       >
-        <div
-          className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        />
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Main site navigation for Angara Streamers.
+        </SheetDescription>
 
-        <div
-          className={`absolute right-0 top-0 h-full w-72 bg-background border-l border-muted/20 shadow-2xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
+        <motion.nav
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="flex flex-col h-full py-12 px-8"
         >
-          <div className="flex justify-between items-center p-6 border-b border-muted/20">
-            <span className="font-semibold">Menu</span>
-            <button
-              onClick={() => setOpen(false)}
-              className="p-2 text-2xl"
-              aria-label="Close Menu"
-            >
-              ×
-            </button>
+          {/* Main Links */}
+          <div className="flex flex-col gap-8 mb-12">
+            {(navItems || []).map((item) => (
+              <SheetClose asChild key={item.slug}>
+                <Link
+                  href={`/${item.slug}`}
+                  className="text-3xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
+                >
+                  {item.title}
+                </Link>
+              </SheetClose>
+            ))}
           </div>
 
-          <nav className="flex flex-col p-6 gap-6">
-            {/* Safe Mapping with fallback */}
-            {(navItems ?? []).map((item) => (
-              <Link
-                key={item?.slug}
-                href={`/${item?.slug ?? ""}`}
-                onClick={() => setOpen(false)}
-                className="text-xl font-medium"
-              >
-                {item?.title ?? "Service"}
-              </Link>
-            ))}
-
-            {(isUpholstery || isLocations) && (
-              <div className="pt-6 border-t border-muted/20 flex flex-col gap-4 text-sm text-muted-foreground uppercase font-bold tracking-widest">
-                {isUpholstery ? "Upholstery Services" : "Service Areas"}
-
-                {isUpholstery && (
-                  <>
+          {/* Service Links */}
+          {activeHub?.service_pages && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="space-y-6"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+                {activeHub.title} Services
+              </p>
+              <div className="flex flex-col gap-4">
+                {activeHub.service_pages.map((page) => (
+                  <SheetClose asChild key={page.slug}>
                     <Link
-                      href="/upholstery"
-                      className="text-base text-foreground capitalize"
-                      onClick={() => setOpen(false)}
+                      href={`/${activeHub.slug}/${page.slug}`}
+                      className="text-lg text-foreground/70 hover:text-primary transition-colors capitalize"
                     >
-                      Sofa Cleaning
+                      {page.title}
                     </Link>
-                    <Link
-                      href="/upholstery"
-                      className="text-base text-foreground capitalize"
-                      onClick={() => setOpen(false)}
-                    >
-                      Mattress Cleaning
-                    </Link>
-                  </>
-                )}
-
-                {isLocations && (
-                  <>
-                    <Link
-                      href="/locations/playa-vista"
-                      className="text-base text-foreground capitalize"
-                      onClick={() => setOpen(false)}
-                    >
-                      Playa Vista
-                    </Link>
-                    <Link
-                      href="/locations/culver-city"
-                      className="text-base text-foreground capitalize"
-                      onClick={() => setOpen(false)}
-                    >
-                      Culver City
-                    </Link>
-                  </>
-                )}
+                  </SheetClose>
+                ))}
               </div>
-            )}
+            </motion.div>
+          )}
 
-            <div className="mt-auto pt-6 border-t border-muted/20">
-              <ThemeToggle />
-            </div>
-          </nav>
-        </div>
-      </div>
-    </>,
-    document.body,
+          <div className="mt-auto pt-12 border-t border-primary/40">
+            <ThemeToggle className="bg-primary/40" />
+          </div>
+        </motion.nav>
+      </SheetContent>
+    </Sheet>
   );
 }
