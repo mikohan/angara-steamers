@@ -1,12 +1,14 @@
 import { fetchStrapi } from "@/lib/strapi";
 import { Project, StrapiResponse } from "@/types";
 import { generateProjectPageSeo } from "@/data/meta-data/meta-project";
-import Image from "next/image";
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { ProjectImage } from "@/components/ProjectImage";
 import { ProjectVideo } from "@/components/ProjectVideo";
-import { VideoComponent } from "@/components/oldComponents/VideoComponent";
 import GoogleMap from "@/components/GoogleMap";
+import { RichTextRenderer } from "@/components/common/RichTextRenderer";
+import { formatDate } from "@/lib/utils";
+import { CTA } from "@/components/CTA";
+import { SlimCTA } from "@/components/SlimCTA";
 // import MarkdownRenderer from "@/components/MarkdownRenderer"; // Ensure this points to your renderer
 
 // 1. Updated getQuery to filter by BOTH slug and location
@@ -95,46 +97,80 @@ export default async function ProjectPage({
         {/* <section>
           <pre>{JSON.stringify(jsonLd, null, 2)}</pre>
         </section> */}
-        <article className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-6">{projectInstance.title}</h1>
 
-          {/* Render Project Images */}
-          <GalleryGrid>
-            {projectInstance.media_gallery.map((img) => (
-              <ProjectImage
-                key={img.url}
-                src={img.url}
-                alt={img.alternativeText || projectInstance.title}
-                width={img.width}
-                height={img.height}
-              />
-            ))}
-          </GalleryGrid>
-          <GalleryGrid>
-            {projectInstance.video?.map((vid) => {
-              console.log(vid.mime);
-              return (
-                <ProjectVideo
-                  key={vid.url}
-                  url={vid.url}
-                  type={vid.mime}
-                  // title={projectInstance.title}
-                />
-              );
-            })}
-          </GalleryGrid>
-
-          {/* Render Markdown SEO Text */}
-          <div className="prose lg:prose-xl max-w-none">
-            Markdown
-            {/* <MarkdownRenderer content={project.seo_text} /> */}
+        <article className="max-w-5xl mx-auto">
+          <div>
+            <div className="flex justify-between text-muted mb-12">
+              <div>
+                <span className="hidden md:block">Comletition date:</span>
+                <span className="font-semibold text-foreground">
+                  {" "}
+                  {formatDate(projectInstance.completion_date)}
+                </span>
+              </div>
+              <div>
+                <span className="hidden md:block">Location: </span>
+                <span className="font-semibold text-foreground">
+                  {projectInstance.location_page?.city_name}
+                </span>
+              </div>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">
+              {projectInstance.title}
+            </h1>
           </div>
+          <div>
+            {/* Render Project Images */}
+            <h3 className="text-2xl font-semibold text-muted">
+              Images gallery {projectInstance.title}
+            </h3>
+            <GalleryGrid>
+              {projectInstance.media_gallery.map((img) => (
+                <ProjectImage
+                  key={img.url}
+                  src={img.url}
+                  alt={img.alternativeText || projectInstance.title}
+                  width={img.width}
+                  height={img.height}
+                  caption={
+                    img.caption
+                      ? img.caption
+                      : img.alternativeText
+                        ? img.alternativeText
+                        : projectInstance.title
+                  }
+                />
+              ))}
+            </GalleryGrid>
+            <GalleryGrid>
+              {projectInstance.video?.map((vid) => {
+                return (
+                  <ProjectVideo
+                    key={vid.url}
+                    url={vid.url}
+                    type={vid.mime}
+                    caption={vid.caption}
+                  />
+                );
+              })}
+            </GalleryGrid>
+          </div>
+          {/* Render Markdown SEO Text */}
+          <div className="flex justify-center">
+            <RichTextRenderer content={projectInstance.seo_text} />
+          </div>
+        </article>
+        <section className="mt-12">
           <GoogleMap
             lat={projectInstance.location_page?.map_component.latitude}
             lng={projectInstance.location_page?.map_component.longitude}
             zoom={projectInstance.location_page?.map_component.zoom}
+            labelText={projectInstance.title}
           />
-        </article>
+        </section>
+        <section className="my-32">
+          <CTA />
+        </section>
       </main>
     </>
   );

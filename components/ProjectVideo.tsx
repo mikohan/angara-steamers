@@ -1,33 +1,35 @@
 "use client";
 
-import { useState } from "react";
-
 type ProjectVideoProps = {
   url: string;
   type: string;
-  title?: string;
+  caption?: string | null;
 };
 
-export function ProjectVideo({ url, type, title }: ProjectVideoProps) {
-  const [hasError, setHasError] = useState(false);
+export function ProjectVideo({ url, type, caption }: ProjectVideoProps) {
   const fullUrl = process.env.NEXT_PUBLIC_STRAPI_URL + url;
-
-  if (hasError) return null;
+  const safeCaption = caption ? caption : "Project Video";
 
   return (
-    <div className="aspect-9/16 overflow-hidden rounded-2xl shadow-xl bg-black  w-full">
-      <video
-        className="w-full h-full object-cover"
-        controls
-        preload="auto"
-        muted
-        playsInline
-        aria-label={title || "Project video"}
-        onError={() => setHasError(true)}
-      >
-        <source src={fullUrl} type={type} />
-        Your browser does not support the video tag.
-      </video>
-    </div>
+    <figure className="bg-primary/10 shadow-xl  p-4 rounded-2xl my-8 flex flex-col items-center">
+      {/* Video Container */}
+      <div className="overflow-hidden rounded-2xl shadow-xl bg-black aspect-9/16 w-full max-w-sm">
+        <video
+          className="w-full h-full object-cover"
+          controls
+          preload="auto"
+          muted
+          playsInline
+        >
+          <source src={fullUrl} type={type} />
+        </video>
+      </div>
+
+      {/* Minimalist Caption */}
+
+      <figcaption className="mt-4 text-center text-sm  font-medium line-clamp-6">
+        {safeCaption}
+      </figcaption>
+    </figure>
   );
 }

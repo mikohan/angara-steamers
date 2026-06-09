@@ -11,9 +11,12 @@ export function Breadcrumbs() {
 
   return (
     <nav aria-label="Breadcrumb" className="px-4 sm:px-6 py-4">
-      <ol className="flex items-center space-x-2 text-xs text-primary-800 uppercase tracking-wider font-semibold">
+      <ol className="flex items-center text-xs  uppercase tracking-wider font-semibold">
         <li>
-          <Link href="/" className="hover:text-primary transition-colors">
+          <Link
+            href="/"
+            className="hover:text-primary/50 underline text-primary transition-colors"
+          >
             Home
           </Link>
         </li>
@@ -27,15 +30,15 @@ export function Breadcrumbs() {
 
           return (
             <li key={href} className="flex items-center">
-              <span className="mx-2 text-muted">/</span>
+              <span className="mx-0.5 text-muted">/</span>
               {isLast ? (
-                <span className="text-primary-800 capitalize">
+                <span className="text-primary uppercase line-clamp-1 sm:line-clamp-none">
                   {segment.replace(/-/g, " ")}
                 </span>
               ) : (
                 <Link
                   href={href}
-                  className="hover:text-primary transition-colors capitalize"
+                  className="hover:text-primary/50 transition-colors uppercase text-primary underline"
                 >
                   {segment.replace(/-/g, " ")}
                 </Link>

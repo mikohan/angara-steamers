@@ -13,6 +13,7 @@ interface GoogleMapProps {
   lng?: number;
   zoom?: number;
   className?: string;
+  labelText?: string;
 }
 
 export default function GoogleMap({
@@ -20,6 +21,7 @@ export default function GoogleMap({
   lng = 118.2426,
   zoom = 12,
   className = "h-100 w-full",
+  labelText,
 }: GoogleMapProps) {
   // Use your environment variable for the API Key
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
@@ -53,8 +55,9 @@ export default function GoogleMap({
           <AdvancedMarker position={{ lat, lng }}>
             <Pin
               background={"#0070f3"} // Your primary-blue
-              glyphColor={"#ffffff"}
+              glyphColor={"#000000"}
               borderColor={"#0051af"}
+              glyph={labelText} // Use the prop instead of <span> as a child
             />
           </AdvancedMarker>
         </Map>

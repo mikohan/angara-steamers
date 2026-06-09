@@ -39,7 +39,7 @@ export function NavbarClient({ navItems }: NavbarProps) {
             href="/"
             className="font-bold text-2xl tracking-tight text-primary"
           >
-            Angara
+            Angara<span className="text-foreground">Steamers</span>
           </Link>
         </div>
 

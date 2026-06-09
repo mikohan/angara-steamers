@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* You must define the color exactly like this in v4 */
@@ -9,6 +10,22 @@
   --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* This maps your custom theme colors to the prose plugin automatically */
+  --prose-body: var(--foreground);
+  --prose-headings: var(--foreground);
+  --prose-lead: var(--foreground);
+  --prose-links: var(--primary);
+  --prose-bold: var(--foreground);
+  --prose-counters: var(--muted);
+  --prose-bullets: var(--muted);
+  --prose-hr: var(--muted);
+  --prose-quotes: var(--foreground);
+  --prose-quote-borders: var(--primary);
+  --prose-captions: var(--muted);
+  --prose-code: var(--foreground);
+  --prose-pre-code: var(--foreground);
+  --prose-pre-bg: var(--muted);
 }
 
 @layer base {
