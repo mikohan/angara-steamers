@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Hero } from "@/components/sections/Hero";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-20 space-y-20">
+      <Breadcrumbs />
       <Hero />
       <section className="space-y-6">
         <Link href="/" className="text-2xl font-bold">

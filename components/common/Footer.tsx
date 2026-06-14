@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ServiceHub } from "@/types";
 import { STATIC_PAGES } from "@/data/links";
+import { WaveDivider } from "./WaveDivider";
 
 interface FooterProps {
   navItems: ServiceHub[];
@@ -8,7 +9,9 @@ interface FooterProps {
 
 export function Footer({ navItems }: FooterProps) {
   return (
-    <footer className="bg-black text-white py-12 md:py-16 px-12 md:px-4">
+    <footer className="relative py-12 md:py-32 px-12 md:px-4">
+      <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/20 to-background"></div>
+      <WaveDivider position="top" fill="var(--color-background)" />
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-12">
         {/* Branding - Full width on mobile */}
         <div className="flex flex-col gap-3">

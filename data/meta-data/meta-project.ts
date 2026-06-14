@@ -97,6 +97,11 @@ export function generateProjectPageSeo(
           (img: StrapiMedia) =>
             `${process.env.NEXT_PUBLIC_STRAPI_URL}${img.formats?.small?.url || img.url}`,
         ),
+        mainEntity: {
+          "@type": "Service",
+          name: "Professional Upholstery Cleaning", // Update to match your actual service name
+          url: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${data.service_page?.service_hub?.slug}/${data.service_page?.slug}`,
+        },
         author: {
           "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#organization`,
         },

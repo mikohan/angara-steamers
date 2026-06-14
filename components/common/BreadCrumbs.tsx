@@ -3,44 +3,59 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Breadcrumbs() {
+interface BreadcrumbsProps {
+  className?: string;
+  removeSegments?: string[]; // Pass parts of the URL you want to hide
+}
+
+// Utility to format labels
+const formatLabel = (segment: string) =>
+  segment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+
+export function Breadcrumbs({
+  className,
+  removeSegments = [],
+}: BreadcrumbsProps) {
   const pathname = usePathname();
-  const segments = pathname.split("/").filter((segment) => segment !== "");
+
+  const segments = pathname
+    .split("/")
+    .filter((s) => s !== "" && !removeSegments.includes(s));
 
   if (segments.length === 0) return null;
 
+  // We need the original path to construct correct links
+  const originalSegments = pathname.split("/").filter(Boolean);
+
+  const crumbs = segments.map((segment) => {
+    // Find where this segment exists in the original path to build the correct href
+    const index = originalSegments.indexOf(segment);
+    const href = `/${originalSegments.slice(0, index + 1).join("/")}`;
+
+    return { href, label: formatLabel(segment) };
+  });
+
   return (
-    <nav aria-label="Breadcrumb" className="px-4 sm:px-6 py-4">
-      <ol className="flex items-center text-xs  uppercase tracking-wider font-semibold">
+    <nav aria-label="Breadcrumb" className={className}>
+      <ol className="flex items-center text-xs uppercase tracking-wider font-semibold">
         <li>
-          <Link
-            href="/"
-            className="hover:text-primary/50 underline text-primary transition-colors"
-          >
+          <Link href="/" className="text-primary underline hover:opacity-50">
             Home
           </Link>
         </li>
-        {segments.map((segment, index) => {
-          // Logic: Skip if this segment is the location (the child of 'projects')
-          const isLocationSegment = segments[index - 1] === "projects";
-          if (isLocationSegment) return null;
-
-          const href = `/${segments.slice(0, index + 1).join("/")}`;
-          const isLast = index === segments.length - 1;
-
+        {crumbs.map((crumb, index) => {
+          const isLast = index === crumbs.length - 1;
           return (
-            <li key={href} className="flex items-center">
-              <span className="mx-0.5 text-muted">/</span>
+            <li key={crumb.href} className="flex items-center">
+              <span className="mx-2 text-muted">/</span>
               {isLast ? (
-                <span className="text-primary uppercase line-clamp-1 sm:line-clamp-none">
-                  {segment.replace(/-/g, " ")}
-                </span>
+                <span className="text-primary">{crumb.label}</span>
               ) : (
                 <Link
-                  href={href}
-                  className="hover:text-primary/50 transition-colors uppercase text-primary underline"
+                  href={crumb.href}
+                  className="text-primary underline hover:opacity-50"
                 >
-                  {segment.replace(/-/g, " ")}
+                  {crumb.label}
                 </Link>
               )}
             </li>

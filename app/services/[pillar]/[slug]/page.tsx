@@ -1,3 +1,5 @@
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { Hero } from "@/components/Hero";
 import { generateServicePageSeo } from "@/data/meta-data/meta-service";
 import { fetchStrapi } from "@/lib/strapi";
 import { ServicePage, State, StrapiResponse } from "@/types";
@@ -90,16 +92,20 @@ export default async function ServicePagePage({
   );
 
   return (
-    <main>
-      {/* Inject Schema as a Script Tag */}
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedJsonLd) }}
       />
+      <main className="mx-auto max-w-7xl">
+        <Breadcrumbs className="my-4" removeSegments={["services"]} />
+        {/* Inject Schema as a Script Tag */}
 
-      <h1>{data.data[0].title}</h1>
-      {/* Rest of your page content */}
-      {/* <pre>{JSON.stringify(combinedJsonLd, null, 2)}</pre> */}
-    </main>
+        <h1>{data.data[0].title}</h1>
+        <Hero header={data.data[0].title} video={false} />
+        {/* Rest of your page content */}
+        {/* <pre>{JSON.stringify(combinedJsonLd, null, 2)}</pre> */}
+      </main>
+    </>
   );
 }

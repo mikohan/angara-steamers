@@ -8,8 +8,12 @@ import GoogleMap from "@/components/GoogleMap";
 import { RichTextRenderer } from "@/components/common/RichTextRenderer";
 import { formatDate } from "@/lib/utils";
 import { CTA } from "@/components/CTA";
-import { SlimCTA } from "@/components/SlimCTA";
-// import MarkdownRenderer from "@/components/MarkdownRenderer"; // Ensure this points to your renderer
+import { LogoTicker } from "@/components/LogoTicker";
+import DefaultServiceImage from "@/public/images/og_image.webp";
+
+import { LinkService } from "@/components/LinkService";
+import { WaveDivider } from "@/components/common/WaveDivider";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 // 1. Updated getQuery to filter by BOTH slug and location
 const getQuery = (slug: string) => ({
@@ -19,13 +23,16 @@ const getQuery = (slug: string) => ({
   populate: {
     media_gallery: true,
     video: true,
+    service_page: {
+      populate: "*", // Populates all fields inside the service_page component
+    },
     location_page: {
-      // 1. Populate the location_page relation
       populate: {
-        // 2. Populate the nested map component inside it
         map_component: {
-          // 3. Include specific fields if needed, or true for all
-          populate: "*",
+          populate: "*", // Works if map_component is a standard component
+        },
+        og_image: {
+          populate: "*", // Necessary if og_image is a media field/object
         },
       },
     },
@@ -84,7 +91,14 @@ export default async function ProjectPage({
 
   // Generate the full SEO object (Metadata + JSON-LD)
   const { jsonLd } = generateProjectPageSeo(response, baseUrl);
-
+  const strapi =
+    process.env.NEXT_PUBLIC_STRAPI_URL || "https://cms.angaracleaning.com";
+  const serviceImageUrl =
+    strapi + projectInstance.service_page?.hero_image.formats?.small.url ||
+    DefaultServiceImage;
+  const locationImageUrl =
+    strapi + projectInstance.location_page?.og_image.url || DefaultServiceImage;
+  const removeBread = projectInstance.location_page?.slug || "pillar";
   return (
     <>
       {/* Inject the full JSON-LD Graph */}
@@ -93,12 +107,13 @@ export default async function ProjectPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main className="container mx-auto py-10 px-4">
+      <main className="py-10">
         {/* <section>
           <pre>{JSON.stringify(jsonLd, null, 2)}</pre>
         </section> */}
 
-        <article className="max-w-5xl mx-auto">
+        <article className="px-4 mx-auto max-w-7xl">
+          <Breadcrumbs className="my-4" removeSegments={[removeBread]} />
           <div>
             <div className="flex justify-between text-muted mb-12">
               <div>
@@ -155,12 +170,34 @@ export default async function ProjectPage({
               })}
             </GalleryGrid>
           </div>
-          {/* Render Markdown SEO Text */}
-          <div className="flex justify-center">
-            <RichTextRenderer content={projectInstance.seo_text} />
-          </div>
         </article>
-        <section className="mt-12">
+        <section className="py-16 relative overflow-hidden">
+          <div className="absolute h-12 border w-full top-1/3 bg-primary/20 blur-2xl"></div>
+          <LogoTicker />
+        </section>
+        {/* Render Markdown SEO Text */}
+        <section className="flex justify-center mx-auto max-w-5xl mt-16 px-8 md:px-4 ">
+          <RichTextRenderer content={projectInstance.seo_text} />
+        </section>
+        <section className="max-w-5xl mx-auto px-8 md:px-4">
+          <div className="mx-auto grid md:grid-cols-2 gap-6 my-32">
+            <LinkService
+              href={`/services/${projectInstance.service_page?.service_hub?.slug}/${projectInstance.service_page?.slug}`}
+              imageSrc={serviceImageUrl}
+              title={`${projectInstance.service_page?.title}`}
+              label={`Learn more about our ${projectInstance.service_page?.title}`}
+              imageAlt={projectInstance.service_page?.meta_description || ""}
+            />
+            <LinkService
+              href={`/locations/${projectInstance.location_page?.slug}`}
+              title={projectInstance.location_page?.city_name}
+              label={`Services in ${projectInstance.location_page?.city_name}`}
+              imageSrc={locationImageUrl}
+              imageAlt={projectInstance.location_page?.meta_description || ""}
+            />
+          </div>
+        </section>
+        <section className="py-4 md:py-24 px-8 md:px-16">
           <GoogleMap
             lat={projectInstance.location_page?.map_component.latitude}
             lng={projectInstance.location_page?.map_component.longitude}
@@ -168,7 +205,9 @@ export default async function ProjectPage({
             labelText={projectInstance.title}
           />
         </section>
-        <section className="my-32">
+        <section className="mt-16 relative pt-32 pb-32">
+          <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/10 to-background"></div>
+          <WaveDivider position="top" fill="var(--color-background)" />
           <CTA />
         </section>
       </main>

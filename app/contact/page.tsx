@@ -1,5 +1,6 @@
 "use client";
 
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 import { useState } from "react";
 
 export default function ContactPage() {
@@ -13,16 +14,17 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-16 px-4 md:px-8">
-      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <div className="mx-auto max-w-7xl py-16 px-4 md:px-0">
+      <Breadcrumbs />
+      <div className="grid md:grid-cols-2 gap-12 items-center">
         {/* Left: Heading & Info */}
         <div className="space-y-6">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
             Let&apos;s Refresh Your Space
           </h1>
           <p className="text-lg text-muted">
-            Have questions about our upholstery cleaning process? We’re here to
-            help you get that fresh-home feeling back.
+            Have questions about our upholstery cleaning process? We&apos;re
+            here to help you get that fresh-home feeling back.
           </p>
           <div className="space-y-4 pt-4">
             <div className="flex items-center gap-3">

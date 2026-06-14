@@ -1,11 +1,11 @@
 import Image from "next/image";
 import React from "react";
-import BeforeImage from "@/public/images/before1.avif";
-import AfterImage from "@/public/images/after1.avif";
+import BeforeImage from "@/public/images/before1.webp";
+import AfterImage from "@/public/images/after1.webp";
 
 export function CTA() {
   return (
-    <section className="bg-background py-16 px-4 md:px-8">
+    <section className="px-4 md:px-8 bg-primary/10 rounded-2xl p-8">
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
         {/* Left Side: Text & Conversion */}
         <div className="flex-1 flex flex-col gap-6">
@@ -23,7 +23,10 @@ export function CTA() {
               GET A FREE QUOTE TODAY!
             </button>
             <p className="text-center text-muted font-medium">
-              Or Call Us: <span className="text-primary">1-800-FRESHEN</span>
+              Or Call Us:{" "}
+              <span className="text-primary">
+                {process.env.NEXT_PUBLIC_COMPANY_PHONE}
+              </span>
             </p>
           </div>
         </div>
@@ -37,6 +40,7 @@ export function CTA() {
               fill
               src={BeforeImage}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized
             />
           </div>
           <div className="aspect-square bg-muted/20 rounded-xl overflow-hidden relative">
@@ -46,6 +50,7 @@ export function CTA() {
               fill
               src={AfterImage}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized
             />
           </div>
 

@@ -1,6 +1,9 @@
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { CTA } from "@/components/CTA";
 import { generateLocationsListSeo } from "@/data/meta-data/locations-meta"; // Adjust path accordingly
 import { fetchStrapi } from "@/lib/strapi"; // Your fetch utility
 import { LocationPage } from "@/types";
+import Image from "next/image";
 
 // 1. Define Metadata for Next.js
 const getQuery = () => ({
@@ -50,11 +53,18 @@ export default async function LocationsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main className="container mx-auto py-12 px-6">
-        <h1 className="text-4xl font-bold mb-12 tracking-tight">
-          Our Service Areas
-        </h1>
-
+      <main className="container mx-auto py-12 px-6 max-w-7xl">
+        <Breadcrumbs className="my-4" />
+        <div className="max-w-5xl">
+          <h1 className="text-4xl font-bold tracking-tight">
+            Professional Upholstery Cleaning Services in Service Areas
+          </h1>
+          <h2 className="mb-12 mt-4">
+            Expert textile restoration for high-end homes and commercial
+            properties. Serving your neighborhood with certified, eco-friendly
+            deep cleaning and allergen extraction.
+          </h2>
+        </div>
         <div className="space-y-16">
           {Object.entries(groupedLocations).map(([state, regions]) => (
             <section key={state}>
@@ -68,17 +78,31 @@ export default async function LocationsPage() {
                     </h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {cities.map((loc) => (
-                        <a
-                          key={loc.slug}
-                          href={`/locations/${loc.slug}`}
-                          className="block p-5 rounded-2xl bg-muted/20 hover:bg-primary/10 transition-all border border-muted/20"
-                        >
-                          <span className="font-medium text-foreground">
-                            {loc.city_name}
-                          </span>
-                        </a>
-                      ))}
+                      {cities.map((loc) => {
+                        const img =
+                          (process.env.NEXT_PUBLIC_STRAPI_URL ||
+                            "https://cms.angaracleaning.com") +
+                            loc.og_image.formats?.thumbnail.url ||
+                          "images/og_image.webp";
+                        return (
+                          <div
+                            key={loc.slug}
+                            className="p-4 rounded-xl bg-primary/10 flex flex-col gap-4 justify-between"
+                          >
+                            <Image
+                              src={img}
+                              alt={loc.city_name}
+                              width={300}
+                              height={200}
+                            />
+                            <a href={`/locations/${loc.slug}`}>
+                              <span className="font-medium text-sm text-foreground">
+                                {loc.city_name}
+                              </span>
+                            </a>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -86,6 +110,9 @@ export default async function LocationsPage() {
             </section>
           ))}
         </div>
+        <section className="my-16 md:my-32">
+          <CTA />
+        </section>
       </main>
     </>
   );

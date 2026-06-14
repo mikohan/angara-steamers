@@ -18,7 +18,7 @@ export function NavbarClient({ navItems }: NavbarProps) {
   // Merge dynamic Strapi hubs with static pages
 
   const currentHub = safeNavData.find((hub) =>
-    pathname?.startsWith(`/${hub.slug}`),
+    pathname?.startsWith(`/services/${hub.slug}`),
   );
 
   return (
@@ -77,11 +77,11 @@ export function NavbarClient({ navItems }: NavbarProps) {
 
       {/* Dynamic Sub-menu */}
       {currentHub?.service_pages && currentHub.service_pages.length > 0 && (
-        <div className="hidden sm:flex border-t bg-background/50 px-6 py-2 gap-6 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+        <div className="hidden sm:flex sm:justify-end border-t border-t-primary/10 bg-background/50 px-8 py-2 gap-6 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
           {currentHub.service_pages.map((page) => (
             <Link
               key={page.slug}
-              href={`/${currentHub.slug}/${page.slug}`}
+              href={`/services/${currentHub.slug}/${page.slug}`}
               className="hover:text-primary transition-colors"
             >
               {page.title}

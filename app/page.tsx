@@ -1,6 +1,6 @@
 import { Team } from "@/components/oldComponents/Team";
 import { VideoReviews } from "@/components/oldComponents/VideoReviews";
-import { HeroImage } from "@/components/oldComponents/HeroImage";
+import { Hero } from "@/components/Hero";
 import { Testimonials } from "@/components/Testimonials";
 import { WhyUs } from "@/components/oldComponents/WhyUs";
 import GoogleMap from "@/components/GoogleMap";
@@ -9,8 +9,8 @@ import { WaveDivider } from "@/components/common/WaveDivider";
 export default function HomePage() {
   return (
     <div className="mx-auto">
-      <section>
-        <HeroImage />
+      <section className="px-4">
+        <Hero video={false} />
       </section>
 
       <section className="relative pt-32 pb-32">
@@ -24,7 +24,7 @@ export default function HomePage() {
       <section>
         <Team />
       </section>
-      <section className="py-32 mx-auto max-w-7xl">
+      <section className="py-32 mx-auto max-w-7xl px-4">
         <GoogleMap lat={33.9792} lng={-118.4138} zoom={14} />
       </section>
 

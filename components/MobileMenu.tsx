@@ -92,7 +92,7 @@ export function MobileMenu({
                 {activeHub.service_pages.map((page) => (
                   <SheetClose asChild key={page.slug}>
                     <Link
-                      href={`/${activeHub.slug}/${page.slug}`}
+                      href={`/services/${activeHub.slug}/${page.slug}`}
                       className="text-lg text-foreground/70 hover:text-primary transition-colors capitalize"
                     >
                       {page.title}

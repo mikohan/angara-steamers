@@ -1,3 +1,9 @@
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { CTA } from "@/components/CTA";
+import { LogoTicker } from "@/components/LogoTicker";
+import { Hero } from "@/components/Hero";
+import { ServiceGrid } from "@/components/ServiseGrid";
+import { Testimonials } from "@/components/Testimonials";
 import { generateHubSeo } from "@/data/meta-data/meta-services";
 import { fetchStrapi } from "@/lib/strapi";
 import { StrapiResponse, ServiceHub } from "@/types";
@@ -62,7 +68,7 @@ export default async function ServicesPage({
   // This acts as your "existence check"
   const getQuery = (pillar: string) => ({
     filters: { slug: { $eq: pillar } },
-    populate: ["service_pages"],
+    populate: ["service_pages", "service_pages.hero_image"],
   });
   const response: StrapiResponse<ServiceHub> = await fetchStrapi(
     "service-hubs",
@@ -74,6 +80,8 @@ export default async function ServicesPage({
     notFound();
   }
 
+  const servicesData = await response.data[0];
+
   const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/${pillar}`;
   const { jsonLd } = generateHubSeo(response, baseUrl);
 
@@ -83,44 +91,32 @@ export default async function ServicesPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main className="container mx-auto py-10">
-        <h1 className="text-4xl font-bold mb-8">
-          Our Upholstery Cleaning Services
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {response.data.map((hub) => (
-            <div
-              key={hub.slug}
-              className="p-6 border rounded-lg hover:shadow-lg transition-shadow"
-            >
-              {/* 1. Hub Section */}
-              <h2 className="text-2xl font-semibold mb-4 text-primary">
-                {hub.title}
-              </h2>
+      <main>
+        <section className="px-4 mx-auto max-w-7xl">
+          <Breadcrumbs className="my-4" removeSegments={["services"]} />
+          <Hero video />
+        </section>
 
-              {/* 2. Nested Service Pages Section */}
-              <ul className="space-y-2">
-                {hub.service_pages && hub.service_pages.length > 0 ? (
-                  hub.service_pages.map((service) => (
-                    <li key={service.slug}>
-                      <a
-                        href={`/${hub.slug}/${service.slug}`}
-                        className="text-sm text-gray-700 hover:text-primary hover:underline transition-colors"
-                      >
-                        {service.title}
-                      </a>
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-xs text-gray-400 italic">
-                    No services listed
-                  </li>
-                )}
-              </ul>
-            </div>
-          ))}
-        </div>
         <section>{/* <pre>{JSON.stringify(jsonLd, null, 2)}</pre> */}</section>
+        <section className="py-16 bg-primary/10 mb-16">
+          <LogoTicker />
+        </section>
+        <section className="px-4 max-w-7xl mx-auto mb-16">
+          {/* Pass the array directly to the Grid component */}
+          <h2 className="heading-h2 text-center py-8 md:py-16">
+            {servicesData.meta_title}
+          </h2>
+          <ServiceGrid
+            services={servicesData.service_pages}
+            parentSlug={pillar}
+          />
+        </section>
+        <section className="px-4 my-16 max-w-7xl mx-auto">
+          <Testimonials />
+        </section>
+        <section className="px-4 max-w-5xl mx-auto my-32">
+          <CTA />
+        </section>
       </main>
     </>
   );

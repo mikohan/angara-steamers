@@ -5,11 +5,12 @@ import { LoadingBar } from "@/components/common/LoadingBar";
 import { ThemeProvider } from "next-themes";
 import { SmoothScroll } from "@/components/common/SmoothScroll";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 import { fetchStrapi } from "@/lib/strapi";
 import { StrapiResponse, ServiceHub } from "@/types";
 import { NavbarClient } from "@/components/NavbarClient";
 import { Footer } from "@/components/common/Footer";
+import { STATIC_PAGES } from "@/data/links";
+import ScrollToTop from "@/components/common/ScrollToTop";
 
 const GTM = process.env.NEXT_PUBLIC_GTM || "GTM-TJF7Q4JF";
 
@@ -47,10 +48,10 @@ export default function RootLayout({
         <LoadingBar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SmoothScroll>
-            <NavbarClient navItems={navData.data} />
-            <Breadcrumbs />
+            <NavbarClient staticItems={STATIC_PAGES} navItems={navData.data} />
             <main className="flex-1">{children}</main>
             <Footer navItems={navData.data} />
+            <ScrollToTop />
           </SmoothScroll>
         </ThemeProvider>
         <div id="portal-root"></div>

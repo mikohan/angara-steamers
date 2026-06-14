@@ -1,5 +1,6 @@
 import { VideoCopmpnent } from "@/types";
 import { cn } from "@/lib/utils";
+import Poster from "@/public/vasya_rug.webp";
 
 export function VideoComponent({
   source,
@@ -13,7 +14,6 @@ export function VideoComponent({
   return (
     <video
       // Pass src directly for better reactivity
-      src={source}
       width={width}
       height={height}
       controls
@@ -23,7 +23,9 @@ export function VideoComponent({
       muted={muted}
       className={cn("rounded-2xl w-full h-full object-cover", className)}
       playsInline
+      poster={Poster.src}
     >
+      <source type="video/mp4" src={source} />
       <track kind="subtitles" srcLang="en" label="English" />
       Your browser does not support the video tag.
     </video>
