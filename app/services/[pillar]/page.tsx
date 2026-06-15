@@ -8,6 +8,7 @@ import { generateHubSeo } from "@/data/meta-data/meta-services";
 import { fetchStrapi } from "@/lib/strapi";
 import { StrapiResponse, ServiceHub } from "@/types";
 import { notFound } from "next/navigation";
+import { WaveDivider } from "@/components/common/WaveDivider";
 
 interface PageProps {
   params: { pillar: string };
@@ -101,15 +102,19 @@ export default async function ServicesPage({
         <section className="py-16 bg-primary/10 mb-16">
           <LogoTicker />
         </section>
-        <section className="px-4 max-w-7xl mx-auto mb-16">
-          {/* Pass the array directly to the Grid component */}
-          <h2 className="heading-h2 text-center py-8 md:py-16">
-            {servicesData.meta_title}
-          </h2>
-          <ServiceGrid
-            services={servicesData.service_pages}
-            parentSlug={pillar}
-          />
+        <section className="relative">
+          <div className="absolute bottom-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-background to-primary/10"></div>
+          <WaveDivider position="bottom" fill="var(--color-background)" />
+          <div className="px-4 max-w-7xl mx-auto mb-16 pb-32">
+            {/* Pass the array directly to the Grid component */}
+            <h2 className="heading-h2 text-center py-8 md:py-16">
+              {servicesData.meta_title}
+            </h2>
+            <ServiceGrid
+              services={servicesData.service_pages}
+              parentSlug={pillar}
+            />
+          </div>
         </section>
         <section className="px-4 my-16 max-w-7xl mx-auto">
           <Testimonials />
