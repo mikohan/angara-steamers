@@ -19,14 +19,18 @@ import { cn } from "@/lib/utils";
 interface IProps {
   className?: string;
   header?: string;
+  subheader?: string;
   heroImage?: string;
   video: boolean;
 }
-function Hero({ header, className, heroImage, video }: IProps) {
+function Hero({ header, className, heroImage, video, subheader }: IProps) {
   const h1 = header
     ? header
     : "Couch and Upholstery Professional Steam Cleaning in LA";
   const heroImageUrl = heroImage ? heroImage : MyImage.src;
+  const h2 = subheader
+    ? subheader
+    : "We restore freshness, remove odors, and save your furniture time & money. Professional, safe, fast.";
   return (
     <section
       className={cn(
@@ -47,8 +51,7 @@ function Hero({ header, className, heroImage, video }: IProps) {
             </h1>
 
             <p className="md:text-left text-lg md:text-xl text-muted-foreground mt-4 md:mt-8">
-              We restore freshness, remove odors, and save your furniture time &
-              money. Professional, safe, fast.
+              {h2}
             </p>
 
             <div className="w-full flex flex-col md:flex-row gap-8 mt-12 md:mt-12 justify-center">

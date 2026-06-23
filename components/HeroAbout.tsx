@@ -1,9 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
+import { VideoComponent } from "./oldComponents/VideoComponent";
+import MeVasya from "@/public/images/me_vasya.webp";
 
-export function Hero() {
+interface IHeroAbout {
+  video?: string;
+  poster?: string;
+  header?: string;
+  subheader?: string;
+}
+
+export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
+  const src = video ? video : "/oldMedia/videos/LandPage1.mp4";
+  const posterImg = poster ? poster : MeVasya.src;
+
   return (
     <section className="relative overflow-hidden bg-background py-20 lg:py-32">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row">
@@ -14,11 +27,14 @@ export function Hero() {
           transition={{ duration: 0.5 }}
           className="relative w-full lg:w-1/2"
         >
-          <div className="aspect-[4/3] w-full rounded-3xl bg-muted/20 shadow-2xl flex items-center justify-center border border-muted/20">
+          <div className="aspect-4/5 w-full rounded-2xl bg-muted/20 shadow-2xl flex items-center justify-center border border-muted/20">
             {/* Replace this div with your Image component later */}
-            <span className="text-muted font-medium">
-              Upholstery Cleaning Preview
-            </span>
+            <VideoComponent
+              source={src}
+              width="1080"
+              height="1350"
+              poster={posterImg}
+            />
           </div>
 
           {/* Social Proof Badge (Floating) */}
@@ -31,7 +47,7 @@ export function Hero() {
             <p className="text-sm font-semibold text-foreground">
               ⭐ Rated 4.9/5
             </p>
-            <p className="text-xs text-muted">Over 500+ couches cleaned</p>
+            <p className="text-xs text-muted">Over 5000+ couches cleaned</p>
           </motion.div>
         </motion.div>
 
@@ -42,15 +58,25 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
-              Professional <span className="text-primary">Steam Cleaning</span>{" "}
-              for Your Home
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Angara Streamers uses advanced steam technology to lift stains,
-              allergens, and odors. Restore your furniture to its original glory
-              without harsh chemicals.
-            </p>
+            {header ? (
+              <h1>{header}</h1>
+            ) : (
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+                Professional{" "}
+                <span className="text-primary">Steam Cleaning</span> for Your
+                Home
+              </h1>
+            )}
+
+            {subheader ? (
+              <p className="mt-4 text-lg text-muted-foreground">{subheader}</p>
+            ) : (
+              <p className="mt-4 text-lg text-muted-foreground">
+                Angara Streamers uses advanced steam technology to lift stains,
+                allergens, and odors. Restore your furniture to its original
+                glory without harsh chemicals.
+              </p>
+            )}
           </motion.div>
 
           <motion.div

@@ -59,7 +59,7 @@ export function MobileMenu({
               <SheetClose asChild key={item.slug}>
                 <Link
                   href={`/services/${item.slug}`}
-                  className="text-3xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
+                  className="text-2xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
                 >
                   {item.title}
                 </Link>
@@ -69,7 +69,7 @@ export function MobileMenu({
               <SheetClose asChild key={item.slug}>
                 <Link
                   href={`/${item.slug}`}
-                  className="text-3xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
+                  className="text-2xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
                 >
                   {item.title}
                 </Link>

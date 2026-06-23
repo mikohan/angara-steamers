@@ -8,6 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-price-green: var(--price-green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -22,6 +23,7 @@
     --primary: oklch(57% 0.145 var(--base-hue));
     --primary-800: oklch(43% 0.103 var(--base-hue));
     --muted: oklch(45% 0.02 var(--base-hue));
+    --price-green: oklch(0.579 0.179 145);
   }
 
   .dark {
@@ -30,6 +32,7 @@
     --primary: oklch(65% 0.16 var(--base-hue));
     --primary-800: oklch(86% 0.052 var(--base-hue));
     --muted: oklch(70% 0.02 var(--base-hue));
+    --price-green: oklch(0.579 0.179 145);
   }
 }
 @layer components {

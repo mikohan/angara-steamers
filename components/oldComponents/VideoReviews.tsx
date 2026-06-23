@@ -18,28 +18,28 @@ export const VideoReviews = () => {
             Helped 1000+ families - fast, safe, professional
           </h3>
           {/* Common container */}
-          <div className="flex flex-col md:flex-row gap-8 pt-16">
-            <div className="md:max-w-[33%]">
+          <div className="flex flex-col md:flex-row gap-8 pt-16 justify-center">
+            <div className="md:max-w-[23%]">
               <VideoComponentTestimonials
-                source="oldMedia/videos/test1.mp4"
+                source="/oldMedia/videos/test1.mp4"
                 autoPlay={false}
                 muted={false}
                 poster={Test1Poster.src}
               />
             </div>
 
-            <div className="md:max-w-[33%]">
+            <div className="md:max-w-[23%]">
               <VideoComponentTestimonials
                 loop={false}
-                source="oldMedia/videos/test2.mp4"
+                source="/oldMedia/videos/test2.mp4"
                 autoPlay={false}
                 muted={false}
                 poster={Test2Poster.src}
               />
             </div>
-            <div className="md:max-w-[33%]">
+            <div className="md:max-w-[23%]">
               <VideoComponentTestimonials
-                source="oldMedia/videos/test3.mp4"
+                source="/oldMedia/videos/test3.mp4"
                 autoPlay={false}
                 muted={false}
                 poster={Test3Poster.src}

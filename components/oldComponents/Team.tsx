@@ -2,7 +2,7 @@ import Image from "next/image";
 import MeVasyaImage from "@/public/oldMedia/couch/me-vasya-bottom.png";
 
 export const Team = () => (
-  <section className="bg-gradient mt-16">
+  <section className="bg-gradient mt-16 max-w-5xl mx-auto">
     <div className="px-6 container mx-auto">
       <div className="flex flex-col justify-center items-center">
         <h2 className="heading-h2 mt-8 text-center">Our Team</h2>

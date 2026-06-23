@@ -9,14 +9,14 @@ interface FooterProps {
 
 export function Footer({ navItems }: FooterProps) {
   return (
-    <footer className="relative py-12 md:py-32 px-12 md:px-4">
+    <footer className="relative pt-16 md:pt-32 px-12 md:px-4">
       <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/20 to-background"></div>
       <WaveDivider position="top" fill="var(--color-background)" />
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-12">
         {/* Branding - Full width on mobile */}
         <div className="flex flex-col gap-3">
           <h2 className="font-bold text-xl tracking-tight">Angara Steamers</h2>
-          <p className="text-md text-background/60 leading-relaxed max-w-xs">
+          <p className="text-md text-primary leading-relaxed max-w-xs">
             Premium upholstery and carpet cleaning services in Los Angeles.
           </p>
         </div>
@@ -54,6 +54,12 @@ export function Footer({ navItems }: FooterProps) {
                 {link.title}
               </Link>
             ))}
+            <Link
+              href="/policy"
+              className="py-1 hover:text-primary transition-colors text-lg md:text-base font-semibold text-primary-800"
+            >
+              Privacy Policy
+            </Link>
           </nav>
         </div>
       </div>

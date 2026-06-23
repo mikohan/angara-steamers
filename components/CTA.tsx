@@ -1,63 +1,142 @@
+"use client";
+import { useState } from "react";
 import Image from "next/image";
-import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { submitQuoteRequest } from "@/app/api/email/actions";
 import BeforeImage from "@/public/images/before1.webp";
 import AfterImage from "@/public/images/after1.webp";
 
-export function CTA() {
-  return (
-    <section className="px-4 md:px-8 bg-primary/10 rounded-2xl p-8">
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-        {/* Left Side: Text & Conversion */}
-        <div className="flex-1 flex flex-col gap-6">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Is your couch looking TIRED?
-          </h2>
-          <p className="text-xl text-muted">
-            We’ll make it look <strong>brand new again!</strong> Instantly
-            restore vibrancy, freshness, and comfort to your favorite furniture.
-            Eco-friendly cleaning you can trust.
-          </p>
+export function CTA({ className }: { className?: string }) {
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [phone, setPhone] = useState("");
 
-          <div className="flex flex-col gap-3 mt-4">
-            <button className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-transform active:scale-95">
-              GET A FREE QUOTE TODAY!
-            </button>
-            <p className="text-center text-muted font-medium">
-              Or Call Us:{" "}
-              <span className="text-primary">
-                {process.env.NEXT_PUBLIC_COMPANY_PHONE}
-              </span>
-            </p>
-          </div>
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 10) value = value.slice(0, 10);
+    if (value.length > 6)
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+    else if (value.length > 3)
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    else if (value.length > 0) value = `(${value}`;
+    setPhone(value);
+  };
+
+  const handleSubmit = async (formData: FormData) => {
+    setStatus("loading");
+    const result = await submitQuoteRequest(formData);
+    if (result.success) {
+      setStatus("success");
+    } else {
+      setStatus("idle");
+      alert("Submission failed. Please try again.");
+    }
+  };
+
+  return (
+    <section
+      className={cn("px-4 md:px-8 bg-primary/10 rounded-2xl p-8", className)}
+    >
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+        {/* Left Side: Animated Form/Success Content */}
+        <div className="flex-1 w-full min-h-[400px] flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {status === "success" ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center text-center"
+              >
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-lg"
+                >
+                  <motion.svg
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="w-12 h-12 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={4}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </motion.svg>
+                </motion.div>
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-2xl font-bold text-foreground"
+                >
+                  Your request sent!
+                </motion.h3>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form"
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full flex flex-col gap-6"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+                  Is your couch looking TIRED?
+                </h2>
+                <p className="text-xl text-muted">
+                  We’ll make it look <strong>brand new again!</strong>
+                </p>
+
+                <form
+                  action={handleSubmit}
+                  className="flex flex-col gap-3 mt-4"
+                >
+                  <input
+                    name="name"
+                    placeholder="Your Name"
+                    required
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
+                  />
+                  <input
+                    name="phone"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    placeholder="(xxx) xxx-xxxx"
+                    required
+                    minLength={14}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-transform active:scale-95 disabled:opacity-50"
+                  >
+                    {status === "loading"
+                      ? "SENDING..."
+                      : "GET A FREE QUOTE TODAY!"}
+                  </button>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Right Side: Visual Proof */}
-        <div className="flex-1 w-full grid grid-cols-2 gap-4">
-          <div className="aspect-square bg-muted/20 rounded-xl overflow-hidden relative">
-            {/* Replace with your 'Before' image */}
+        {/* Right Side: Image Stays Put */}
+        <div className="w-full flex-1">
+          <div className="max-w-175 aspect-square rounded-xl overflow-hidden relative">
             <Image
               alt="Before"
               fill
               src={BeforeImage}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
               unoptimized
             />
           </div>
-          <div className="aspect-square bg-muted/20 rounded-xl overflow-hidden relative">
-            {/* Replace with your 'After' image */}
-            <Image
-              alt="After"
-              fill
-              src={AfterImage}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              unoptimized
-            />
-          </div>
-
-          {/* Optional: Person Image overlay or caption */}
-          {/* <div className="col-span-2 h-48 bg-muted/20 rounded-xl flex items-center justify-center">
-            <span className="text-muted">Friendly Staff Image Placeholder</span>
-          </div> */}
         </div>
       </div>
     </section>

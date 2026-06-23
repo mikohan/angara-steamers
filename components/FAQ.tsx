@@ -86,8 +86,8 @@ export default function FAQ({
               <h2 className="text-3xl font-extrabold leading-[1.15] tracking-tight text-foreground sm:text-4xl">
                 {serviceName
                   ? `${serviceName} `
-                  : `Cleaning Services in ${cityName} `}
-                <span className="block bg-gradient-to-r from-primary to-primary-800 bg-clip-text text-transparent">
+                  : `Cleaning Services ${cityName ? "in " + cityName : ""} `}
+                <span className="block bg-linear-to-r from-primary to-primary-800 bg-clip-text text-transparent">
                   What You Need to Know
                 </span>
               </h2>
@@ -113,14 +113,14 @@ export default function FAQ({
                 >
                   <AccordionItem
                     value={`item-${index}`}
-                    className="group rounded-2xl border border-muted/20 bg-background px-6 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.02)] transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_24px_-10px_rgba(0,0,0,0.04)] data-[state=open]:border-primary data-[state=open]:shadow-[0_12px_32px_-8px_rgba(var(--primary),0.08)]"
+                    className="group rounded-2xl border border-primary/20 bg-background px-6 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.02)] transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_24px_-10px_rgba(0,0,0,0.04)] data-[state=open]:border-primary data-[state=open]:shadow-[0_12px_32px_-8px_rgba(var(--primary),0.08)]"
                   >
                     <AccordionTrigger className="py-5 text-left text-base font-semibold tracking-tight text-foreground transition-colors duration-200 hover:text-primary hover:no-underline md:text-lg">
                       {faq.question}
                     </AccordionTrigger>
 
                     <AccordionContent className="pb-6 text-sm leading-relaxed text-muted whitespace-pre-line sm:text-base">
-                      <div className="border-t border-muted/10 pt-4">
+                      <div className="border-t border-primary/10 pt-4">
                         {renderAnswer(faq.answer)}
                       </div>
                     </AccordionContent>

@@ -8,3 +8,4 @@ export * from "./state";
 export * from "./navbar";
 export * from "./videoComponent";
 export * from "./testimonials";
+export * from "./prices";

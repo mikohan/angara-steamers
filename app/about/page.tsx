@@ -1,57 +1,33 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Hero } from "@/components/sections/Hero";
+import { HeroAbout } from "@/components/HeroAbout";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import MeVasya from "@/public/images/me_vasya.webp";
+import { Problem } from "@/components/Problem";
+import { VideoReviews } from "@/components/oldComponents/VideoReviews";
+import { SectionWrapper } from "@/components/common/SectionWrapper";
+import { Prices } from "@/components/Prices";
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-20 space-y-20">
-      <Breadcrumbs />
-      <Hero />
-      <section className="space-y-6">
-        <Link href="/" className="text-2xl font-bold">
-          Angara
-        </Link>
-        <h1 className="text-6xl font-bold">Our Story</h1>
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          Angara Steamers started with a simple mission: deliver the
-          highest-quality upholstery cleaning service in Los Angeles. Today, we
-          serve hundreds of homes every month with unmatched precision and care.
-        </p>
-        <Image
-          alt="sls"
-          width={500}
-          height={600}
-          src="/vasya_rug.webp"
-          className="w-full rounded-3xl shadow-lg"
+    <main>
+      <div className="mx-auto max-w-7xl px-4 md:px-0">
+        <Breadcrumbs />
+        <HeroAbout
+          video="/oldMedia/videos/LandPage1.mp4"
+          poster={MeVasya.src}
         />
-      </section>
+      </div>
+      <SectionWrapper>
+        <section>
+          <Problem />
+        </section>
+      </SectionWrapper>
 
-      <section className="grid md:grid-cols-2 gap-12">
-        <div className="space-y-4">
-          <h2 className="text-4xl font-semibold">Local Expertise</h2>
-          <p className="text-muted-foreground text-lg">
-            Our team understands the unique climate and fabric challenges in LA
-            homes. From microfiber to velvet, we know how to treat each material
-            safely.
-          </p>
-        </div>
-
-        <Image
-          alt="sls"
-          width={500}
-          height={600}
-          src="/vasya_rug.webp"
-          className="w-full rounded-3xl shadow-lg"
-        />
+      <section className="pb-16">
+        <VideoReviews />
       </section>
-
-      <section className="space-y-4">
-        <h2 className="text-4xl font-semibold">Our Values</h2>
-        <p className="text-muted-foreground text-lg">
-          Quality, transparency, and customer satisfaction. Every technician is
-          trained to deliver consistent results with zero shortcuts.
-        </p>
+      <section>
+        <Prices />
       </section>
-    </div>
+    </main>
   );
 }

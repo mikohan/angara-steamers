@@ -44,12 +44,12 @@ export function NavbarClient({ navItems }: NavbarProps) {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden sm:flex items-center gap-6 text-sm font-medium">
+        <nav className="hidden sm:flex items-center gap-6 font-medium">
           {safeNavData.map((item) => (
             <Link
               key={item.slug}
               href={`/services/${item.slug}`}
-              className="hover:text-primary transition-colors text-lg"
+              className="relative transition-all duration-300 hover:text-primary after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full hover:scale-105 text-primary-800"
             >
               {item.title}
             </Link>
@@ -58,12 +58,12 @@ export function NavbarClient({ navItems }: NavbarProps) {
             <Link
               key={item.slug}
               href={`/${item.slug}`}
-              className="hover:text-primary transition-colors text-lg"
+              className="relative transition-all duration-300 hover:text-primary after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full hover:scale-105 text-primary-800"
             >
               {item.title}
             </Link>
           ))}
-          <div className="pl-2 border-l border-muted/20">
+          <div className="pl-2 border-l border-primary/20 text-primary-800">
             <ThemeToggle />
           </div>
         </nav>
@@ -77,12 +77,12 @@ export function NavbarClient({ navItems }: NavbarProps) {
 
       {/* Dynamic Sub-menu */}
       {currentHub?.service_pages && currentHub.service_pages.length > 0 && (
-        <div className="hidden sm:flex sm:justify-end border-t border-t-primary/10 bg-background/50 px-8 py-2 gap-6 text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+        <div className="hidden sm:flex sm:justify-end bg-background/50 px-8 py-2 gap-6 text-xs tracking-tight font-semibold text-muted">
           {currentHub.service_pages.map((page) => (
             <Link
               key={page.slug}
               href={`/services/${currentHub.slug}/${page.slug}`}
-              className="hover:text-primary transition-colors"
+              className="transition-all duration-300 hover:text-primary after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full hover:scale-105"
             >
               {page.title}
             </Link>

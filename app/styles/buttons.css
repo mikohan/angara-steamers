@@ -1,0 +1,87 @@
+.radial-gradient {
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(250, 250, 250, 0.05) 0%,
+      transparent 60%
+    ),
+    rgba(0, 11, 238, 0.7);
+}
+.linear-mask {
+  /* Reducing the range (e.g., from 30% to 10%) makes the streak thinner */
+  mask-image: linear-gradient(
+    -75deg,
+    white calc(var(--x) + 5%),
+    /* Was 20% */ transparent calc(var(--x) + 10%),
+    /* Was 30% */ white calc(var(--x) + 15%) /* Was 100% */
+  );
+}
+.linear-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    -75deg,
+    rgba(255, 255, 255, 0.1) calc(var(--x) + 10%),
+    rgba(255, 255, 255, 0.6) calc(var(--x) + 15%),
+    /* The peak brightness */ rgba(255, 255, 255, 0.1) calc(var(--x) + 30%)
+  );
+  /* Use explicit properties instead of the shorthand 'mask' if it's failing */
+  mask-image: linear-gradient(black, black);
+  -webkit-mask-image: linear-gradient(black, black);
+}
+
+/* 1. The Border Layer (The glow/gradient) */
+.box {
+  position: relative;
+  width: 300px;
+  height: 400px;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.box::after {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background-image: conic-gradient(
+    transparent,
+    transparent,
+    transparent,
+    #d400d4
+  );
+  animation: animate 4s linear infinite;
+  animation-delay: -2s; /* This creates the offset movement */
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: conic-gradient(transparent, transparent, transparent, #00cfff);
+  animation: animate 4s linear infinite;
+}
+
+@keyframes animate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.box span {
+  position: absolute;
+  inset: 5px; /* Creates the border gap */
+  background: #0c1022; /* Background color of your card */
+  border-radius: 16px;
+  z-index: 1;
+}

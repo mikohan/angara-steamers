@@ -10,6 +10,7 @@ export function VideoComponent({
   width = "720",
   height = "1280", // Fixed typo here
   className,
+  poster = Poster.src,
 }: VideoCopmpnent) {
   return (
     <video
@@ -23,7 +24,7 @@ export function VideoComponent({
       muted={muted}
       className={cn("rounded-2xl w-full h-full object-cover", className)}
       playsInline
-      poster={Poster.src}
+      poster={poster}
     >
       <source type="video/mp4" src={source} />
       <track kind="subtitles" srcLang="en" label="English" />

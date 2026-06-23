@@ -1,4 +1,5 @@
 import type { StrapiBase, StrapiMedia, ServiceFaq } from "./common";
+import { Project } from "./project";
 import type { ServiceHub } from "./service-hub";
 
 // ===============================
@@ -27,4 +28,5 @@ export interface ServicePage extends StrapiBase {
   og_image: StrapiMedia; // required single image
 
   service_hub?: ServiceHub | null; // many-to-one
+  projects?: Project[];
 }

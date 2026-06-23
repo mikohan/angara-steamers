@@ -5,6 +5,8 @@ import { Testimonials } from "@/components/Testimonials";
 import { WhyUs } from "@/components/oldComponents/WhyUs";
 import GoogleMap from "@/components/GoogleMap";
 import { WaveDivider } from "@/components/common/WaveDivider";
+import SafeShampoos from "@/components/SafeShampoos";
+import { SectionWrapper } from "@/components/common/SectionWrapper";
 
 export default function HomePage() {
   return (
@@ -31,7 +33,10 @@ export default function HomePage() {
       <section className="space-y-4">
         <WhyUs />
       </section>
-      <section>
+      <SectionWrapper>
+        <SafeShampoos />
+      </SectionWrapper>
+      <section className="mb-16">
         <VideoReviews />
       </section>
     </div>

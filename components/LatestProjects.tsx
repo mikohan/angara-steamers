@@ -9,8 +9,8 @@ import { Project } from "@/types";
 
 interface LatestProjectsProps {
   projects: Project[];
-  cityName: string;
-  locationSlug: string;
+  cityName?: string;
+  locationSlug?: string;
 }
 
 export function LatestProjects({
@@ -52,7 +52,7 @@ export function LatestProjects({
         </div>
 
         {/* Premium Grid Canvas */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-4">
           {projects.map((project, index) => {
             // Securely grab the first image out of the media gallery as your thumbnail
             const thumbnailMedia = project.media_gallery?.[0];

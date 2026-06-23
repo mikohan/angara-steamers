@@ -12,8 +12,8 @@ export function VideoComponentTestimonials({
   autoPlay = true,
   loop = true,
   muted = true,
-  width = "720",
-  height = "1280",
+  width = "504",
+  height = "896",
   poster,
 }: VideoCopmpnent) {
   const vid = useRef<HTMLVideoElement>(null);
@@ -46,7 +46,7 @@ export function VideoComponentTestimonials({
         autoPlay={autoPlay}
         loop={loop}
         muted={muted}
-        className="rounded-2xl"
+        className="rounded-2xl w-full h-auto"
         poster={poster}
         playsInline
         onPlay={() => setIsPlaying(true)} // Sync state when video starts
