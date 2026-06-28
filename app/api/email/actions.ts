@@ -1,17 +1,36 @@
 "use server";
-import { sendEmail } from "@/lib/email";
+
+import { headers } from "next/headers";
+import { sendMyEmail } from "@/lib/email";
 
 export async function submitQuoteRequest(formData: FormData) {
   const name = formData.get("name") as string;
   const phone = formData.get("phone") as string;
+  const eventId = formData.get("eventId") as string;
 
-  // Simple server-side validation
-  if (!name || !phone) return { success: false, error: "Missing fields" };
+  // Update this in actions.ts
+  const headerList = await headers();
+  const forwarded = headerList.get("x-forwarded-for");
+  // Split by comma and take the first item, default to 127.0.0.1
+  // const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+  const ip = "164.68.240.80";
+  const ua = headerList.get("user-agent") ?? "unknown";
 
-  await sendEmail(
-    undefined,
-    "New Quote Request",
-    `<p><strong>Name:</strong> ${name}</p><p><strong>Phone:</strong> ${phone}</p>`,
+  const result = await sendMyEmail(
+    "New Lead - Angara Steamers",
+    `Name: ${name}, Phone: ${phone}`,
+    {
+      eventName: "Lead",
+      eventId,
+      value: 0,
+      user: {
+        phone,
+        firstName: name,
+        clientIpAddress: ip,
+        clientUserAgent: ua,
+      },
+    },
   );
-  return { success: true };
+
+  return result;
 }

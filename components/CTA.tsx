@@ -1,17 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { submitQuoteRequest } from "@/app/api/email/actions";
 import BeforeImage from "@/public/images/before1.webp";
-import AfterImage from "@/public/images/after1.webp";
+
+// Extend the window object for Facebook Pixel
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+  }
+}
 
 export function CTA({ className }: { className?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [phone, setPhone] = useState("");
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
     if (value.length > 10) value = value.slice(0, 10);
     if (value.length > 6)
@@ -24,7 +30,28 @@ export function CTA({ className }: { className?: string }) {
 
   const handleSubmit = async (formData: FormData) => {
     setStatus("loading");
+
+    // Generate the eventId at the start so it is identical for both browser and server
+    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+    // Append to FormData so the Server Action receives it
+    formData.append("eventId", eventId);
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "form_submitted",
+      // These keys MUST match the "Data Layer Variable Name" in GTM
+      event_id: eventId, // Matches 'dlv - event_id'
+      estimated_value: 0, // Matches 'dlv - estimated_value'
+    });
+
+    console.log("DEBUG: Pushed to DataLayer:", {
+      event_id: eventId,
+      estimated_value: 180,
+    });
+
     const result = await submitQuoteRequest(formData);
+
     if (result.success) {
       setStatus("success");
     } else {
@@ -38,7 +65,6 @@ export function CTA({ className }: { className?: string }) {
       className={cn("px-4 md:px-8 bg-primary/10 rounded-2xl p-8", className)}
     >
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-        {/* Left Side: Animated Form/Success Content */}
         <div className="flex-1 w-full min-h-[400px] flex items-center justify-center">
           <AnimatePresence mode="wait">
             {status === "success" ? (
@@ -56,7 +82,6 @@ export function CTA({ className }: { className?: string }) {
                   <motion.svg
                     initial={{ pathLength: 0 }}
                     animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
                     className="w-12 h-12 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -91,7 +116,6 @@ export function CTA({ className }: { className?: string }) {
                 <p className="text-xl text-muted">
                   We’ll make it look <strong>brand new again!</strong>
                 </p>
-
                 <form
                   action={handleSubmit}
                   className="flex flex-col gap-3 mt-4"
@@ -125,8 +149,6 @@ export function CTA({ className }: { className?: string }) {
             )}
           </AnimatePresence>
         </div>
-
-        {/* Right Side: Image Stays Put */}
         <div className="w-full flex-1">
           <div className="max-w-175 aspect-square rounded-xl overflow-hidden relative">
             <Image
