@@ -86,7 +86,7 @@ export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
             transition={{ delay: 0.4 }}
           >
             <Link
-              href="/upholstery"
+              href="/services/upholstery"
               className="rounded-full bg-primary px-8 py-3 text-white font-medium touch-feedback hover:opacity-90"
             >
               Book Now

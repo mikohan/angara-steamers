@@ -42,10 +42,10 @@ The content is organized as follows:
 <directory_structure>
 .gitignore
 AGENTS.md
+api/checkout/route.ts
+api/email/actions.ts
+api/webhooks/stripe/route.ts
 app/about/page.tsx
-app/api/checkout/route.ts
-app/api/email/actions.ts
-app/api/webhooks/stripe/route.ts
 app/cart/page.tsx
 app/contact/page.tsx
 app/favicon.ico
@@ -109,6 +109,7 @@ components/Problem.tsx
 components/ProcessSmall.tsx
 components/ProjectImage.tsx
 components/ProjectVideo.tsx
+components/QuoteDialog.tsx
 components/SafeShampoos.tsx
 components/ServiceServiceLinks.tsx
 components/ServiseGrid.tsx
@@ -145,7 +146,7 @@ lib/meta-mapper.ts
 lib/navbar-helpers.ts
 lib/strapi.ts
 lib/utils.ts
-next-sitemap.js
+next-sitemap.config.js
 next.config.ts
 package.json
 pnpm-workspace.yaml
@@ -290,7 +291,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- END:nextjs-agent-rules -->
 </file>
 
-<file path="app/api/checkout/route.ts">
+<file path="api/checkout/route.ts">
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 interface CartItem {
@@ -300,7 +301,7 @@ interface CartItem {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-05-27.dahlia",
+  apiVersion: "2026-06-24.dahlia",
 });
 
 export async function POST(req: Request) {
@@ -334,14 +335,53 @@ export async function POST(req: Request) {
 }
 </file>
 
-<file path="app/api/webhooks/stripe/route.ts">
+<file path="api/email/actions.ts">
+"use server";
+
+import { headers } from "next/headers";
+import { sendEmail } from "@/lib/email";
+
+export async function submitQuoteRequest(formData: FormData) {
+  const name = formData.get("name") as string;
+  const phone = formData.get("phone") as string;
+  const eventId = formData.get("eventId") as string;
+
+  // Update this in actions.ts
+  const headerList = await headers();
+  const forwarded = headerList.get("x-forwarded-for");
+  // Split by comma and take the first item, default to 127.0.0.1
+  const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+  // const ip = "164.68.240.80";
+  const ua = headerList.get("user-agent") ?? "unknown";
+
+  const result = await sendEmail(
+    "New Lead - Angara Steamers",
+    `Name: ${name}, Phone: ${phone}`,
+    {
+      eventName: "Lead",
+      eventId,
+      value: 0,
+      user: {
+        phone,
+        firstName: name,
+        clientIpAddress: ip,
+        clientUserAgent: ua,
+      },
+    },
+  );
+
+  return result;
+}
+</file>
+
+<file path="api/webhooks/stripe/route.ts">
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
 
 // Initialize Stripe with the secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-05-27.dahlia",
+  apiVersion: "2026-06-24.dahlia",
 });
 
 export async function POST(req: Request) {
@@ -389,9 +429,11 @@ export async function POST(req: Request) {
     `;
 
     await sendEmail(
-      to_email, // Replace with actual email
-      "New Booking Angara Steamers",
-      emailBody,
+      "New Booking Angara Steamers", // subject
+      emailBody, // html
+      undefined, // meta (not needed here)
+      undefined, // to (uses default env var)
+      undefined, // from (uses default env var)
     );
   }
 
@@ -1262,84 +1304,6 @@ export const BorderLightButton = ({ className }: BorderLightButtonProps) => {
 };
 </file>
 
-<file path="components/common/ButtonShiny.tsx">
-"use client";
-import { motion, HTMLMotionProps, TargetAndTransition } from "framer-motion";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
-
-const shinyButtonVariants = cva(
-  "radial-gradient relative overflow-hidden transition-shadow focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-  {
-    variants: {
-      size: {
-        sm: "rounded-lg px-4 py-2 text-sm",
-        md: "rounded-xl px-6 py-3 text-base",
-        lg: "rounded-2xl px-8 py-4 text-xl",
-        xl: "rounded-3xl px-10 py-5 text-2xl",
-        icon: "flex h-10 w-10 items-center justify-center rounded-md",
-      },
-    },
-    defaultVariants: {
-      size: "lg",
-    },
-  },
-);
-
-interface Props
-  extends HTMLMotionProps<"div">, VariantProps<typeof shinyButtonVariants> {
-  text?: string;
-  // Pass any CSS color (hex, rgb, or tailwind variable)
-  bgColor?: string;
-}
-
-export const ButtonShiny = ({
-  text,
-  className,
-  size = "xl",
-  bgColor = "var(--color-primary)", // Default Playa Cleaning Blue
-  style,
-  ...props
-}: Props) => {
-  return (
-    <motion.div
-      // Merge CVA with custom classes
-      className={cn(
-        shinyButtonVariants({ size }),
-        "font-semibold text-center",
-        className,
-      )}
-      // Use inline styles to inject the dynamic color
-      style={
-        {
-          backgroundColor: bgColor,
-          ...style,
-        } as React.CSSProperties
-      }
-      initial={{ "--x": "100%" } as TargetAndTransition}
-      animate={{ "--x": "-100%" } as TargetAndTransition}
-      whileTap={{ scale: 0.95 }}
-      transition={{
-        repeat: Infinity,
-        repeatType: "loop",
-        repeatDelay: 1,
-        type: "spring",
-        stiffness: 20,
-        damping: 15,
-        mass: 2,
-      }}
-      {...props}
-    >
-      <span className="linear-mask relative z-10 block h-full w-full cursor-pointer tracking-wide text-white">
-        {text ? text : "Book now"}
-      </span>
-      {/* Overlay for the shimmer effect */}
-      <span className="linear-overlay pointer-events-none absolute inset-0 block rounded-[inherit]"></span>
-    </motion.div>
-  );
-};
-</file>
-
 <file path="components/common/LoadingBar.tsx">
 "use client";
 
@@ -1648,114 +1612,6 @@ export function GalleryGrid({ children }: { children: React.ReactNode }) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
       {children}
     </div>
-  );
-}
-</file>
-
-<file path="components/HeroAbout.tsx">
-"use client";
-
-import { motion } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { VideoComponent } from "./oldComponents/VideoComponent";
-import MeVasya from "@/public/images/me_vasya.webp";
-
-interface IHeroAbout {
-  video?: string;
-  poster?: string;
-  header?: string;
-  subheader?: string;
-}
-
-export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
-  const src = video ? video : "/oldMedia/videos/LandPage1.mp4";
-  const posterImg = poster ? poster : MeVasya.src;
-
-  return (
-    <section className="relative overflow-hidden bg-background py-20 lg:py-32">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row">
-        {/* Left: Image / Visual Area */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative w-full lg:w-1/2"
-        >
-          <div className="aspect-4/5 w-full rounded-2xl bg-muted/20 shadow-2xl flex items-center justify-center border border-muted/20">
-            {/* Replace this div with your Image component later */}
-            <VideoComponent
-              source={src}
-              width="1080"
-              height="1350"
-              poster={posterImg}
-            />
-          </div>
-
-          {/* Social Proof Badge (Floating) */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="absolute -bottom-6 -left-6 rounded-2xl bg-background p-4 shadow-lg border border-muted/20"
-          >
-            <p className="text-sm font-semibold text-foreground">
-              ⭐ Rated 4.9/5
-            </p>
-            <p className="text-xs text-muted">Over 5000+ couches cleaned</p>
-          </motion.div>
-        </motion.div>
-
-        {/* Right: Text Content */}
-        <div className="w-full lg:w-1/2 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            {header ? (
-              <h1>{header}</h1>
-            ) : (
-              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
-                Professional{" "}
-                <span className="text-primary">Steam Cleaning</span> for Your
-                Home
-              </h1>
-            )}
-
-            {subheader ? (
-              <p className="mt-4 text-lg text-muted-foreground">{subheader}</p>
-            ) : (
-              <p className="mt-4 text-lg text-muted-foreground">
-                Angara Streamers uses advanced steam technology to lift stains,
-                allergens, and odors. Restore your furniture to its original
-                glory without harsh chemicals.
-              </p>
-            )}
-          </motion.div>
-
-          <motion.div
-            className="flex flex-wrap gap-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Link
-              href="/upholstery"
-              className="rounded-full bg-primary px-8 py-3 text-white font-medium touch-feedback hover:opacity-90"
-            >
-              Book Now
-            </Link>
-            <Link
-              href="/features"
-              className="rounded-full bg-muted/20 px-8 py-3 text-foreground font-medium touch-feedback hover:bg-muted/30"
-            >
-              See Our Process
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-    </section>
   );
 }
 </file>
@@ -3431,43 +3287,6 @@ export {
 }
 </file>
 
-<file path="data/meta-data/jsonBreadcrumbs.ts">
-export function generateBreadcrumbs(pathname: string) {
-  // Split path into segments (e.g., /locations/playa-vista -> ["", "locations", "playa-vista"])
-  const segments = pathname.split("/").filter(Boolean);
-  const baseUrl =
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
-
-  const itemListElement = [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Home",
-      item: baseUrl,
-    },
-  ];
-
-  // Dynamically build the breadcrumbs from URL segments
-  segments.forEach((segment, index) => {
-    const path = `/${segments.slice(0, index + 1).join("/")}`;
-    itemListElement.push({
-      "@type": "ListItem",
-      position: index + 2,
-      // Capitalize first letter and replace hyphens with spaces for readability
-      name:
-        segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " "),
-      item: `${baseUrl}${path}`,
-    });
-  });
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: itemListElement,
-  };
-}
-</file>
-
 <file path="data/meta-data/locations-meta.ts">
 import { LocationPage, StrapiResponse } from "../../types/index";
 import { Metadata } from "next";
@@ -4072,14 +3891,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 </file>
 
-<file path="lib/config.ts">
-// lib/config.ts
-export const DEBUG_CONFIG = {
-  SEND_EMAIL: false, // Set to true only when ready to deploy
-  LOG_META_PAYLOAD: true, // Keep this true to verify CAPI
-};
-</file>
-
 <file path="lib/dataCleaner.ts">
 // Add this helper to clean the phone number for Schema
 export const formatPhoneForSchema = (phone?: string) => {
@@ -4138,16 +3949,6 @@ export const checkPath = (pathname: string | null | undefined) => {
     isCarpet: path.startsWith("/carpet"),
     isLocations: path.startsWith("/locations"),
   };
-};
-</file>
-
-<file path="next-sitemap.js">
-/** @type {import('next-sitemap').IConfig} */
-module.exports = {
-  siteUrl:
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com", // Replace with your actual domain
-  generateRobotsTxt: true, // (Optional) Generates robots.txt
-  exclude: ["/test", "/admin"],
 };
 </file>
 
@@ -4535,90 +4336,6 @@ export interface VideoCopmpnent {
 }
 </file>
 
-<file path=".gitignore">
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-*sitemap.xml
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-</file>
-
-<file path="app/api/email/actions.ts">
-"use server";
-
-import { headers } from "next/headers";
-import { sendMyEmail } from "@/lib/email";
-
-export async function submitQuoteRequest(formData: FormData) {
-  const name = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
-  const eventId = formData.get("eventId") as string;
-
-  // Update this in actions.ts
-  const headerList = await headers();
-  const forwarded = headerList.get("x-forwarded-for");
-  // Split by comma and take the first item, default to 127.0.0.1
-  const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
-  //const ip = "164.68.240.80";
-  const ua = headerList.get("user-agent") ?? "unknown";
-
-  const result = await sendMyEmail(
-    "New Lead - Angara Steamers",
-    `Name: ${name}, Phone: ${phone}`,
-    {
-      eventName: "Lead",
-      eventId,
-      value: 0,
-      user: {
-        phone,
-        firstName: name,
-        clientIpAddress: ip,
-        clientUserAgent: ua,
-      },
-    },
-  );
-
-  return result;
-}
-</file>
-
 <file path="app/contact/page.tsx">
 "use client";
 
@@ -4693,6 +4410,85 @@ export default function ContactPage() {
     </div>
   );
 }
+</file>
+
+<file path="components/common/ButtonShiny.tsx">
+"use client";
+import { motion, HTMLMotionProps, TargetAndTransition } from "framer-motion";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const shinyButtonVariants = cva(
+  "radial-gradient relative overflow-hidden transition-shadow focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+  {
+    variants: {
+      size: {
+        sm: "rounded-lg px-4 py-2 text-sm",
+        md: "rounded-xl px-6 py-3 text-base",
+        lg: "rounded-2xl px-8 py-4 text-xl",
+        xl: "rounded-3xl px-10 py-5 text-2xl",
+        icon: "flex h-10 w-10 items-center justify-center rounded-md",
+      },
+    },
+    defaultVariants: {
+      size: "lg",
+    },
+  },
+);
+
+interface Props
+  extends HTMLMotionProps<"div">, VariantProps<typeof shinyButtonVariants> {
+  text?: string;
+  // Pass any CSS color (hex, rgb, or tailwind variable)
+  bgColor?: string;
+  type?: string;
+}
+
+export const ButtonShiny = ({
+  text,
+  className,
+  size = "xl",
+  bgColor = "var(--color-primary)", // Default Playa Cleaning Blue
+  style,
+  ...props
+}: Props) => {
+  return (
+    <motion.div
+      // Merge CVA with custom classes
+      className={cn(
+        shinyButtonVariants({ size }),
+        "font-semibold text-center",
+        className,
+      )}
+      // Use inline styles to inject the dynamic color
+      style={
+        {
+          backgroundColor: bgColor,
+          ...style,
+        } as React.CSSProperties
+      }
+      initial={{ "--x": "100%" } as TargetAndTransition}
+      animate={{ "--x": "-100%" } as TargetAndTransition}
+      whileTap={{ scale: 0.95 }}
+      transition={{
+        repeat: Infinity,
+        repeatType: "loop",
+        repeatDelay: 1,
+        type: "spring",
+        stiffness: 20,
+        damping: 15,
+        mass: 2,
+      }}
+      {...props}
+    >
+      <span className="linear-mask relative z-10 block h-full w-full cursor-pointer tracking-wide text-white">
+        {text ? text : "Book now"}
+      </span>
+      {/* Overlay for the shimmer effect */}
+      <span className="linear-overlay pointer-events-none absolute inset-0 block rounded-[inherit]"></span>
+    </motion.div>
+  );
+};
 </file>
 
 <file path="components/common/ScrollToTop.tsx">
@@ -4986,138 +4782,112 @@ export default function GoogleMap({
 }
 </file>
 
-<file path="components/Hero.tsx">
-import { GoogleStars } from "./oldComponents/GoogleStars";
-import { AvatarGroup } from "./oldComponents/AvatarGroup";
-import { Button } from "@/components/ui/button"; // Shadcn Button
-import { X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogDescription,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog"; // Shadcn Dialog
-import Image from "next/image";
-import MyImage from "@/public/oldMedia/couch/hero-me-color.png";
-import { VideoComponent } from "./oldComponents/VideoComponent";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils";
-import { ButtonShiny } from "./common/ButtonShiny";
+<file path="components/HeroAbout.tsx">
+"use client";
 
-interface IProps {
-  className?: string;
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { VideoComponent } from "./oldComponents/VideoComponent";
+import MeVasya from "@/public/images/me_vasya.webp";
+
+interface IHeroAbout {
+  video?: string;
+  poster?: string;
   header?: string;
   subheader?: string;
-  heroImage?: string;
-  video: boolean;
 }
-function Hero({ header, className, heroImage, video, subheader }: IProps) {
-  const h1 = header
-    ? header
-    : "Couch and Upholstery Professional Steam Cleaning in LA";
-  const heroImageUrl = heroImage ? heroImage : MyImage.src;
-  const h2 = subheader
-    ? subheader
-    : "We restore freshness, remove odors, and save your furniture time & money. Professional, safe, fast.";
+
+export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
+  const src = video ? video : "/oldMedia/videos/LandPage1.mp4";
+  const posterImg = poster ? poster : MeVasya.src;
+
   return (
-    <section
-      className={cn(
-        "pt-8 md:pt-16 pb-16 bg-background mx-auto max-w-7xl md:px-0",
-        className,
-      )}
-    >
-      <div className="md:flex justify-center w-full items-center">
-        <div className="md:flex-1">
-          <div className="inline-flex gap-2 w-full justify-center">
-            <AvatarGroup />
-            <GoogleStars starsCount={5} rating="" />
+    <section className="relative overflow-hidden bg-background py-20 lg:py-32">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row">
+        {/* Left: Image / Visual Area */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative w-full lg:w-1/2"
+        >
+          <div className="aspect-4/5 w-full rounded-2xl bg-muted/20 shadow-2xl flex items-center justify-center border border-muted/20">
+            {/* Replace this div with your Image component later */}
+            <VideoComponent
+              source={src}
+              width="1080"
+              height="1350"
+              poster={posterImg}
+            />
           </div>
 
-          <div className="flex flex-col md:items-center">
-            <h1 className="md:text-left mt-4 md:mt-12 text-3xl md:text-6xl font-bold tracking-tight">
-              {h1}
-            </h1>
-
-            <p className="md:text-left text-lg md:text-xl text-muted-foreground mt-4 md:mt-8">
-              {h2}
+          {/* Social Proof Badge (Floating) */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="absolute -bottom-6 -left-6 rounded-2xl bg-background p-4 shadow-lg border border-muted/20"
+          >
+            <p className="text-sm font-semibold text-foreground">
+              ⭐ Rated 4.9/5
             </p>
+            <p className="text-xs text-muted">Over 5000+ couches cleaned</p>
+          </motion.div>
+        </motion.div>
 
-            <div className="w-full flex flex-col md:flex-row gap-8 mt-12 md:mt-12 justify-center">
-              {/* Shadcn Button Pattern */}
-              <ButtonShiny
-                size="lg"
-                className="rounded-full px-8 text-white text-lg font-bold"
-              >
-                Get a Free Quote
-              </ButtonShiny>
+        {/* Right: Text Content */}
+        <div className="w-full lg:w-1/2 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {header ? (
+              <h1>{header}</h1>
+            ) : (
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+                Professional{" "}
+                <span className="text-primary">Steam Cleaning</span> for Your
+                Home
+              </h1>
+            )}
 
-              {/* Shadcn Dialog Pattern (Replaces ModalDaisy) */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="xxl"
-                    className="rounded-full px-8 border-primary/50 text-lg font-bold"
-                  >
-                    Watch Our Process
-                  </Button>
-                </DialogTrigger>
-                <DialogContent
-                  showCloseButton={false}
-                  className="max-w-4xl ring-0 overflow-hidden flex flex-col items-center justify-center"
-                >
-                  <VisuallyHidden>
-                    <DialogTitle>Our Upholstery Cleaning Process</DialogTitle>
-                    <DialogDescription>
-                      A short video showing our steam cleaning technique.
-                    </DialogDescription>
-                  </VisuallyHidden>
+            {subheader ? (
+              <p className="mt-4 text-lg text-muted-foreground">{subheader}</p>
+            ) : (
+              <p className="mt-4 text-lg text-muted-foreground">
+                Angara Streamers uses advanced steam technology to lift stains,
+                allergens, and odors. Restore your furniture to its original
+                glory without harsh chemicals.
+              </p>
+            )}
+          </motion.div>
 
-                  {/* Container that forces the video to stay in the box */}
-                  <div className="relative px-4 md:px-0 w-full max-h-[80vh] aspect-video">
-                    <VideoComponent
-                      source="/oldMedia/videos/process.mp4"
-                      className="w-full"
-                    />
-                  </div>
-
-                  {/* X button visibility fix */}
-                  <DialogClose className="absolute right-12 top-12 z-50 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 flex items-center justify-center">
-                    <X className="h-8 w-8" strokeWidth={2.5} />
-                  </DialogClose>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-16 md:mt-0 md:flex-1 flex justify-center ">
-          {!video && (
-            <div className="relative aspect-4/5 w-full max-w-sm md:max-w-md h-auto">
-              <Image
-                fetchPriority="high"
-                src={heroImageUrl}
-                priority
-                alt="Professional upholstery cleaning in Los Angeles"
-                className="rounded-2xl object-cover shadow-2xl w-full h-full"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
-          )}
-          {video && (
-            <div className="relative aspect-9/16 w-full max-w-sm md:max-w-md h-auto">
-              <VideoComponent source="/oldMedia/videos/process.mp4" />
-            </div>
-          )}
+          <motion.div
+            className="flex flex-wrap gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Link
+              href="/upholstery"
+              className="rounded-full bg-primary px-8 py-3 text-white font-medium touch-feedback hover:opacity-90"
+            >
+              Book Now
+            </Link>
+            <Link
+              href="/contact"
+              className="rounded-full bg-muted/20 px-8 py-3 text-foreground font-medium touch-feedback hover:bg-muted/30"
+            >
+              See Our Process
+            </Link>
+          </motion.div>
         </div>
       </div>
     </section>
   );
 }
-export { Hero };
 </file>
 
 <file path="components/LatestProjects.tsx">
@@ -5560,79 +5330,126 @@ export function ProjectVideo({ url, type, caption }: ProjectVideoProps) {
 }
 </file>
 
-<file path="components/ui/button.tsx">
+<file path="components/QuoteDialog.tsx">
 "use client";
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { Slot } from "radix-ui";
+import { useState, ChangeEvent } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { submitQuoteRequest } from "@/api/email/actions";
 
-import { cn } from "@/lib/utils";
+export function QuoteDialog({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
-const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
-        destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon: "size-8",
-        "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
-        xl: "h-12 gap-1.5 px-4 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xxl: "text-2xl h-14 gap-2 px-8 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Only allow letters and spaces
+    const value = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+    setName(value);
+  };
 
-        "icon-xl": "size-11",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 10) value = value.slice(0, 10);
+    if (value.length > 6)
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+    else if (value.length > 3)
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    else if (value.length > 0) value = `(${value}`;
+    setPhone(value);
+  };
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
-  const Comp = asChild ? Slot.Root : "button";
+  const handleSubmit = async (formData: FormData) => {
+    setStatus("loading");
+
+    // Generate unique ID
+    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    formData.append("eventId", eventId);
+
+    // Browser Tracking
+    if (typeof window !== "undefined") {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "form_submitted", event_id: eventId });
+    }
+
+    // Submit to Server
+    const result = await submitQuoteRequest(formData);
+
+    if (result.success) {
+      setStatus("success");
+      // Auto-close after 3 seconds
+      setTimeout(() => {
+        setOpen(false);
+        setStatus("idle");
+        setName("");
+        setPhone("");
+      }, 3000);
+    } else {
+      setStatus("idle");
+      alert("Failed. Please try again.");
+    }
+  };
 
   return (
-    <Comp
-      data-slot="button"
-      data-variant={variant}
-      data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+
+      {/* DialogContent uses theme-aware variables from global.css */}
+      <DialogContent className="sm:max-w-md bg-background border border-primary/20 p-8 shadow-2xl rounded-2xl">
+        {status === "success" ? (
+          <div className="text-center py-8">
+            <h3 className="text-2xl font-bold text-primary">Request Sent!</h3>
+            <p className="text-muted mt-2">We will be in touch shortly.</p>
+          </div>
+        ) : (
+          <form action={handleSubmit} className="flex flex-col gap-6">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                Get a Quote for Upholstery or Carpets Cleaning
+              </h2>
+              <p className="text-muted mt-1 text-sm">
+                Fill out your details below. I will contact you ASAP.
+              </p>
+            </div>
+
+            <input
+              name="name"
+              placeholder="Your Name"
+              value={name}
+              onChange={handleNameChange}
+              required
+              className="w-full px-4 py-3 rounded-lg bg-primary/5 border border-primary/10 focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
+            />
+            <input
+              name="phone"
+              placeholder="(000) 000-0000"
+              value={phone}
+              onChange={handlePhoneChange}
+              required
+              minLength={14}
+              className="w-full px-4 py-3 rounded-lg bg-primary/5 border border-primary/10 focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
+            />
+
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary-800 transition-colors disabled:opacity-50 touch-feedback"
+            >
+              {status === "loading" ? "SENDING..." : "GET FREE QUOTE"}
+            </button>
+          </form>
+        )}
+        <div className="mt-4 text-xs text-muted text-center">
+          By submitting, you agree to our{" "}
+          <a href="/policy" className="underline hover:text-primary">
+            Privacy Policy
+          </a>{" "}
+          and consent to receive communication from Angara Streamers.
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
-
-export { Button, buttonVariants };
 </file>
 
 <file path="data/business-config.ts">
@@ -5849,97 +5666,40 @@ export const testimonials: ITestimonial[] = [
 ];
 </file>
 
-<file path="data/meta-data/meta-projects.ts">
-import { Project } from "@/types";
-import { BUSINESS_CONFIG } from "@/data/business-config";
-import { Metadata } from "next";
+<file path="data/meta-data/jsonBreadcrumbs.ts">
+export function generateBreadcrumbs(pathname: string) {
+  // Split path into segments (e.g., /locations/playa-vista -> ["", "locations", "playa-vista"])
+  const segments = pathname.split("/").filter(Boolean);
+  const baseUrl =
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com";
 
-export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
-  const canonical = baseUrl;
-  const companyWebsite =
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
-
-  // Define primary image
-  const primaryImageUrl =
-    projects.length > 0 && projects[0].media_gallery?.[0]?.url
-      ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${projects[0].media_gallery[0].url}`
-      : `${companyWebsite}/og-image.png`;
-
-  const metadata: Metadata = {
-    metadataBase: new URL(companyWebsite),
-    title: `Upholstery Cleaning Projects & Case Studies | ${BUSINESS_CONFIG.business_name}`,
-    description: `Browse our professional upholstery, sofa, and carpet cleaning project results across Los Angeles. See how Angara Steamers restores luxury furniture.`,
-    alternates: { canonical },
-    openGraph: {
-      type: "website",
-      url: canonical,
-      title: `Upholstery Cleaning Projects | ${BUSINESS_CONFIG.business_name}`,
-      description: `View our latest sofa and upholstery restoration projects.`,
-      siteName: BUSINESS_CONFIG.business_name,
-      images: [
-        {
-          url: primaryImageUrl,
-          width: 1200,
-          height: 630,
-          alt: "Cleaning projects",
-        },
-      ],
+  const itemListElement = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: baseUrl,
     },
-  };
+  ];
 
-  const jsonLd = {
+  // Dynamically build the breadcrumbs from URL segments
+  segments.forEach((segment, index) => {
+    const path = `/${segments.slice(0, index + 1).join("/")}`;
+    itemListElement.push({
+      "@type": "ListItem",
+      position: index + 2,
+      // Capitalize first letter and replace hyphens with spaces for readability
+      name:
+        segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " "),
+      item: `${baseUrl}${path}`,
+    });
+  });
+
+  return {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "CollectionPage",
-        "@id": `${canonical}#collection`,
-        name: "Angara Steamers Cleaning Projects",
-        description:
-          "Portfolio of professional sofa and upholstery steam cleaning case studies.",
-        url: canonical,
-        publisher: { "@id": `${companyWebsite}/#organization` },
-      },
-      {
-        "@type": "ItemList",
-        "@id": `${canonical}#list`,
-        mainEntityOfPage: { "@id": `${canonical}#collection` },
-        itemListElement: projects.map((project, index) => {
-          // Construct the correct path: /projects/[location]/[project]
-          const locSlug = project.location_page?.slug || "general";
-          const projectUrl = `${companyWebsite}/projects/${locSlug}/${project.slug}`;
-
-          return {
-            "@type": "ListItem",
-            position: index + 1,
-            name: project.title,
-            url: projectUrl,
-            image: project.media_gallery?.[0]?.url
-              ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${project.media_gallery[0].url}`
-              : undefined,
-          };
-        }),
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: companyWebsite,
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Projects",
-            item: canonical,
-          },
-        ],
-      },
-    ],
+    "@type": "BreadcrumbList",
+    itemListElement: itemListElement,
   };
-
-  return { metadata, jsonLd };
 }
 </file>
 
@@ -6101,73 +5861,6 @@ const eslintConfig = defineConfig([
 export default eslintConfig;
 </file>
 
-<file path="lib/email.ts">
-import { Resend } from "resend";
-import { MetaEventParams } from "@/types";
-import { createMetaPayload } from "./meta-mapper";
-import { DEBUG_CONFIG } from "./config";
-
-const resend = new Resend(process.env.RESEND_API_KEY as string);
-
-export async function sendMyEmail(
-  subject: string,
-  html: string,
-  meta?: MetaEventParams,
-  to: string = process.env.NEXT_PUBLIC_COMPANY_MANAGER_EMAIL ||
-    "angaralabllc@gmail.com",
-  from: string = process.env.RESEND_FROM_EMAIL || "info@angaracleaning.com",
-) {
-  try {
-    // 1. Prepare Email Task
-    const emailPromise = DEBUG_CONFIG.SEND_EMAIL
-      ? resend.emails.send({ from, to, subject, html })
-      : Promise.resolve({ data: { id: "DEBUG_SKIP" }, error: null });
-
-    // 2. Prepare Meta Task
-
-    const metaPromise =
-      meta && process.env.META_PIXEL_ID
-        ? sendMetaEvent(meta)
-        : Promise.resolve();
-
-    // 3. AWAIT BOTH
-    const [emailResult, metaResult] = await Promise.all([
-      emailPromise,
-      metaPromise,
-    ]);
-
-    if (emailResult.error) {
-      console.error("Resend API Error:", emailResult.error);
-      return { success: false };
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("sendMyEmail Exception:", error);
-    return { success: false };
-  }
-}
-
-async function sendMetaEvent(meta: MetaEventParams) {
-  console.log("DEBUG PAYLOAD", meta);
-  try {
-    const payload = createMetaPayload(meta);
-    const url = `https://graph.facebook.com/v20.0/${process.env.META_PIXEL_ID}/events?access_token=${process.env.META_CAPI_TOKEN}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await response.json();
-    return result; // Ensure this returns so Promise.all can track it
-  } catch (error) {
-    console.error("ENGINEERING: [Meta-Task] Exception:", error);
-  }
-}
-</file>
-
 <file path="tsconfig.json">
 {
   "compilerOptions": {
@@ -6326,6 +6019,53 @@ export interface ServiceHub extends StrapiBase {
 
   service_pages?: ServicePage[]; // one-to-many
 }
+</file>
+
+<file path=".gitignore">
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+sitemap-*.xml
+sitemap.xml
+robots.txt
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 </file>
 
 <file path="app/about/page.tsx">
@@ -7127,6 +6867,143 @@ export function Footer({ navItems }: FooterProps) {
 }
 </file>
 
+<file path="components/Hero.tsx">
+import { GoogleStars } from "./oldComponents/GoogleStars";
+import { AvatarGroup } from "./oldComponents/AvatarGroup";
+import { Button } from "@/components/ui/button"; // Shadcn Button
+import { X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogDescription,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog"; // Shadcn Dialog
+import Image from "next/image";
+import MyImage from "@/public/oldMedia/couch/hero-me-color.png";
+import { VideoComponent } from "./oldComponents/VideoComponent";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { cn } from "@/lib/utils";
+import { ButtonShiny } from "./common/ButtonShiny";
+import { QuoteDialog } from "./QuoteDialog";
+
+interface IProps {
+  className?: string;
+  header?: string;
+  subheader?: string;
+  heroImage?: string;
+  video: boolean;
+}
+function Hero({ header, className, heroImage, video, subheader }: IProps) {
+  const h1 = header
+    ? header
+    : "Couch and Upholstery Professional Steam Cleaning in LA";
+  const heroImageUrl = heroImage ? heroImage : MyImage.src;
+  const h2 = subheader
+    ? subheader
+    : "We restore freshness, remove odors, and save your furniture time & money. Professional, safe, fast.";
+  return (
+    <section
+      className={cn(
+        "pt-8 md:pt-16 pb-16 bg-background mx-auto max-w-7xl md:px-0",
+        className,
+      )}
+    >
+      <div className="md:flex justify-center w-full items-center">
+        <div className="md:flex-1">
+          <div className="inline-flex gap-2 w-full justify-center">
+            <AvatarGroup />
+            <GoogleStars starsCount={5} rating="" />
+          </div>
+
+          <div className="flex flex-col md:items-center">
+            <h1 className="md:text-left mt-4 md:mt-12 text-3xl md:text-6xl font-bold tracking-tight">
+              {h1}
+            </h1>
+
+            <p className="md:text-left text-lg md:text-xl text-muted-foreground mt-4 md:mt-8">
+              {h2}
+            </p>
+
+            <div className="w-full flex flex-col md:flex-row gap-8 mt-12 md:mt-12 justify-center">
+              {/* Shadcn Button Pattern */}
+              <QuoteDialog>
+                <ButtonShiny
+                  size="lg"
+                  className="rounded-full px-8 text-white text-lg font-bold"
+                >
+                  Get a Free Quote
+                </ButtonShiny>
+              </QuoteDialog>
+
+              {/* Shadcn Dialog Pattern (Replaces ModalDaisy) */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="xxl"
+                    className="rounded-full px-8 border-primary/50 text-lg font-bold"
+                  >
+                    Watch Our Process
+                  </Button>
+                </DialogTrigger>
+                <DialogContent
+                  showCloseButton={false}
+                  className="max-w-4xl ring-0 overflow-hidden flex flex-col items-center justify-center"
+                >
+                  <VisuallyHidden>
+                    <DialogTitle>Our Upholstery Cleaning Process</DialogTitle>
+                    <DialogDescription>
+                      A short video showing our steam cleaning technique.
+                    </DialogDescription>
+                  </VisuallyHidden>
+
+                  {/* Container that forces the video to stay in the box */}
+                  <div className="relative px-4 md:px-0 w-full max-h-[80vh] aspect-video">
+                    <VideoComponent
+                      source="/oldMedia/videos/process.mp4"
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* X button visibility fix */}
+                  <DialogClose className="absolute right-12 top-12 z-50 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 flex items-center justify-center">
+                    <X className="h-8 w-8" strokeWidth={2.5} />
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-16 md:mt-0 md:flex-1 flex justify-center ">
+          {!video && (
+            <div className="relative aspect-4/5 w-full max-w-sm md:max-w-md h-auto">
+              <Image
+                fetchPriority="high"
+                src={heroImageUrl}
+                priority
+                alt="Professional upholstery cleaning in Los Angeles"
+                className="rounded-2xl object-cover shadow-2xl w-full h-full"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            </div>
+          )}
+          {video && (
+            <div className="relative aspect-9/16 w-full max-w-sm md:max-w-md h-auto">
+              <VideoComponent source="/oldMedia/videos/process.mp4" />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+export { Hero };
+</file>
+
 <file path="components/oldComponents/VideoComponent.tsx">
 import { VideoCopmpnent } from "@/types";
 import { cn } from "@/lib/utils";
@@ -7162,6 +7039,81 @@ export function VideoComponent({
     </video>
   );
 }
+</file>
+
+<file path="components/ui/button.tsx">
+"use client";
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
+
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        outline:
+          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        ghost:
+          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+        destructive:
+          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default:
+          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
+        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        icon: "size-8",
+        "icon-xs":
+          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm":
+          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
+        "icon-lg": "size-9",
+        xl: "h-12 gap-1.5 px-4 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xxl: "text-2xl h-14 gap-2 px-8 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+
+        "icon-xl": "size-11",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  }) {
+  const Comp = asChild ? Slot.Root : "button";
+
+  return (
+    <Comp
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+}
+
+export { Button, buttonVariants };
 </file>
 
 <file path="data/links.ts">
@@ -7333,6 +7285,108 @@ export function generateProjectPageSeo(
 }
 </file>
 
+<file path="data/meta-data/meta-projects.ts">
+import { Project } from "@/types";
+import { BUSINESS_CONFIG } from "@/data/business-config";
+import { Metadata } from "next";
+
+export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
+  const canonical = baseUrl;
+  const companyWebsite =
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com";
+
+  // Define primary image
+  const primaryImageUrl =
+    projects.length > 0 && projects[0].media_gallery?.[0]?.url
+      ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${projects[0].media_gallery[0].url}`
+      : `${companyWebsite}/og-image.png`;
+
+  const metadata: Metadata = {
+    metadataBase: new URL(companyWebsite),
+    title: `Upholstery Cleaning Projects & Case Studies | ${BUSINESS_CONFIG.business_name}`,
+    description: `Browse our professional upholstery, sofa, and carpet cleaning project results across Los Angeles. See how Angara Steamers restores luxury furniture.`,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      url: canonical,
+      title: `Upholstery Cleaning Projects | ${BUSINESS_CONFIG.business_name}`,
+      description: `View our latest sofa and upholstery restoration projects.`,
+      siteName: BUSINESS_CONFIG.business_name,
+      images: [
+        {
+          url: primaryImageUrl,
+          width: 1200,
+          height: 630,
+          alt: "Cleaning projects",
+        },
+      ],
+    },
+  };
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${canonical}#collection`,
+        name: "Angara Steamers Cleaning Projects",
+        description:
+          "Portfolio of professional sofa and upholstery steam cleaning case studies.",
+        url: canonical,
+        publisher: { "@id": `${companyWebsite}/#organization` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${canonical}#list`,
+        mainEntityOfPage: { "@id": `${canonical}#collection` },
+        itemListElement: projects.map((project, index) => {
+          // Construct the correct path: /projects/[location]/[project]
+          const locSlug = project.location_page?.slug || "general";
+          const projectUrl = `${companyWebsite}/projects/${locSlug}/${project.slug}`;
+
+          return {
+            "@type": "ListItem",
+            position: index + 1,
+            name: project.title,
+            url: projectUrl,
+            image: project.media_gallery?.[0]?.url
+              ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${project.media_gallery[0].url}`
+              : undefined,
+          };
+        }),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: companyWebsite,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Projects",
+            item: canonical,
+          },
+        ],
+      },
+    ],
+  };
+
+  return { metadata, jsonLd };
+}
+</file>
+
+<file path="lib/config.ts">
+// lib/config.ts
+export const DEBUG_CONFIG = {
+  SEND_EMAIL: true, //false, // Set to true only when ready to deploy
+  LOG_META_PAYLOAD: false, // Keep this true to verify CAPI
+};
+</file>
+
 <file path="lib/utils.ts">
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -7365,8 +7419,29 @@ export function stringUrl(
 
   // Add &publicationState=preview to the URL string
   const url = `${STRAPI_URL}/api/${sanitizedPath}${queryString ? `?${queryString}` : ""}`;
-  // console.log("This is fetching url:", url);
+  console.log("This is fetching url:", url);
 }
+</file>
+
+<file path="next-sitemap.config.js">
+/** @type {import('next-sitemap').IConfig} */
+const config = {
+  siteUrl:
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE ?? "https://angaraprosteamers.com", // Replace with your actual domain
+  generateRobotsTxt: true,
+  // Optional: Add other settings here
+  exclude: ["/admin/*", "/secret-page", "/booking/*", "/styleguide"],
+  robotsTxtOptions: {
+    policies: [
+      {
+        userAgent: "*",
+        allow: "/", // This tells all bots NOT to crawl your site
+      },
+    ],
+  },
+};
+
+export default config;
 </file>
 
 <file path="types/common.ts">
@@ -7636,167 +7711,69 @@ export function Breadcrumbs({
 }
 </file>
 
-<file path="components/CTA.tsx">
-"use client";
-import { useState, ChangeEvent } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { submitQuoteRequest } from "@/app/api/email/actions";
-import BeforeImage from "@/public/images/before1.webp";
+<file path="lib/email.ts">
+import { Resend } from "resend";
+import { MetaEventParams } from "@/types";
+import { createMetaPayload } from "./meta-mapper";
+import { DEBUG_CONFIG } from "./config";
 
-// Extend the window object for Facebook Pixel
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
+const resend = new Resend(process.env.RESEND_API_KEY as string);
+
+export async function sendEmail(
+  subject: string,
+  html: string,
+  meta?: MetaEventParams,
+  to: string = process.env.NEXT_PUBLIC_COMPANY_MANAGER_EMAIL ||
+    "angaralabllc@gmail.com",
+  from: string = process.env.RESEND_FROM_EMAIL || "info@angaracleaning.com",
+) {
+  try {
+    // 1. Prepare Email Task
+    const emailPromise = DEBUG_CONFIG.SEND_EMAIL
+      ? resend.emails.send({ from, to, subject, html })
+      : Promise.resolve({ data: { id: "DEBUG_SKIP" }, error: null });
+
+    // 2. Prepare Meta Task
+
+    const metaPromise =
+      meta && process.env.META_PIXEL_ID
+        ? sendMetaEvent(meta)
+        : Promise.resolve();
+
+    // 3. AWAIT BOTH
+    const [emailResult, metaResult] = await Promise.all([
+      emailPromise,
+      metaPromise,
+    ]);
+
+    if (emailResult.error) {
+      console.error("Resend API Error:", emailResult.error);
+      return { success: false };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("sendEmail Exception:", error);
+    return { success: false };
   }
 }
 
-export function CTA({ className }: { className?: string }) {
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [phone, setPhone] = useState("");
+async function sendMetaEvent(meta: MetaEventParams) {
+  try {
+    const payload = createMetaPayload(meta);
+    const url = `https://graph.facebook.com/v20.0/${process.env.META_PIXEL_ID}/events?access_token=${process.env.META_CAPI_TOKEN}`;
 
-  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 10) value = value.slice(0, 10);
-    if (value.length > 6)
-      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
-    else if (value.length > 3)
-      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-    else if (value.length > 0) value = `(${value}`;
-    setPhone(value);
-  };
-
-  const handleSubmit = async (formData: FormData) => {
-    setStatus("loading");
-
-    // Generate the eventId at the start so it is identical for both browser and server
-    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-
-    // Append to FormData so the Server Action receives it
-    formData.append("eventId", eventId);
-
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: "form_submitted",
-      // These keys MUST match the "Data Layer Variable Name" in GTM
-      event_id: eventId, // Matches 'dlv - event_id'
-      estimated_value: 0, // Matches 'dlv - estimated_value'
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
 
-    const result = await submitQuoteRequest(formData);
-
-    if (result.success) {
-      setStatus("success");
-    } else {
-      setStatus("idle");
-      alert("Submission failed. Please try again.");
-    }
-  };
-
-  return (
-    <section
-      className={cn("px-4 md:px-8 bg-primary/10 rounded-2xl p-8", className)}
-    >
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-        <div className="flex-1 w-full min-h-[400px] flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            {status === "success" ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center text-center"
-              >
-                <motion.div
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-lg"
-                >
-                  <motion.svg
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    className="w-12 h-12 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={4}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </motion.svg>
-                </motion.div>
-                <motion.h3
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-2xl font-bold text-foreground"
-                >
-                  Your request sent!
-                </motion.h3>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="form"
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="w-full flex flex-col gap-6"
-              >
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-                  Is your couch looking TIRED?
-                </h2>
-                <p className="text-xl text-muted">
-                  We’ll make it look <strong>brand new again!</strong>
-                </p>
-                <form
-                  action={handleSubmit}
-                  className="flex flex-col gap-3 mt-4"
-                >
-                  <input
-                    name="name"
-                    placeholder="Your Name"
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
-                  />
-                  <input
-                    name="phone"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    placeholder="(xxx) xxx-xxxx"
-                    required
-                    minLength={14}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-transform active:scale-95 disabled:opacity-50"
-                  >
-                    {status === "loading"
-                      ? "SENDING..."
-                      : "GET A FREE QUOTE TODAY!"}
-                  </button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        <div className="w-full flex-1">
-          <div className="max-w-175 aspect-square rounded-xl overflow-hidden relative">
-            <Image
-              alt="Before"
-              fill
-              src={BeforeImage}
-              className="object-cover"
-              unoptimized
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+    const result = await response.json();
+    return result; // Ensure this returns so Promise.all can track it
+  } catch (error) {
+    console.error("ENGINEERING: [Meta-Task] Exception:", error);
+  }
 }
 </file>
 
@@ -8545,6 +8522,177 @@ export default function HomePage() {
         <VideoReviews />
       </section>
     </div>
+  );
+}
+</file>
+
+<file path="components/CTA.tsx">
+"use client";
+import { useState, ChangeEvent } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { submitQuoteRequest } from "@/api/email/actions";
+import BeforeImage from "@/public/images/before1.webp";
+
+// Extend the window object for Facebook Pixel
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+  }
+}
+
+export function CTA({ className }: { className?: string }) {
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [phone, setPhone] = useState("");
+
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 10) value = value.slice(0, 10);
+    if (value.length > 6)
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+    else if (value.length > 3)
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    else if (value.length > 0) value = `(${value}`;
+    setPhone(value);
+  };
+
+  const handleSubmit = async (formData: FormData) => {
+    setStatus("loading");
+
+    // Generate the eventId at the start so it is identical for both browser and server
+    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+    // Append to FormData so the Server Action receives it
+    formData.append("eventId", eventId);
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "form_submitted",
+      // These keys MUST match the "Data Layer Variable Name" in GTM
+      event_id: eventId, // Matches 'dlv - event_id'
+      estimated_value: 0, // Matches 'dlv - estimated_value'
+    });
+
+    const result = await submitQuoteRequest(formData);
+
+    if (result.success) {
+      setStatus("success");
+    } else {
+      setStatus("idle");
+      alert("Submission failed. Please try again.");
+    }
+  };
+
+  return (
+    <section
+      className={cn("px-4 md:px-8 bg-primary/10 rounded-2xl p-8", className)}
+    >
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+        <div className="flex-1 w-full min-h-[400px] flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {status === "success" ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center text-center"
+              >
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-lg"
+                >
+                  <motion.svg
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    className="w-12 h-12 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={4}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </motion.svg>
+                </motion.div>
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-2xl font-bold text-foreground"
+                >
+                  Your request sent!
+                </motion.h3>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form"
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full flex flex-col gap-6"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+                  Is your couch looking TIRED?
+                </h2>
+                <p className="text-xl text-muted">
+                  We’ll make it look <strong>brand new again!</strong>
+                </p>
+                <form
+                  action={handleSubmit}
+                  className="flex flex-col gap-3 mt-4"
+                >
+                  <input
+                    name="name"
+                    placeholder="Your Name"
+                    required
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
+                  />
+                  <input
+                    name="phone"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    placeholder="(xxx) xxx-xxxx"
+                    required
+                    minLength={14}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-transform active:scale-95 disabled:opacity-50"
+                  >
+                    {status === "loading"
+                      ? "SENDING..."
+                      : "GET A FREE QUOTE TODAY!"}
+                  </button>
+                </form>
+                <div className="mt-4 text-xs text-muted text-center">
+                  By submitting, you agree to our{" "}
+                  <a href="/policy" className="underline hover:text-primary">
+                    Privacy Policy
+                  </a>{" "}
+                  and consent to receive communication from Angara Streamers.
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="w-full flex-1">
+          <div className="max-w-175 aspect-square rounded-xl overflow-hidden relative">
+            <Image
+              alt="Before"
+              fill
+              src={BeforeImage}
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 </file>
