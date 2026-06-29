@@ -30,7 +30,7 @@ export function Footer({ navItems }: FooterProps) {
             {navItems.map((hub) => (
               <Link
                 key={hub.slug}
-                href={`/${hub.slug}`}
+                href={`/services/${hub.slug}`}
                 className="py-1 hover:text-primary transition-colors font-medium text-lg md:text-md"
               >
                 {hub.title}
