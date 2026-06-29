@@ -92,7 +92,7 @@ export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
               Book Now
             </Link>
             <Link
-              href="/features"
+              href="/contact"
               className="rounded-full bg-muted/20 px-8 py-3 text-foreground font-medium touch-feedback hover:bg-muted/30"
             >
               See Our Process
