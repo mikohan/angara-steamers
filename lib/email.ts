@@ -13,8 +13,6 @@ export async function sendMyEmail(
     "angaralabllc@gmail.com",
   from: string = process.env.RESEND_FROM_EMAIL || "info@angaracleaning.com",
 ) {
-  console.log("ENGINEERING: [3a/4] sendMyEmail started");
-
   try {
     // 1. Prepare Email Task
     const emailPromise = DEBUG_CONFIG.SEND_EMAIL
@@ -22,12 +20,6 @@ export async function sendMyEmail(
       : Promise.resolve({ data: { id: "DEBUG_SKIP" }, error: null });
 
     // 2. Prepare Meta Task
-
-    console.log("ENGINEERING: Checking Meta conditions:", {
-      hasMeta: !!meta,
-      hasPixelId: !!process.env.META_PIXEL_ID,
-      pixelIdValue: process.env.META_PIXEL_ID, // See what it actually contains
-    });
 
     const metaPromise =
       meta && process.env.META_PIXEL_ID
@@ -53,7 +45,6 @@ export async function sendMyEmail(
 }
 
 async function sendMetaEvent(meta: MetaEventParams) {
-  console.log("DEBUG PAYLOAD", meta);
   try {
     const payload = createMetaPayload(meta);
     const url = `https://graph.facebook.com/v20.0/${process.env.META_PIXEL_ID}/events?access_token=${process.env.META_CAPI_TOKEN}`;

@@ -26,6 +26,7 @@ interface Props
   text?: string;
   // Pass any CSS color (hex, rgb, or tailwind variable)
   bgColor?: string;
+  type?: string;
 }
 
 export const ButtonShiny = ({

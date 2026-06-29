@@ -15,6 +15,8 @@ import MyImage from "@/public/oldMedia/couch/hero-me-color.png";
 import { VideoComponent } from "./oldComponents/VideoComponent";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { cn } from "@/lib/utils";
+import { ButtonShiny } from "./common/ButtonShiny";
+import { QuoteDialog } from "./QuoteDialog";
 
 interface IProps {
   className?: string;
@@ -56,19 +58,21 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
 
             <div className="w-full flex flex-col md:flex-row gap-8 mt-12 md:mt-12 justify-center">
               {/* Shadcn Button Pattern */}
-              <Button
-                size="xl"
-                className="rounded-full px-8 text-white text-lg font-bold"
-              >
-                Get a Free Quote
-              </Button>
+              <QuoteDialog>
+                <ButtonShiny
+                  size="lg"
+                  className="rounded-full px-8 text-white text-lg font-bold"
+                >
+                  Get a Free Quote
+                </ButtonShiny>
+              </QuoteDialog>
 
               {/* Shadcn Dialog Pattern (Replaces ModalDaisy) */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    size="xl"
+                    size="xxl"
                     className="rounded-full px-8 border-primary/50 text-lg font-bold"
                   >
                     Watch Our Process

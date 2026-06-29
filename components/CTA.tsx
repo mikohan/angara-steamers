@@ -45,11 +45,6 @@ export function CTA({ className }: { className?: string }) {
       estimated_value: 0, // Matches 'dlv - estimated_value'
     });
 
-    console.log("DEBUG: Pushed to DataLayer:", {
-      event_id: eventId,
-      estimated_value: 180,
-    });
-
     const result = await submitQuoteRequest(formData);
 
     if (result.success) {
@@ -145,6 +140,13 @@ export function CTA({ className }: { className?: string }) {
                       : "GET A FREE QUOTE TODAY!"}
                   </button>
                 </form>
+                <div className="mt-4 text-xs text-muted text-center">
+                  By submitting, you agree to our{" "}
+                  <a href="/policy" className="underline hover:text-primary">
+                    Privacy Policy
+                  </a>{" "}
+                  and consent to receive communication from Angara Streamers.
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

@@ -282,100 +282,6 @@ web-app-manifest-512x512.png
 <files>
 This section contains the contents of the repository's files.
 
-<file path="lib/config.ts">
-// lib/config.ts
-export const DEBUG_CONFIG = {
-  SEND_EMAIL: false, // Set to true only when ready to deploy
-  LOG_META_PAYLOAD: true, // Keep this true to verify CAPI
-};
-</file>
-
-<file path="lib/meta-mapper.ts">
-import { createHash } from "crypto";
-import { MetaEventParams, MetaPayload } from "@/types";
-
-const hashData = (data: string): string =>
-  createHash("sha256").update(data.toLowerCase().trim()).digest("hex");
-
-export const createMetaPayload = (meta: MetaEventParams): MetaPayload => {
-  return {
-    data: [
-      {
-        event_name: meta.eventName,
-        event_time: Math.floor(Date.now() / 1000),
-        event_id: meta.eventId,
-        action_source: meta.actionSource ?? "website",
-        user_data: {
-          ph: hashData(meta.user.phone),
-          client_ip_address: meta.user.clientIpAddress,
-          client_user_agent: meta.user.clientUserAgent,
-          ...(meta.user.email && { em: hashData(meta.user.email) }),
-        },
-        ...(meta.value && {
-          custom_data: { value: meta.value, currency: meta.currency ?? "USD" },
-        }),
-      },
-    ],
-    ...(process.env.FB_TEST_EVENT_CODE && {
-      test_event_code: process.env.FB_TEST_EVENT_CODE,
-    }),
-  };
-};
-</file>
-
-<file path="pnpm-workspace.yaml">
-allowBuilds:
-  core-js: true
-  sharp: true
-  unrs-resolver: true
-</file>
-
-<file path="types/capi.ts">
-export interface MetaUser {
-  email?: string;
-  phone: string;
-  clientIpAddress: string;
-  clientUserAgent: string;
-  fbc?: string;
-  fbp?: string;
-}
-
-export interface MetaEvent {
-  eventName: string;
-  eventId: string;
-  actionSource: "website" | "app" | "email" | "physical_store";
-  user: MetaUser;
-  value?: number;
-  currency?: string;
-}
-
-export interface MetaEventParams extends Omit<MetaEvent, "actionSource"> {
-  actionSource?: "website" | "app" | "email" | "physical_store";
-}
-
-export interface MetaPayloadEvent {
-  event_name: string;
-  event_time: number;
-  event_id: string;
-  action_source: string;
-  user_data: {
-    ph: string;
-    client_ip_address: string;
-    client_user_agent: string;
-    em?: string;
-  };
-  custom_data?: {
-    value: number;
-    currency: string;
-  };
-}
-
-export interface MetaPayload {
-  data: MetaPayloadEvent[];
-  test_event_code?: string;
-}
-</file>
-
 <file path="AGENTS.md">
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
@@ -425,45 +331,6 @@ export async function POST(req: Request) {
     console.error("Stripe Error:", error);
     return NextResponse.json({ error: "Checkout failed" }, { status: 500 });
   }
-}
-</file>
-
-<file path="app/api/email/actions.ts">
-"use server";
-
-import { headers } from "next/headers";
-import { sendEmail } from "@/lib/email";
-
-export async function submitQuoteRequest(formData: FormData) {
-  console.log("ENGINEERING: [1/4] submitQuoteRequest started");
-
-  const name = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
-  const eventId = formData.get("eventId") as string;
-
-  const headerList = await headers();
-  const ip = headerList.get("x-forwarded-for") ?? "127.0.0.1";
-  const ua = headerList.get("user-agent") ?? "unknown";
-
-  console.log("ENGINEERING: [2/4] Data extracted and headers gathered");
-
-  const result = await sendEmail(
-    "New Lead - Angara Steamers",
-    `Name: ${name}, Phone: ${phone}`,
-    {
-      eventName: "Lead",
-      eventId,
-      value: 0,
-      user: {
-        phone,
-        clientIpAddress: ip,
-        clientUserAgent: ua,
-      },
-    },
-  );
-
-  console.log("ENGINEERING: [4/4] sendEmail result received:", result);
-  return result;
 }
 </file>
 
@@ -4205,6 +4072,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 </file>
 
+<file path="lib/config.ts">
+// lib/config.ts
+export const DEBUG_CONFIG = {
+  SEND_EMAIL: false, // Set to true only when ready to deploy
+  LOG_META_PAYLOAD: true, // Keep this true to verify CAPI
+};
+</file>
+
 <file path="lib/dataCleaner.ts">
 // Add this helper to clean the phone number for Schema
 export const formatPhoneForSchema = (phone?: string) => {
@@ -4213,75 +4088,45 @@ export const formatPhoneForSchema = (phone?: string) => {
 };
 </file>
 
-<file path="lib/email.ts">
-import { Resend } from "resend";
-import { MetaEventParams } from "@/types";
-import { createMetaPayload } from "./meta-mapper";
-import { DEBUG_CONFIG } from "./config";
+<file path="lib/meta-mapper.ts">
+import { createHash } from "crypto";
+import { MetaEventParams, MetaPayload } from "@/types";
 
-const resend = new Resend(process.env.RESEND_API_KEY as string);
+const hashData = (data: string): string =>
+  createHash("sha256").update(data.toLowerCase().trim()).digest("hex");
 
-export async function sendEmail(
-  subject: string,
-  html: string,
-  meta?: MetaEventParams,
-  to: string = process.env.NEXT_PUBLIC_COMPANY_MANAGER_EMAIL ||
-    "angaralabllc@gmail.com",
-  from: string = process.env.RESEND_FROM_EMAIL || "info@angaracleaning.com",
-) {
-  try {
-    // Conditional logic based on DEBUG.SEND_EMAIL constant
-    const emailTask = DEBUG_CONFIG.SEND_EMAIL
-      ? resend.emails.send({ from, to, subject, html })
-      : Promise.resolve({ data: { id: "DEBUG_SKIP" }, error: null });
+export const createMetaPayload = (meta: MetaEventParams): MetaPayload => {
+  const payload: MetaPayload = {
+    data: [
+      {
+        event_name: meta.eventName,
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: meta.eventId,
+        action_source: meta.actionSource ?? "website",
+        user_data: {
+          ph: hashData(meta.user.phone),
+          fn: hashData(meta.user.firstName),
+          client_ip_address: meta.user.clientIpAddress,
+          client_user_agent: meta.user.clientUserAgent,
+          ...(meta.user.fbp && { fbp: meta.user.fbp }),
+          ...(meta.user.fbc && { fbc: meta.user.fbc }),
+          ...(meta.user.email && { em: hashData(meta.user.email) }),
+        },
+        custom_data: {
+          value: meta.value ?? 180,
+          currency: meta.currency ?? "USD",
+          content_name: meta.contentName ?? "Quote Request",
+        },
+      },
+    ],
+  };
 
-    const metaTask =
-      meta && process.env.FB_PIXEL_ID ? sendMetaEvent(meta) : Promise.resolve();
-
-    const [emailResult] = await Promise.all([emailTask, metaTask]);
-
-    // Success if email was sent OR if debug mode is skipping it
-    if (emailResult.data?.id || !DEBUG_CONFIG.SEND_EMAIL) {
-      return { success: true };
-    }
-
-    if (emailResult.error) {
-      console.error("Resend API Error:", emailResult.error);
-    }
-
-    return { success: false };
-  } catch (error) {
-    console.error("sendEmail Exception:", error);
-    return { success: false };
+  if (process.env.FB_TEST_EVENT_CODE) {
+    payload.test_event_code = process.env.FB_TEST_EVENT_CODE;
   }
-}
 
-// lib/email-service.ts
-async function sendMetaEvent(meta: MetaEventParams) {
-  try {
-    const payload = createMetaPayload(meta);
-    console.log("ENGINEERING: Preparing to fetch Meta CAPI..."); // Track if we even get here
-
-    const url = `https://graph.facebook.com/v20.0/${process.env.FB_PIXEL_ID}/events?access_token=${process.env.FB_ACCESS_TOKEN}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    // Await the response body to see the server's reply
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error("ENGINEERING: Meta CAPI Error Response:", result);
-    } else {
-      console.log("ENGINEERING: Meta CAPI Success:", result);
-    }
-  } catch (error) {
-    console.error("ENGINEERING: Meta CAPI Fetch Exception:", error);
-  }
-}
+  return payload;
+};
 </file>
 
 <file path="lib/navbar-helpers.ts">
@@ -4304,6 +4149,13 @@ module.exports = {
   generateRobotsTxt: true, // (Optional) Generates robots.txt
   exclude: ["/test", "/admin"],
 };
+</file>
+
+<file path="pnpm-workspace.yaml">
+allowBuilds:
+  core-js: true
+  sharp: true
+  unrs-resolver: true
 </file>
 
 <file path="postcss.config.mjs">
@@ -4592,6 +4444,58 @@ export const useCart = create<CartState>()(
 );
 </file>
 
+<file path="types/capi.ts">
+export interface MetaUser {
+  email?: string;
+  phone: string;
+  firstName: string;
+  clientIpAddress: string;
+  clientUserAgent: string;
+  fbc?: string;
+  fbp?: string;
+}
+
+export interface MetaEvent {
+  eventName: string;
+  eventId: string;
+  actionSource: "website" | "app" | "email" | "physical_store";
+  user: MetaUser;
+  value?: number;
+  currency?: string;
+  contentName?: string;
+}
+
+export interface MetaEventParams extends Omit<MetaEvent, "actionSource"> {
+  actionSource?: "website" | "app" | "email" | "physical_store";
+}
+
+export interface MetaPayloadEvent {
+  event_name: string;
+  event_time: number;
+  event_id: string;
+  action_source: string;
+  user_data: {
+    ph: string;
+    fn: string;
+    client_ip_address: string;
+    client_user_agent: string;
+    em?: string;
+    fbc?: string;
+    fbp?: string;
+  };
+  custom_data?: {
+    value: number;
+    currency: string;
+    content_name?: string;
+  };
+}
+
+export interface MetaPayload {
+  data: MetaPayloadEvent[];
+  test_event_code?: string;
+}
+</file>
+
 <file path="types/state.ts">
 import type { StrapiBase } from "./common";
 import type { LocationPage } from "./location";
@@ -4674,6 +4578,45 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+</file>
+
+<file path="app/api/email/actions.ts">
+"use server";
+
+import { headers } from "next/headers";
+import { sendMyEmail } from "@/lib/email";
+
+export async function submitQuoteRequest(formData: FormData) {
+  const name = formData.get("name") as string;
+  const phone = formData.get("phone") as string;
+  const eventId = formData.get("eventId") as string;
+
+  // Update this in actions.ts
+  const headerList = await headers();
+  const forwarded = headerList.get("x-forwarded-for");
+  // Split by comma and take the first item, default to 127.0.0.1
+  const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+  //const ip = "164.68.240.80";
+  const ua = headerList.get("user-agent") ?? "unknown";
+
+  const result = await sendMyEmail(
+    "New Lead - Angara Steamers",
+    `Name: ${name}, Phone: ${phone}`,
+    {
+      eventName: "Lead",
+      eventId,
+      value: 0,
+      user: {
+        phone,
+        firstName: name,
+        clientIpAddress: ip,
+        clientUserAgent: ua,
+      },
+    },
+  );
+
+  return result;
+}
 </file>
 
 <file path="app/contact/page.tsx">
@@ -5061,6 +5004,7 @@ import MyImage from "@/public/oldMedia/couch/hero-me-color.png";
 import { VideoComponent } from "./oldComponents/VideoComponent";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { cn } from "@/lib/utils";
+import { ButtonShiny } from "./common/ButtonShiny";
 
 interface IProps {
   className?: string;
@@ -5102,19 +5046,19 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
 
             <div className="w-full flex flex-col md:flex-row gap-8 mt-12 md:mt-12 justify-center">
               {/* Shadcn Button Pattern */}
-              <Button
-                size="xl"
+              <ButtonShiny
+                size="lg"
                 className="rounded-full px-8 text-white text-lg font-bold"
               >
                 Get a Free Quote
-              </Button>
+              </ButtonShiny>
 
               {/* Shadcn Dialog Pattern (Replaces ModalDaisy) */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    size="xl"
+                    size="xxl"
                     className="rounded-full px-8 border-primary/50 text-lg font-bold"
                   >
                     Watch Our Process
@@ -5653,6 +5597,7 @@ const buttonVariants = cva(
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
         xl: "h-12 gap-1.5 px-4 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xxl: "text-2xl h-14 gap-2 px-8 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
 
         "icon-xl": "size-11",
       },
@@ -6154,6 +6099,73 @@ const eslintConfig = defineConfig([
 ]);
 
 export default eslintConfig;
+</file>
+
+<file path="lib/email.ts">
+import { Resend } from "resend";
+import { MetaEventParams } from "@/types";
+import { createMetaPayload } from "./meta-mapper";
+import { DEBUG_CONFIG } from "./config";
+
+const resend = new Resend(process.env.RESEND_API_KEY as string);
+
+export async function sendMyEmail(
+  subject: string,
+  html: string,
+  meta?: MetaEventParams,
+  to: string = process.env.NEXT_PUBLIC_COMPANY_MANAGER_EMAIL ||
+    "angaralabllc@gmail.com",
+  from: string = process.env.RESEND_FROM_EMAIL || "info@angaracleaning.com",
+) {
+  try {
+    // 1. Prepare Email Task
+    const emailPromise = DEBUG_CONFIG.SEND_EMAIL
+      ? resend.emails.send({ from, to, subject, html })
+      : Promise.resolve({ data: { id: "DEBUG_SKIP" }, error: null });
+
+    // 2. Prepare Meta Task
+
+    const metaPromise =
+      meta && process.env.META_PIXEL_ID
+        ? sendMetaEvent(meta)
+        : Promise.resolve();
+
+    // 3. AWAIT BOTH
+    const [emailResult, metaResult] = await Promise.all([
+      emailPromise,
+      metaPromise,
+    ]);
+
+    if (emailResult.error) {
+      console.error("Resend API Error:", emailResult.error);
+      return { success: false };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("sendMyEmail Exception:", error);
+    return { success: false };
+  }
+}
+
+async function sendMetaEvent(meta: MetaEventParams) {
+  console.log("DEBUG PAYLOAD", meta);
+  try {
+    const payload = createMetaPayload(meta);
+    const url = `https://graph.facebook.com/v20.0/${process.env.META_PIXEL_ID}/events?access_token=${process.env.META_CAPI_TOKEN}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+    return result; // Ensure this returns so Promise.all can track it
+  } catch (error) {
+    console.error("ENGINEERING: [Meta-Task] Exception:", error);
+  }
+}
 </file>
 
 <file path="tsconfig.json">
@@ -7115,163 +7127,6 @@ export function Footer({ navItems }: FooterProps) {
 }
 </file>
 
-<file path="components/CTA.tsx">
-"use client";
-import { useState, ChangeEvent } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { submitQuoteRequest } from "@/app/api/email/actions";
-import BeforeImage from "@/public/images/before1.webp";
-
-// Extend the window object for Facebook Pixel
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
-  }
-}
-
-export function CTA({ className }: { className?: string }) {
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [phone, setPhone] = useState("");
-
-  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 10) value = value.slice(0, 10);
-    if (value.length > 6)
-      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
-    else if (value.length > 3)
-      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-    else if (value.length > 0) value = `(${value}`;
-    setPhone(value);
-  };
-
-  const handleSubmit = async (formData: FormData) => {
-    setStatus("loading");
-
-    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    formData.append("eventId", eventId);
-
-    // Debugging: Verify that data is actually in the FormData
-    for (const [key, value] of formData.entries()) {
-      console.log(`DEBUG: FormData Entry: ${key} = ${value}`);
-    }
-
-    const result = await submitQuoteRequest(formData);
-
-    if (result.success) {
-      setStatus("success");
-    } else {
-      setStatus("idle");
-      alert("Submission failed. Please try again.");
-    }
-  };
-  return (
-    <section
-      className={cn("px-4 md:px-8 bg-primary/10 rounded-2xl p-8", className)}
-    >
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-        <div className="flex-1 w-full min-h-[400px] flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            {status === "success" ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center text-center"
-              >
-                <motion.div
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-lg"
-                >
-                  <motion.svg
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    className="w-12 h-12 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={4}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </motion.svg>
-                </motion.div>
-                <motion.h3
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-2xl font-bold text-foreground"
-                >
-                  Your request sent!
-                </motion.h3>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="form"
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="w-full flex flex-col gap-6"
-              >
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-                  Is your couch looking TIRED?
-                </h2>
-                <p className="text-xl text-muted">
-                  We’ll make it look <strong>brand new again!</strong>
-                </p>
-                <form
-                  action={handleSubmit}
-                  className="flex flex-col gap-3 mt-4"
-                >
-                  <input
-                    name="name"
-                    placeholder="Your Name"
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
-                  />
-                  <input
-                    name="phone"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    placeholder="(xxx) xxx-xxxx"
-                    required
-                    minLength={14}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-transform active:scale-95 disabled:opacity-50"
-                  >
-                    {status === "loading"
-                      ? "SENDING..."
-                      : "GET A FREE QUOTE TODAY!"}
-                  </button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        <div className="w-full flex-1">
-          <div className="max-w-175 aspect-square rounded-xl overflow-hidden relative">
-            <Image
-              alt="Before"
-              fill
-              src={BeforeImage}
-              className="object-cover"
-              unoptimized
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-</file>
-
 <file path="components/oldComponents/VideoComponent.tsx">
 import { VideoCopmpnent } from "@/types";
 import { cn } from "@/lib/utils";
@@ -7510,7 +7365,7 @@ export function stringUrl(
 
   // Add &publicationState=preview to the URL string
   const url = `${STRAPI_URL}/api/${sanitizedPath}${queryString ? `?${queryString}` : ""}`;
-  console.log("This is fetching url:", url);
+  // console.log("This is fetching url:", url);
 }
 </file>
 
@@ -7781,6 +7636,170 @@ export function Breadcrumbs({
 }
 </file>
 
+<file path="components/CTA.tsx">
+"use client";
+import { useState, ChangeEvent } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { submitQuoteRequest } from "@/app/api/email/actions";
+import BeforeImage from "@/public/images/before1.webp";
+
+// Extend the window object for Facebook Pixel
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+  }
+}
+
+export function CTA({ className }: { className?: string }) {
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [phone, setPhone] = useState("");
+
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 10) value = value.slice(0, 10);
+    if (value.length > 6)
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+    else if (value.length > 3)
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    else if (value.length > 0) value = `(${value}`;
+    setPhone(value);
+  };
+
+  const handleSubmit = async (formData: FormData) => {
+    setStatus("loading");
+
+    // Generate the eventId at the start so it is identical for both browser and server
+    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+    // Append to FormData so the Server Action receives it
+    formData.append("eventId", eventId);
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "form_submitted",
+      // These keys MUST match the "Data Layer Variable Name" in GTM
+      event_id: eventId, // Matches 'dlv - event_id'
+      estimated_value: 0, // Matches 'dlv - estimated_value'
+    });
+
+    const result = await submitQuoteRequest(formData);
+
+    if (result.success) {
+      setStatus("success");
+    } else {
+      setStatus("idle");
+      alert("Submission failed. Please try again.");
+    }
+  };
+
+  return (
+    <section
+      className={cn("px-4 md:px-8 bg-primary/10 rounded-2xl p-8", className)}
+    >
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+        <div className="flex-1 w-full min-h-[400px] flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {status === "success" ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center text-center"
+              >
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-lg"
+                >
+                  <motion.svg
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    className="w-12 h-12 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={4}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </motion.svg>
+                </motion.div>
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-2xl font-bold text-foreground"
+                >
+                  Your request sent!
+                </motion.h3>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form"
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full flex flex-col gap-6"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+                  Is your couch looking TIRED?
+                </h2>
+                <p className="text-xl text-muted">
+                  We’ll make it look <strong>brand new again!</strong>
+                </p>
+                <form
+                  action={handleSubmit}
+                  className="flex flex-col gap-3 mt-4"
+                >
+                  <input
+                    name="name"
+                    placeholder="Your Name"
+                    required
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
+                  />
+                  <input
+                    name="phone"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    placeholder="(xxx) xxx-xxxx"
+                    required
+                    minLength={14}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-transform active:scale-95 disabled:opacity-50"
+                  >
+                    {status === "loading"
+                      ? "SENDING..."
+                      : "GET A FREE QUOTE TODAY!"}
+                  </button>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="w-full flex-1">
+          <div className="max-w-175 aspect-square rounded-xl overflow-hidden relative">
+            <Image
+              alt="Before"
+              fill
+              src={BeforeImage}
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+</file>
+
 <file path="lib/strapi.ts">
 import { StrapiResponse } from "@/types";
 import qs from "qs";
@@ -7834,21 +7853,6 @@ export async function fetchStrapi<T>(
     throw error;
   }
 }
-</file>
-
-<file path="types/index.ts">
-export * from "./common";
-
-export * from "./location";
-export * from "./project";
-export * from "./service-hub";
-export * from "./service";
-export * from "./state";
-export * from "./navbar";
-export * from "./videoComponent";
-export * from "./testimonials";
-export * from "./prices";
-export * from "./capi";
 </file>
 
 <file path="app/layout.tsx">
@@ -8377,6 +8381,21 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+</file>
+
+<file path="types/index.ts">
+export * from "./common";
+
+export * from "./location";
+export * from "./project";
+export * from "./service-hub";
+export * from "./service";
+export * from "./state";
+export * from "./navbar";
+export * from "./videoComponent";
+export * from "./testimonials";
+export * from "./prices";
+export * from "./capi";
 </file>
 
 <file path="app/globals.css">
