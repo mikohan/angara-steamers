@@ -6,12 +6,7 @@ const config = {
   // Optional: Add other settings here
   exclude: ["/admin/*", "/secret-page", "/booking/*", "/styleguide"],
   robotsTxtOptions: {
-    policies: [
-      {
-        userAgent: "*",
-        disallow: "/", // This tells all bots NOT to crawl your site
-      },
-    ],
+    policies: [{}],
   },
 };
 
