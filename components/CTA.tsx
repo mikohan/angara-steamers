@@ -3,7 +3,7 @@ import { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { submitQuoteRequest } from "@/app/api/email/actions";
+import { submitQuoteRequest } from "@/api/email/actions";
 import BeforeImage from "@/public/images/before1.webp";
 
 // Extend the window object for Facebook Pixel

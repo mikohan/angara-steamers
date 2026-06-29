@@ -1,7 +1,7 @@
 "use client";
 import { useState, ChangeEvent } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { submitQuoteRequest } from "@/app/api/email/actions";
+import { submitQuoteRequest } from "@/api/email/actions";
 
 export function QuoteDialog({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
