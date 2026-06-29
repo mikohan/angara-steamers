@@ -5,7 +5,7 @@ import { Metadata } from "next";
 export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
   const canonical = baseUrl;
   const companyWebsite =
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com";
 
   // Define primary image
   const primaryImageUrl =

@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { sendMyEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email";
 
 export async function submitQuoteRequest(formData: FormData) {
   const name = formData.get("name") as string;
@@ -12,11 +12,11 @@ export async function submitQuoteRequest(formData: FormData) {
   const headerList = await headers();
   const forwarded = headerList.get("x-forwarded-for");
   // Split by comma and take the first item, default to 127.0.0.1
-  // const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
-  const ip = "164.68.240.80";
+  const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+  // const ip = "164.68.240.80";
   const ua = headerList.get("user-agent") ?? "unknown";
 
-  const result = await sendMyEmail(
+  const result = await sendEmail(
     "New Lead - Angara Steamers",
     `Name: ${name}, Phone: ${phone}`,
     {

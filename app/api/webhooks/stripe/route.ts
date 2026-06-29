@@ -52,9 +52,11 @@ export async function POST(req: Request) {
     `;
 
     await sendEmail(
-      to_email, // Replace with actual email
-      "New Booking Angara Steamers",
-      emailBody,
+      "New Booking Angara Steamers", // subject
+      emailBody, // html
+      undefined, // meta (not needed here)
+      undefined, // to (uses default env var)
+      undefined, // from (uses default env var)
     );
   }
 

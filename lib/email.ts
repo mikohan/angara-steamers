@@ -5,7 +5,7 @@ import { DEBUG_CONFIG } from "./config";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
-export async function sendMyEmail(
+export async function sendEmail(
   subject: string,
   html: string,
   meta?: MetaEventParams,
@@ -39,7 +39,7 @@ export async function sendMyEmail(
 
     return { success: true };
   } catch (error) {
-    console.error("sendMyEmail Exception:", error);
+    console.error("sendEmail Exception:", error);
     return { success: false };
   }
 }
