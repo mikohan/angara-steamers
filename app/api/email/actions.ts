@@ -6,6 +6,7 @@ import { sendEmail } from "@/lib/email";
 export async function submitQuoteRequest(formData: FormData) {
   const name = formData.get("name") as string;
   const phone = formData.get("phone") as string;
+  const message = formData.get("message") as string;
   const eventId = formData.get("eventId") as string;
 
   // Update this in actions.ts
@@ -18,7 +19,7 @@ export async function submitQuoteRequest(formData: FormData) {
 
   const result = await sendEmail(
     "New Lead - Angara Steamers",
-    `Name: ${name}, Phone: ${phone}`,
+    `New Lead Received:, Name: ${name}, Phone: ${phone}, Message: ${message}`,
     {
       eventName: "Lead",
       eventId,
