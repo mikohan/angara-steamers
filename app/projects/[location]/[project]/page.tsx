@@ -163,9 +163,9 @@ export default async function ProjectPage({
       />
 
       <main className="py-10">
-        <section>
+        {/* <section>
           <pre>{JSON.stringify(jsonLd, null, 2)}</pre>
-        </section>
+        </section> */}
         {Array.isArray(projectInstance.media_gallery) && (
           <article className="px-4 mx-auto max-w-7xl">
             <Breadcrumbs className="my-4" segments={breadcrumbSegments} />

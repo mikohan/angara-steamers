@@ -43,6 +43,9 @@ export default function ServiceListingPage() {
     <div className="min-h-screen bg-background p-4 md:p-8 lg:p-12">
       <div className="max-w-6xl mx-auto">
         <Breadcrumbs segments={breadcrumbSegments} className="pb-8 pl-4" />
+        <h1 className="my-8 heading-h2">
+          Price for Upholstery and Carpet Professional Cleaning
+        </h1>
         <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8 items-start">
           {/* SIDEBAR LEDGER (RIGHT SIDE - FIXED POSITION) */}
           <div className="lg:col-span-4 lg:sticky lg:top-8">
