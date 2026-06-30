@@ -42,6 +42,9 @@ function Testimonials() {
   const firstCol = testimonials.slice(0, 9);
   const secondCol = testimonials.slice(9, 18);
   const thridCol = testimonials.slice(18, 27);
+  const GMB =
+    process.env.NEXT_PUBLIC_COMPANY_GMB ||
+    "https://share.google/oDULc3KpCXQC52z9f";
   return (
     <div className="container px-8 mx-auto">
       {/* Header and subheader */}
@@ -52,7 +55,7 @@ function Testimonials() {
       <h3 className="heading-h3 text-center mt-2 px-8 mb-16 md:mb-32">
         Our customer love us so much. All reviews are real.
         <a
-          href="4.9 Google Rated https://share.google/oDULc3KpCXQC52z9f"
+          href={GMB}
           target="_blank"
           rel="noopener noreferrer"
           className="text-couchBlue underline"

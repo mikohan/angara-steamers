@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description:
     "Restore your furniture's freshness with Angara Steamers. Top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles. Fast, reliable results for families and pets.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "http://angaraprosteamers.com",
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com",
   ),
   openGraph: {
     title: "Angara Steamers | Professional Upholstery Cleaning in LA",

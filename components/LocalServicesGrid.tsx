@@ -59,9 +59,14 @@ export default function LocalServicesGrid({
 
             // Advanced Dynamic URL Assembly matching: /services/[hub-slug]/[service-slug]
             const hubSlug = service.service_hub?.slug;
-            const absolutePath = hubSlug
-              ? `/services/${hubSlug}/${service.slug}`
-              : `/services/${service.slug}`;
+            const serviceSlug = service.slug;
+
+            // Ensure we have at least a serviceSlug before building the path
+            const absolutePath = serviceSlug
+              ? hubSlug
+                ? `/services/${hubSlug}/${serviceSlug}`
+                : `/services/${hubSlug}/${serviceSlug}`
+              : "/services/upholstery"; // Fallback if the slug is missing entirely
 
             return (
               <motion.div
