@@ -45,6 +45,10 @@ export default async function LocationsPage() {
     {} as Record<string, Record<string, typeof response.data>>,
   );
 
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Service Areas", path: "/locations" },
+  ];
   return (
     <>
       {/* 3. Inject JSON-LD into the page */}
@@ -54,7 +58,7 @@ export default async function LocationsPage() {
       />
 
       <main className="container mx-auto py-12 px-6 max-w-7xl">
-        <Breadcrumbs className="my-4" />
+        <Breadcrumbs segments={breadcrumbSegments} className="my-4" />
         <div className="max-w-5xl">
           <h1 className="text-4xl font-bold tracking-tight">
             Professional Upholstery Cleaning Services in Service Areas

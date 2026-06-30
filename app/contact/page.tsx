@@ -12,10 +12,14 @@ export default function ContactPage() {
     // Simulate API call
     setTimeout(() => setStatus("success"), 1500);
   };
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Contacts", path: "/contact" },
+  ];
 
   return (
     <div className="mx-auto max-w-7xl py-16 px-4 md:px-0">
-      <Breadcrumbs />
+      <Breadcrumbs segments={breadcrumbSegments} />
       <div className="grid md:grid-cols-2 gap-12 items-center">
         {/* Left: Heading & Info */}
         <div className="space-y-6">

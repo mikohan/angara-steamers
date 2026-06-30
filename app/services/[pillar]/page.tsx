@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps) {
       return { title: "Page Not Found" };
     }
 
-    const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/${pillar}`;
+    const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}`;
     const { metadata } = generateHubSeo(response, baseUrl);
     return metadata;
   } catch (error) {
@@ -83,8 +83,17 @@ export default async function ServicesPage({
 
   const servicesData = await response.data[0];
 
-  const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/${pillar}`;
+  const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}`;
   const { jsonLd } = generateHubSeo(response, baseUrl);
+
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    // { label: "Services", path: "/services" },
+    {
+      label: servicesData.title || "Category",
+      path: `/services/${pillar}`,
+    },
+  ];
 
   return (
     <>
@@ -94,7 +103,7 @@ export default async function ServicesPage({
       />
       <main>
         <section className="px-4 mx-auto max-w-7xl">
-          <Breadcrumbs className="my-4" removeSegments={["services"]} />
+          <Breadcrumbs className="my-4" segments={breadcrumbSegments} />
           <Hero video />
         </section>
 

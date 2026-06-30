@@ -32,7 +32,10 @@ export default async function ProjectsPage() {
   const projects = response.data;
 
   const { jsonLd } = generateProjectsListSeo(baseUrl, projects);
-
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Projects", path: "/projects" },
+  ];
   return (
     <>
       <script
@@ -41,7 +44,7 @@ export default async function ProjectsPage() {
       />
       <main>
         <section className="container max-w-7xl mx-auto py-10 px-4">
-          <Breadcrumbs className="my-4" />
+          <Breadcrumbs segments={breadcrumbSegments} className="my-4" />
           <header className="mb-12">
             <h1 className="text-5xl font-extrabold mb-6">
               Upholstery & Sofa Cleaning Projects

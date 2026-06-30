@@ -10,6 +10,7 @@ import { WaveDivider } from "@/components/common/WaveDivider";
 import { LatestProjects } from "@/components/LatestProjects";
 import LocalServicesGrid from "@/components/LocalServicesGrid";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -198,6 +199,12 @@ export default async function Location({ params }: PageProps) {
     null,
     2,
   );
+  // Inside Location component, after: const location = rawResponse.data[0];
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Service Areas", path: "/locations" },
+    { label: location.city_name, path: `/locations/${slug}` },
+  ];
 
   return (
     <>
@@ -207,7 +214,8 @@ export default async function Location({ params }: PageProps) {
       />
 
       <main>
-        <section className="px-4">
+        <section className="px-4 max-w-7xl mx-auto">
+          <Breadcrumbs segments={breadcrumbSegments} className="mt-8" />
           <Hero
             video={false}
             header={location.h1_heading}

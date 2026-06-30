@@ -7,10 +7,15 @@ import { VideoReviews } from "@/components/oldComponents/VideoReviews";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { Prices } from "@/components/Prices";
 export default function AboutPage() {
+  // Inside ServicePagePage component
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "About", path: "/about" },
+  ];
   return (
     <main>
       <div className="mx-auto max-w-7xl px-4 md:px-0">
-        <Breadcrumbs />
+        <Breadcrumbs segments={breadcrumbSegments} />
         <HeroAbout
           video="/oldMedia/videos/LandPage1.mp4"
           poster={MeVasya.src}

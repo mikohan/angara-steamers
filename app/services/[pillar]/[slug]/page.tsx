@@ -90,7 +90,7 @@ export async function generateMetadata({
   // 4. Generate Metadata
   const { metadata } = generateServicePageSeo(
     response,
-    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${slug}`,
+    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
   );
 
   return metadata;
@@ -100,9 +100,9 @@ export async function generateMetadata({
 export default async function ServicePagePage({
   params,
 }: {
-  params: { slug: string };
+  params: { pillar: string; slug: string };
 }) {
-  const { slug } = await params;
+  const { pillar, slug } = await params;
   const data: StrapiResponse<ServicePage> = await fetchStrapi(
     "service-pages",
     getQuery(slug),
@@ -115,7 +115,7 @@ export default async function ServicePagePage({
   const statesData: StrapiResponse<State> = await fetchStrapi("states");
   const { combinedJsonLd } = generateServicePageSeo(
     data,
-    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${slug}`,
+    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
     statesData,
   );
   const heroImageUrl =
@@ -150,6 +150,16 @@ export default async function ServicePagePage({
     { populate: "*" },
   );
   const services = allServices.data;
+  // Inside ServicePagePage component
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    // { label: "Services", path: "/services" },
+    {
+      label: service.service_hub?.title || "Category",
+      path: `/services/${pillar}`,
+    },
+    { label: service.title, path: `/services/${pillar}/${slug}` },
+  ];
   return (
     <>
       <script
@@ -159,7 +169,7 @@ export default async function ServicePagePage({
       <main>
         <div className="mx-auto max-w-7xl">
           <div className="mx-4 md:mx-0">
-            <Breadcrumbs className="my-4" removeSegments={["services"]} />
+            <Breadcrumbs className="my-4" segments={breadcrumbSegments} />
             {/* Inject Schema as a Script Tag */}
             <Hero
               header={data.data[0].title}

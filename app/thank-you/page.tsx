@@ -5,16 +5,21 @@ import Link from "next/link";
 import { useCart } from "@/store/useCart";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import familyPhoto from "@/public/images/family.webp"; // Replace with your generated image path
-import { ButtonShiny } from "@/components/common/ButtonShiny";
-import { BorderLightButton } from "@/components/common/BorderLightButton";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 export default function ThankYouPage() {
   const { cart } = useCart();
   const total = cart.reduce((sum, i) => sum + i.priceAfter * i.quantity, 0);
 
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Thank You!", path: "/thank-you" },
+  ];
   return (
-    <div className="min-h-screen bg-background py-16 px-4 md:px-8">
-      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <div className="min-h-screen bg-background py-16 px-4 md:px-8 max-w-6xl mx-auto">
+      <Breadcrumbs segments={breadcrumbSegments} />
+
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* Left: Content */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 text-price-green">

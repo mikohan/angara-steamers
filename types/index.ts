@@ -10,3 +10,4 @@ export * from "./videoComponent";
 export * from "./testimonials";
 export * from "./prices";
 export * from "./capi";
+export * from "./navigation";

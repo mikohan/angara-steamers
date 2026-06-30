@@ -1,5 +1,5 @@
 import { fetchStrapi } from "@/lib/strapi";
-import { Project, StrapiResponse } from "@/types";
+import { BreadcrumbItem, Project, StrapiResponse } from "@/types";
 import { generateProjectPageSeo } from "@/data/meta-data/meta-project";
 import { GalleryGrid } from "@/components/GalleryGrid";
 import { ProjectImage } from "@/components/ProjectImage";
@@ -98,7 +98,26 @@ export default async function ProjectPage({
     DefaultServiceImage;
   const locationImageUrl =
     strapi + projectInstance.location_page?.og_image.url || DefaultServiceImage;
-  const removeBread = projectInstance.location_page?.slug || "pillar";
+
+  const breadcrumbSegments: BreadcrumbItem[] = [
+    { label: "Home", path: "/" },
+    {
+      label: "Projects",
+      path: "/projects",
+    },
+    {
+      label: projectInstance.location_page?.city_name || "Location",
+      path: `/locations/${projectInstance.location_page?.slug}`,
+    },
+    {
+      label: projectInstance.service_page?.title || "Service",
+      path: `/services/${projectInstance.service_page?.service_hub?.slug}/${projectInstance.service_page?.slug}`,
+    },
+    {
+      label: projectInstance.title,
+      path: `/projects/${projectInstance.location_page?.slug}/${project}`,
+    },
+  ];
   return (
     <>
       {/* Inject the full JSON-LD Graph */}
@@ -113,7 +132,7 @@ export default async function ProjectPage({
         </section> */}
 
         <article className="px-4 mx-auto max-w-7xl">
-          {/* <Breadcrumbs className="my-4" removeSegments={[removeBread]} /> */}
+          <Breadcrumbs className="my-4" segments={breadcrumbSegments} />
           <div>
             <div className="flex justify-between text-muted mb-12">
               <div>

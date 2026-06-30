@@ -8,6 +8,7 @@ import {
   FileText,
   UserCircle,
 } from "lucide-react";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 export default function PrivacyPolicy() {
   const phone = process.env.NEXT_PUBLIC_COMPANY_PHONE;
@@ -19,9 +20,15 @@ export default function PrivacyPolicy() {
     { label: "CCPA/CPRA Compliant", icon: <FileText className="size-5" /> },
     { label: "Secure Local Storage", icon: <Lock className="size-5" /> },
   ];
-
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Policy", path: "/policy" },
+  ];
   return (
     <main className="min-h-screen bg-background py-16 px-6 lg:py-24 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto">
+        <Breadcrumbs className="mb-8" segments={breadcrumbSegments} />
+      </div>
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
         {/* Left Column: Personal Touch */}
         <aside className="space-y-8">

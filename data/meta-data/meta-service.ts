@@ -17,7 +17,7 @@ export function generateServicePageSeo(
     // 1. Safety Check: Ensure faqs exists and has at least one item
     // if (!faq || !Array.isArray(faq) || faq.length === 0) {
     //   return null;
-    // }
+    // , canonical}
 
     // 2. Map only if safe
     return {

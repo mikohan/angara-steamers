@@ -5,6 +5,7 @@ import { useCart } from "@/store/useCart";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowLeft, CreditCard } from "lucide-react";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 export default function CartPage() {
   const [hasHydrated, setHasHydrated] = useState<boolean>(false);
@@ -60,9 +61,15 @@ export default function CartPage() {
   const total = subtotal; //  + tax;
 
   // Inside your checkout component
+
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Cart", path: "/cart" },
+  ];
   if (cart.length === 0) {
     return (
       <div className="container mx-auto max-w-3xl px-6 py-24 text-center space-y-6">
+        <Breadcrumbs segments={breadcrumbSegments} />
         <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
           🛒
         </div>
@@ -85,6 +92,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto max-w-6xl px-6 py-12 md:py-20">
+      <Breadcrumbs segments={breadcrumbSegments} />
       <div className="flex items-center justify-between mb-8 border-b border-muted/10 pb-4">
         <h1 className="text-3xl font-black tracking-tight text-foreground">
           Shopping Cart

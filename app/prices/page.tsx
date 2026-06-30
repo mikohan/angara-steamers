@@ -14,6 +14,7 @@ import {
 import { prices } from "@/data/prices";
 import { IPrice } from "@/types";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 export default function ServiceListingPage() {
   const [hasHydrated, setHasHydrated] = useState(false);
@@ -33,45 +34,52 @@ export default function ServiceListingPage() {
     },
     {} as Record<string, IPrice[]>,
   );
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Prices", path: "/prices" },
+  ];
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8 lg:p-12">
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8 items-start">
-        {/* SIDEBAR LEDGER (RIGHT SIDE - FIXED POSITION) */}
-        <div className="lg:col-span-4 lg:sticky lg:top-8">
-          {cart.length > 0 ? (
-            <div className="border border-foreground/20 rounded-3xl overflow-hidden shadow-2xl min-h-[500px] flex flex-col relative bg-background">
-              <div className="p-8 flex flex-col h-full">
-                <h2 className="text-3xl font-black">Your Selection</h2>
-                <SidebarLedger />
+      <div className="max-w-6xl mx-auto">
+        <Breadcrumbs segments={breadcrumbSegments} className="pb-8 pl-4" />
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8 items-start">
+          {/* SIDEBAR LEDGER (RIGHT SIDE - FIXED POSITION) */}
+          <div className="lg:col-span-4 lg:sticky lg:top-8">
+            {cart.length > 0 ? (
+              <div className="border border-foreground/20 rounded-3xl overflow-hidden shadow-2xl min-h-[500px] flex flex-col relative bg-background">
+                <div className="p-8 flex flex-col h-full">
+                  <h2 className="text-3xl font-black">Your Selection</h2>
+                  <SidebarLedger />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="hidden border border-foreground/20 rounded-3xl overflow-hidden shadow-2xl min-h-[500px] md:flex flex-col relative bg-background">
-              <div className="p-8 flex flex-col h-full">
-                <h2 className="text-3xl font-black">Your Selection</h2>
-                <SidebarLedger />
+            ) : (
+              <div className="hidden border border-foreground/20 rounded-3xl overflow-hidden shadow-2xl min-h-[500px] md:flex flex-col relative bg-background">
+                <div className="p-8 flex flex-col h-full">
+                  <h2 className="text-3xl font-black">Your Selection</h2>
+                  <SidebarLedger />
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-        {/* SERVICES GRID (LEFT SIDE) */}
-        <div className="lg:col-span-8 space-y-12">
-          {Object.entries(groupedServices).map(([category, items]) => (
-            <div key={category} className="space-y-6">
-              <h3 className="text-2xl font-black text-foreground uppercase tracking-wider border-b border-foreground/10 pb-2">
-                {category}
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                {items.map((service, idx) => (
-                  <BigServiceCard
-                    key={`${category}-${idx}`}
-                    service={service}
-                  />
-                ))}
+            )}
+          </div>
+          {/* SERVICES GRID (LEFT SIDE) */}
+          <div className="lg:col-span-8 space-y-12">
+            {Object.entries(groupedServices).map(([category, items]) => (
+              <div key={category} className="space-y-6">
+                <h3 className="text-2xl font-black text-foreground uppercase tracking-wider border-b border-foreground/10 pb-2">
+                  {category}
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {items.map((service, idx) => (
+                    <BigServiceCard
+                      key={`${category}-${idx}`}
+                      service={service}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
