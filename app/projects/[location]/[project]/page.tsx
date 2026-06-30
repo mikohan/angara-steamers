@@ -113,7 +113,7 @@ export default async function ProjectPage({
         </section> */}
 
         <article className="px-4 mx-auto max-w-7xl">
-          <Breadcrumbs className="my-4" removeSegments={[removeBread]} />
+          {/* <Breadcrumbs className="my-4" removeSegments={[removeBread]} /> */}
           <div>
             <div className="flex justify-between text-muted mb-12">
               <div>
