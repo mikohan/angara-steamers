@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import { GoogleStars } from "./oldComponents/GoogleStars";
 import { AvatarGroup } from "./oldComponents/AvatarGroup";
-import { Button } from "@/components/ui/button"; // Shadcn Button
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import {
   Dialog,
@@ -9,7 +12,7 @@ import {
   DialogDescription,
   DialogTitle,
   DialogClose,
-} from "@/components/ui/dialog"; // Shadcn Dialog
+} from "@/components/ui/dialog";
 import Image from "next/image";
 import MyImage from "@/public/oldMedia/couch/hero-me-color.png";
 import { VideoComponent } from "./oldComponents/VideoComponent";
@@ -25,7 +28,10 @@ interface IProps {
   heroImage?: string;
   video: boolean;
 }
+
 function Hero({ header, className, heroImage, video, subheader }: IProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const h1 = header
     ? header
     : "Couch and Upholstery Professional Steam Cleaning in LA";
@@ -33,31 +39,30 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
   const h2 = subheader
     ? subheader
     : "We restore freshness, remove odors, and save your furniture time & money. Professional, safe, fast.";
+
   return (
     <section
       className={cn(
-        "pt-8 md:pt-16 pb-16 bg-background mx-auto max-w-7xl md:px-0",
+        "pt-8 md:pt-16 pb-16 bg-background mx-auto max-w-7xl px-4 md:px-0",
         className,
       )}
     >
-      <div className="md:flex justify-center w-full items-center">
+      <div className="md:flex justify-center w-full items-center gap-12">
         <div className="md:flex-1">
-          <div className="inline-flex gap-2 w-full justify-center">
+          <div className="inline-flex gap-2 w-full justify-center md:justify-start">
             <AvatarGroup />
             <GoogleStars starsCount={5} rating="" />
           </div>
 
-          <div className="flex flex-col md:items-center">
-            <h1 className="md:text-left mt-4 md:mt-12 text-3xl md:text-6xl font-bold tracking-tight">
+          <div className="flex flex-col md:items-start text-center md:text-left">
+            <h1 className="mt-4 md:mt-12 text-3xl md:text-6xl font-bold tracking-tight">
               {h1}
             </h1>
-
-            <p className="md:text-left text-lg md:text-xl text-muted-foreground mt-4 md:mt-8">
+            <p className="text-lg md:text-xl text-muted-foreground mt-4 md:mt-8">
               {h2}
             </p>
 
-            <div className="w-full flex flex-col md:flex-row gap-8 mt-12 md:mt-12 justify-center">
-              {/* Shadcn Button Pattern */}
+            <div className="w-full flex flex-col md:flex-row gap-4 mt-8 md:mt-12 justify-center md:justify-start">
               <QuoteDialog>
                 <ButtonShiny
                   size="lg"
@@ -67,8 +72,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                 </ButtonShiny>
               </QuoteDialog>
 
-              {/* Shadcn Dialog Pattern (Replaces ModalDaisy) */}
-              <Dialog>
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
@@ -80,7 +84,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                 </DialogTrigger>
                 <DialogContent
                   showCloseButton={false}
-                  className="max-w-4xl ring-0 overflow-hidden flex flex-col items-center justify-center"
+                  className="max-w-sm w-[90vw] p-0 overflow-hidden ring-0 border-none flex flex-col items-center justify-center bg-transparent"
                 >
                   <VisuallyHidden>
                     <DialogTitle>Our Upholstery Cleaning Process</DialogTitle>
@@ -89,16 +93,19 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                     </DialogDescription>
                   </VisuallyHidden>
 
-                  {/* Container that forces the video to stay in the box */}
-                  <div className="relative px-4 md:px-0 w-full max-h-[80vh] aspect-video">
-                    <VideoComponent
-                      source="/oldMedia/videos/process.mp4"
-                      className="w-full"
-                    />
+                  {/* Vertical container (9:16) */}
+                  <div className="relative w-full aspect-[9/16] bg-black rounded-2xl overflow-hidden">
+                    {isOpen && (
+                      <VideoComponent
+                        source="/oldMedia/videos/test1.mp4"
+                        className="w-full h-full"
+                        autoPlay={true}
+                        muted={true}
+                      />
+                    )}
                   </div>
 
-                  {/* X button visibility fix */}
-                  <DialogClose className="absolute right-12 top-12 z-50 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 flex items-center justify-center">
+                  <DialogClose className="absolute -top-12 right-0 z-50 rounded-full bg-white/10 p-2 text-white hover:bg-white/20">
                     <X className="h-8 w-8" strokeWidth={2.5} />
                   </DialogClose>
                 </DialogContent>
@@ -107,23 +114,29 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
           </div>
         </div>
 
-        <div className="mt-16 md:mt-0 md:flex-1 flex justify-center ">
+        {/* Hero Image or Hero Video */}
+        <div className="mt-16 md:mt-0 md:flex-1 flex justify-center">
           {!video && (
-            <div className="relative aspect-4/5 w-full max-w-sm md:max-w-md h-auto">
+            <div className="relative aspect-[4/5] w-full max-w-sm h-auto">
               <Image
                 fetchPriority="high"
                 src={heroImageUrl}
                 priority
-                alt="Professional upholstery cleaning in Los Angeles"
+                alt="Professional upholstery cleaning"
                 className="rounded-2xl object-cover shadow-2xl w-full h-full"
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 768px) 100vw, 500px"
               />
             </div>
           )}
           {video && (
-            <div className="relative aspect-9/16 w-full max-w-sm md:max-w-md h-auto">
-              <VideoComponent source="/oldMedia/videos/process.mp4" />
+            <div className="relative aspect-[9/16] w-full max-w-sm h-auto rounded-2xl overflow-hidden shadow-2xl">
+              <VideoComponent
+                source="/oldMedia/videos/test3.mp4"
+                className="w-full h-full"
+                autoPlay={true}
+                muted={true}
+              />
             </div>
           )}
         </div>
@@ -131,4 +144,5 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
     </section>
   );
 }
+
 export { Hero };
