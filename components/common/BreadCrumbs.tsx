@@ -7,7 +7,7 @@ export const Breadcrumbs = ({ segments, className }: BreadcrumbsProps) => {
       aria-label="Breadcrumb"
       className={`text-sm text-muted-foreground ${className || ""}`}
     >
-      <ol className="flex items-center space-x-2">
+      <ol className="flex items-center space-x-2 text-primary-800 font-semibold">
         {segments.map((segment, index) => (
           <li key={segment.path} className="flex items-center">
             {index > 0 && <span className="mx-2">/</span>}
