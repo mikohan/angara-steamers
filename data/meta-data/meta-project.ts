@@ -6,11 +6,25 @@ export function generateProjectPageSeo(
   response: StrapiResponse<Project>,
   baseUrl: string,
 ) {
+  if (!response?.data || response.data.length === 0) {
+    return {
+      metadata: { title: "Project Not Found" },
+      jsonLd: null,
+    };
+  }
+
   const data = response.data[0];
   const canonical = baseUrl.startsWith("http")
     ? baseUrl
     : `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}${baseUrl}`;
   const loc = data.location_page;
+  const cmsBase =
+    process.env.NEXT_PUBLIC_STRAPI_URL || "https://cms.angaracleaning.com";
+
+  const servicePath = data.service_page
+    ? `/services/${data.service_page.service_hub?.slug}/${data.service_page.slug}`
+    : "/services";
+  const fullServiceUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}${servicePath}`;
 
   // 1. Full Metadata Configuration
   const metadata: Metadata = {
@@ -23,14 +37,22 @@ export function generateProjectPageSeo(
       title: data.meta_title,
       description: data.meta_description,
       siteName: BUSINESS_CONFIG.business_name,
-      images: data.media_gallery.map((img) => ({
-        url:
-          process.env.NEXT_PUBLIC_STRAPI_URL +
-            (img.formats?.medium?.url || img.url) || "/images/og_image.webp",
-        width: 1200,
-        height: 630,
-        alt: img.alternativeText || data.title,
-      })),
+      images: (data.media_gallery || []).map((img) => {
+        // Safely extract the path, preferring medium, then original, or empty
+        const path = img.formats?.medium?.url || img.url || "";
+
+        // Only prepend the base URL if a valid path exists
+        const fullUrl = path
+          ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${path}`
+          : "/images/og_image.webp";
+
+        return {
+          url: fullUrl,
+          width: 1200,
+          height: 630,
+          alt: img.alternativeText || data.title,
+        };
+      }),
     },
   };
 
@@ -97,14 +119,12 @@ export function generateProjectPageSeo(
         datePublished: data.completion_date,
         image: data.media_gallery.map(
           (img: StrapiMedia) =>
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}${img.formats?.small?.url || img.url}`,
+            `${cmsBase}${img.formats?.small?.url || img.url}`,
         ),
         mainEntity: {
           "@type": "Service",
           name: "Professional Upholstery Cleaning", // Update to match your actual service name
-          url:
-            `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${data.service_page?.service_hub?.slug}/${data.service_page?.slug}` ||
-            process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/services",
+          url: fullServiceUrl,
         },
         author: {
           "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#organization`,
