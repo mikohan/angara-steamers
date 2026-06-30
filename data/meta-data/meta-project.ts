@@ -7,7 +7,9 @@ export function generateProjectPageSeo(
   baseUrl: string,
 ) {
   const data = response.data[0];
-  const canonical = baseUrl;
+  const canonical = baseUrl.startsWith("http")
+    ? baseUrl
+    : `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}${baseUrl}`;
   const loc = data.location_page;
 
   // 1. Full Metadata Configuration
@@ -24,7 +26,7 @@ export function generateProjectPageSeo(
       images: data.media_gallery.map((img) => ({
         url:
           process.env.NEXT_PUBLIC_STRAPI_URL +
-          (img.formats?.medium?.url || img.url),
+            (img.formats?.medium?.url || img.url) || "/images/og_image.webp",
         width: 1200,
         height: 630,
         alt: img.alternativeText || data.title,
@@ -100,7 +102,9 @@ export function generateProjectPageSeo(
         mainEntity: {
           "@type": "Service",
           name: "Professional Upholstery Cleaning", // Update to match your actual service name
-          url: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${data.service_page?.service_hub?.slug}/${data.service_page?.slug}`,
+          url:
+            `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${data.service_page?.service_hub?.slug}/${data.service_page?.slug}` ||
+            process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/services",
         },
         author: {
           "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#organization`,
