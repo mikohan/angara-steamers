@@ -19,7 +19,7 @@ export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
 
   return (
     <section className="relative overflow-hidden bg-background py-20 lg:py-32">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row">
+      <div className="mx-auto flex  flex-col items-center gap-12 lg:flex-row px-8">
         {/* Left: Image / Visual Area */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

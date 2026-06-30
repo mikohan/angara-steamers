@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { HeroAbout } from "@/components/HeroAbout";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 import MeVasya from "@/public/images/me_vasya.webp";
@@ -15,7 +14,7 @@ export default function AboutPage() {
   return (
     <main>
       <div className="mx-auto max-w-7xl px-4 md:px-0">
-        <Breadcrumbs segments={breadcrumbSegments} />
+        <Breadcrumbs className="mt-8" segments={breadcrumbSegments} />
         <HeroAbout
           video="/oldMedia/videos/LandPage1.mp4"
           poster={MeVasya.src}
