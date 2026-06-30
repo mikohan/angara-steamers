@@ -58,7 +58,7 @@ export default async function LocationsPage() {
       />
 
       <main className="container mx-auto py-12 px-6 max-w-7xl">
-        <Breadcrumbs segments={breadcrumbSegments} className="my-4" />
+        <Breadcrumbs segments={breadcrumbSegments} className="mt-4 mb-8" />
         <div className="max-w-5xl">
           <h1 className="text-4xl font-bold tracking-tight">
             Professional Upholstery Cleaning Services in Service Areas

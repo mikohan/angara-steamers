@@ -44,7 +44,7 @@ export default async function ProjectsPage() {
       />
       <main>
         <section className="container max-w-7xl mx-auto py-10 px-4">
-          <Breadcrumbs segments={breadcrumbSegments} className="my-4" />
+          <Breadcrumbs segments={breadcrumbSegments} className="mt-4 mb-8" />
           <header className="mb-12">
             <h1 className="text-5xl font-extrabold mb-6">
               Upholstery & Sofa Cleaning Projects
