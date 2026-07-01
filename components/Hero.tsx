@@ -97,7 +97,8 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                   <div className="relative w-full aspect-9/16 bg-black rounded-2xl overflow-hidden max-w-[90%] md:max-w-full">
                     {isOpen && (
                       <VideoComponent
-                        source="/oldMedia/videos/test1.mp4"
+                        source_webm="/videos/land_process.webm"
+                        source_mp4="/videos/land_process.mp4"
                         className="w-full h-full"
                         autoPlay={true}
                         muted={true}
@@ -132,7 +133,8 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
           {video && (
             <div className="relative aspect-9/16 w-full max-w-sm h-auto rounded-2xl overflow-hidden shadow-2xl">
               <VideoComponent
-                source="/oldMedia/videos/test3.mp4"
+                source_mp4="/videos/land_process.mp4"
+                source_webm="/videos/land_process.webm"
                 className="w-full h-full"
                 autoPlay={true}
                 muted={true}

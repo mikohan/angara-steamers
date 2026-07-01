@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 import Poster from "@/public/vasya_rug.webp";
 
 export function VideoComponent({
-  source,
+  source_webm,
+  source_mp4,
   autoPlay = true,
   loop = true,
   muted = true,
@@ -26,7 +27,10 @@ export function VideoComponent({
       playsInline
       poster={poster}
     >
-      <source type="video/mp4" src={source} />
+      {/* <!-- Browser tries WebM (VP9) first for better compression --> */}
+      <source src={source_webm} type="video/webm" />
+      {/* <!-- Fallback to MP4 (H.264) for Safari/iOS --> */}
+      <source src={source_mp4} type="video/mp4" />
       <track kind="subtitles" srcLang="en" label="English" />
       Your browser does not support the video tag.
     </video>

@@ -1,5 +1,6 @@
 export interface VideoCopmpnent {
-  source: string;
+  source_webm?: string;
+  source_mp4: string;
   autoPlay?: boolean;
   loop?: boolean;
   muted?: boolean;
