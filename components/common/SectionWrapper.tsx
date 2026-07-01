@@ -16,7 +16,7 @@ export const WaveDivider2 = ({
   return (
     <div
       className={cn(
-        "absolute left-0 w-full overflow-hidden leading-0",
+        "absolute left-0 w-full overflow-hidden leading-0 z-10",
         position === "top" ? "top-0 rotate-180" : "bottom-0",
         className,
       )}
@@ -24,7 +24,7 @@ export const WaveDivider2 = ({
       <svg
         viewBox="0 0 1200 120"
         preserveAspectRatio="none"
-        className="relative block h-10 w-full md:h-10"
+        className="relative block h-10 w-full"
         style={{ fill: fill }}
       >
         <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C41.4,14.63,89.58,34.1,133,48.16,173.12,61.1,235.61,72.3,321.39,56.44Z"></path>
@@ -32,18 +32,24 @@ export const WaveDivider2 = ({
     </div>
   );
 };
-interface IProps {
+
+interface SectionWrapperProps {
   children: ReactNode;
 }
 
-export function SectionWrapper({ children }: IProps) {
+export function SectionWrapper({ children }: SectionWrapperProps) {
   return (
-    <section className="relative py-24 md:py-32 my-8 md:my-16">
+    <section className="relative py-24 md:py-32 my-8 md:my-16 overflow-x-hidden">
+      {/* Background Gradients */}
       <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/10 to-background"></div>
       <div className="absolute bottom-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-background to-primary/10"></div>
+
+      {/* Wave Dividers */}
       <WaveDivider2 position="top" fill="var(--color-background)" />
       <WaveDivider2 position="bottom" fill="var(--color-background)" />
-      <div>{children}</div>
+
+      {/* Content Container */}
+      <div className="relative z-0">{children}</div>
     </section>
   );
 }
