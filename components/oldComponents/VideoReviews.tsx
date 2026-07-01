@@ -21,7 +21,8 @@ export const VideoReviews = () => {
           <div className="flex flex-col md:flex-row gap-8 pt-16 justify-center">
             <div className="md:max-w-[23%]">
               <VideoComponentTestimonials
-                source="/oldMedia/videos/test1.mp4"
+                source_mp4="/videos/rev1.mp4"
+                source_webm="/videos/rev1.webm"
                 autoPlay={false}
                 muted={false}
                 poster={Test1Poster.src}
@@ -31,7 +32,8 @@ export const VideoReviews = () => {
             <div className="md:max-w-[23%]">
               <VideoComponentTestimonials
                 loop={false}
-                source="/oldMedia/videos/test2.mp4"
+                source_mp4="/videos/rev2.mp4"
+                source_webm="/videos/rev2.webm"
                 autoPlay={false}
                 muted={false}
                 poster={Test2Poster.src}
@@ -39,7 +41,8 @@ export const VideoReviews = () => {
             </div>
             <div className="md:max-w-[23%]">
               <VideoComponentTestimonials
-                source="/oldMedia/videos/test3.mp4"
+                source_mp4="/videos/rev3.mp4"
+                source_webm="/videos/rev3.webm"
                 autoPlay={false}
                 muted={false}
                 poster={Test3Poster.src}

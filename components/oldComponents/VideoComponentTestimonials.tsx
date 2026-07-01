@@ -8,7 +8,8 @@ import { VideoCopmpnent } from "@/types";
 
 // Removed "types" (you requested no types)
 export function VideoComponentTestimonials({
-  source,
+  source_mp4,
+  source_webm,
   autoPlay = true,
   loop = true,
   muted = true,
@@ -53,7 +54,8 @@ export function VideoComponentTestimonials({
         onPause={() => setIsPlaying(false)} // Sync state when video pauses
         onClick={handlePlay}
       >
-        <source src={source} type="video/mp4" />
+        <source src={source_mp4} type="video/mp4" />
+        <source src={source_webm} type="video/webm" />
       </video>
 
       {/* Use a button element for better accessibility. 
