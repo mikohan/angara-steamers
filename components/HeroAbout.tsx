@@ -8,13 +8,15 @@ import MeVasya from "@/public/images/me_vasya.webp";
 
 interface IHeroAbout {
   video?: string;
+  video_webm?: string;
   poster?: string;
   header?: string;
   subheader?: string;
 }
 
 export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
-  const src = video ? video : "/oldMedia/videos/LandPage1.mp4";
+  const src_mp4 = video ? video : "/videos/land_process.mp4";
+  const src_webm = video ? video : "/videos/land_process.webm";
   const posterImg = poster ? poster : MeVasya.src;
 
   return (
@@ -30,7 +32,8 @@ export function HeroAbout({ video, poster, header, subheader }: IHeroAbout) {
           <div className="aspect-4/5 w-full rounded-2xl bg-muted/20 shadow-2xl flex items-center justify-center border border-muted/20">
             {/* Replace this div with your Image component later */}
             <VideoComponent
-              source={src}
+              source_mp4={src_mp4}
+              source_webm={src_webm}
               width="1080"
               height="1350"
               poster={posterImg}

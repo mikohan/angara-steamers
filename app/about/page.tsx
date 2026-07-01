@@ -16,7 +16,8 @@ export default function AboutPage() {
       <div className="mx-auto max-w-7xl px-4 md:px-0">
         <Breadcrumbs className="mt-8" segments={breadcrumbSegments} />
         <HeroAbout
-          video="/oldMedia/videos/LandPage1.mp4"
+          video="/videos/land_process.mp4"
+          video_webm="/videos/land_process.webm"
           poster={MeVasya.src}
         />
       </div>
