@@ -69,7 +69,9 @@ export default function HomePage() {
           }),
         }}
       />
-      <section className="px-4">{/* <Hero video={false} /> */}</section>
+      <section className="px-4">
+        <Hero video={false} />
+      </section>
 
       <section className="relative pt-32 pb-32">
         <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/10 to-background"></div>
