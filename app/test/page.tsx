@@ -1,5 +1,6 @@
 import { BorderLightButton } from "@/components/common/BorderLightButton";
 import { ButtonShiny } from "@/components/common/ButtonShiny";
+import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
 import SafetySection from "@/components/SafeShampoos";
 import { Metadata } from "next";
 
@@ -13,9 +14,12 @@ export const metadata: Metadata = {
 export default function Test() {
   return (
     <>
-      <div className="max-w-[20%] mx-auto mt-32">
+      <div className="max-w-full mx-auto mt-32">
+        <div className="my-16">
+          <CarpetSliderPerks />
+        </div>
         <ButtonShiny />
-        <BorderLightButton className="mt-4" text="Border Light" />
+        <BorderLightButton className="mb-8" text="Border Light" />
       </div>
       <div>
         <SafetySection />

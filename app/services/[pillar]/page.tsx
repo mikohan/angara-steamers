@@ -9,6 +9,7 @@ import { fetchStrapi } from "@/lib/strapi";
 import { StrapiResponse, ServiceHub } from "@/types";
 import { notFound } from "next/navigation";
 import { WaveDivider } from "@/components/common/WaveDivider";
+import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
 
 interface PageProps {
   params: { pillar: string };
@@ -111,13 +112,16 @@ export default async function ServicesPage({
         <section className="py-16 bg-primary/10 mb-16">
           <LogoTicker />
         </section>
+        <section>
+          <CarpetSliderPerks />
+        </section>
         <section className="relative">
           <div className="absolute bottom-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-background to-primary/10"></div>
           <WaveDivider position="bottom" fill="var(--color-background)" />
           <div className="px-4 max-w-7xl mx-auto mb-16 pb-32">
             {/* Pass the array directly to the Grid component */}
             <h2 className="heading-h2 text-center py-8 md:py-16">
-              {servicesData.meta_title}
+              Related Professional Services
             </h2>
             <ServiceGrid
               services={servicesData.service_pages}
