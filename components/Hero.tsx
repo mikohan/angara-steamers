@@ -94,7 +94,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                   </VisuallyHidden>
 
                   {/* Vertical container (9:16) */}
-                  <div className="relative w-full aspect-[9/16] bg-black rounded-2xl overflow-hidden">
+                  <div className="relative w-full aspect-9/16 bg-black rounded-2xl overflow-hidden max-w-[90%] md:max-w-full">
                     {isOpen && (
                       <VideoComponent
                         source="/oldMedia/videos/test1.mp4"
@@ -104,9 +104,9 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                       />
                     )}
                   </div>
-
-                  <DialogClose className="absolute -top-12 right-0 z-50 rounded-full bg-white/10 p-2 text-white hover:bg-white/20">
-                    <X className="h-8 w-8" strokeWidth={2.5} />
+                  <DialogClose className="absolute right-10 md:right-4 top-4 rounded-full p-3 transition-opacity hover:bg-neutral-100 focus:outline-none">
+                    <X className="size-8" strokeWidth={2.5} />
+                    <span className="sr-only">Close</span>
                   </DialogClose>
                 </DialogContent>
               </Dialog>
@@ -117,7 +117,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
         {/* Hero Image or Hero Video */}
         <div className="mt-16 md:mt-0 md:flex-1 flex justify-center">
           {!video && (
-            <div className="relative aspect-[4/5] w-full max-w-sm h-auto">
+            <div className="relative aspect-4/5 w-full max-w-sm h-auto">
               <Image
                 fetchPriority="high"
                 src={heroImageUrl}
@@ -130,7 +130,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
             </div>
           )}
           {video && (
-            <div className="relative aspect-[9/16] w-full max-w-sm h-auto rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative aspect-9/16 w-full max-w-sm h-auto rounded-2xl overflow-hidden shadow-2xl">
               <VideoComponent
                 source="/oldMedia/videos/test3.mp4"
                 className="w-full h-full"
