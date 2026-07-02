@@ -24,7 +24,7 @@ export function MobileMenu({
     <Sheet>
       <SheetTrigger className="sm:hidden p-3 rounded-xl touch-feedback hover:bg-muted/10 transition-colors">
         <svg
-          className="h-6 w-6"
+          className="h-8 w-8"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
