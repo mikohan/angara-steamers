@@ -8,6 +8,9 @@ import { WaveDivider } from "@/components/common/WaveDivider";
 import SafeShampoos from "@/components/SafeShampoos";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { Metadata } from "next";
+import { LogoTicker } from "@/components/LogoTicker";
+import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
+import { CTA } from "@/components/CTA";
 
 export const metadata: Metadata = {
   title:
@@ -72,6 +75,12 @@ export default function HomePage() {
       <section className="px-4">
         <Hero video={false} />
       </section>
+      <section className="py-8 md:py-16">
+        <LogoTicker />
+      </section>
+      <section className="py-8 md:py-16">
+        <CarpetSliderPerks />
+      </section>
 
       <section className="relative pt-32 pb-32">
         <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/10 to-background"></div>
@@ -96,6 +105,9 @@ export default function HomePage() {
       </SectionWrapper>
       <section className="mb-16">
         <VideoReviews />
+      </section>
+      <section className="max-w-6xl mx-auto mb-16">
+        <CTA />
       </section>
     </div>
   );
