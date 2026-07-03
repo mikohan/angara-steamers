@@ -7,13 +7,17 @@ export const metadata: Metadata = {
   description:
     "Get in touch with Angara Steamers for professional upholstery, carpet, and mattress cleaning services in Los Angeles. Request a free quote today.",
   alternates: {
-    canonical: "https://angarasteamers.com/contact",
+    canonical:
+      process.env.NEXT_PUBLIC_COMPANY_WEBSITE ||
+      "https://angaraprosteamers.com/contact",
   },
   openGraph: {
     title: "Contact Angara Steamers | Upholstery & Carpet Cleaning in LA",
     description:
       "Professional upholstery and carpet cleaning services in the Los Angeles area.",
-    url: "https://angarasteamers.com/contact",
+    url:
+      process.env.NEXT_PUBLIC_COMPANY_WEBSITE ||
+      "https://angaraprosteamers.com/contact",
     siteName: "Angara Steamers",
     type: "website",
   },
