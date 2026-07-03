@@ -55,12 +55,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <LoadingBar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {/* <SmoothScroll> */}
-          <NavbarClient staticItems={STATIC_PAGES} navItems={navData.data} />
-          <main className="flex-1">{children}</main>
-          <Footer navItems={navData.data} />
-          <ScrollToTop />
-          {/* </SmoothScroll> */}
+          <SmoothScroll>
+            <NavbarClient staticItems={STATIC_PAGES} navItems={navData.data} />
+            <main className="flex-1">{children}</main>
+            <Footer navItems={navData.data} />
+            <ScrollToTop />
+          </SmoothScroll>
         </ThemeProvider>
         <div id="portal-root"></div>
       </body>

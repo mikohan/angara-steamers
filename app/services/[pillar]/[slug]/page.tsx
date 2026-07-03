@@ -124,6 +124,9 @@ export default async function ServicePagePage({
     },
     { label: service.title, path: `/services/${pillar}/${slug}` },
   ];
+  const relatedServices = allServices.data.filter(
+    (s) => s.service_hub?.slug === pillar,
+  );
 
   return (
     <>
@@ -180,7 +183,7 @@ export default async function ServicePagePage({
           <div className="max-w-7xl px-4 mx-auto">
             <h2 className="heading-h2 text-primary-800">Related services</h2>
             <ServiceServiceLinks
-              allServices={services}
+              allServices={relatedServices}
               currentSlug={service.slug}
               limit={8}
             />
