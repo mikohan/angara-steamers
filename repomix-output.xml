@@ -80,11 +80,12 @@ components/common/SectionWrapper.tsx
 components/common/SmoothScroll.tsx
 components/common/ThemeToggle.tsx
 components/common/WaveDivider.tsx
+components/ContactPageContent.tsx
 components/CTA.tsx
 components/FAQ.tsx
 components/FAQSection.tsx
 components/GalleryGrid.tsx
-components/games/UV.tsx
+components/games/CarpetSliderPerks.tsx
 components/GoogleMap.tsx
 components/Hero.tsx
 components/HeroAbout.tsx
@@ -295,107 +296,6 @@ web-app-manifest-512x512.png
 <files>
 This section contains the contents of the repository's files.
 
-<file path="components/games/UV.tsx">
-"use client";
-
-import {
-  useEffect,
-  useRef,
-  useState,
-  MouseEvent as ReactMouseEvent,
-  TouchEvent as ReactTouchEvent,
-} from "react";
-
-export const BeforeAfterSlider = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [sliderX, setSliderX] = useState<number>(0);
-  const images = useRef<{
-    clean: HTMLImageElement;
-    dirty: HTMLImageElement;
-  } | null>(null);
-
-  // 1. Handle Resize Responsively
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      const { width } = entries[0].contentRect;
-      // Maintain a 16:9 aspect ratio or fixed height
-      const height = width * 0.66;
-      setDimensions({ width, height });
-      setSliderX(width / 2); // Reset slider to center on resize
-    });
-
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  // 2. Initialize Images
-  useEffect(() => {
-    const clean = new Image();
-    const dirty = new Image();
-    clean.src = "/images/rug-after.jpg";
-    dirty.src = "/images/rug-before.jpg";
-    images.current = { clean, dirty };
-  }, []);
-
-  // 3. Optimized Draw Function
-  const draw = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !images.current || dimensions.width === 0) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(images.current.dirty, 0, 0, canvas.width, canvas.height);
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, 0, sliderX, canvas.height);
-    ctx.clip();
-    ctx.drawImage(images.current.clean, 0, 0, canvas.width, canvas.height);
-    ctx.restore();
-
-    ctx.beginPath();
-    ctx.moveTo(sliderX, 0);
-    ctx.lineTo(sliderX, canvas.height);
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 4;
-    ctx.stroke();
-  };
-
-  useEffect(() => {
-    requestAnimationFrame(draw);
-  }, [sliderX, dimensions]);
-
-  const handleMove = (
-    e: ReactMouseEvent<HTMLDivElement> | ReactTouchEvent<HTMLDivElement>,
-  ): void => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    setSliderX(Math.max(0, Math.min(clientX - rect.left, dimensions.width)));
-  };
-
-  return (
-    <div
-      ref={containerRef}
-      className="w-full max-w-2xl mx-auto touch-none select-none"
-      onMouseMove={handleMove}
-      onTouchMove={handleMove}
-    >
-      <canvas
-        ref={canvasRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        className="w-full h-auto cursor-ew-resize rounded-lg border-2 border-primary/20"
-      />
-    </div>
-  );
-};
-</file>
-
 <file path="AGENTS.md">
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
@@ -534,38 +434,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
     >
       {children}
     </motion.main>
-  );
-}
-</file>
-
-<file path="app/test/page.tsx">
-import { BorderLightButton } from "@/components/common/BorderLightButton";
-import { ButtonShiny } from "@/components/common/ButtonShiny";
-import { BeforeAfterSlider } from "@/components/games/UV";
-import SafetySection from "@/components/SafeShampoos";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
-
-export default function Test() {
-  return (
-    <>
-      <div className="max-w-full mx-auto mt-32">
-        <div className="my-16">
-          <BeforeAfterSlider />
-        </div>
-        <ButtonShiny />
-        <BorderLightButton className="mb-8" text="Border Light" />
-      </div>
-      <div>
-        <SafetySection />
-      </div>
-    </>
   );
 }
 </file>
@@ -741,6 +609,168 @@ export function ThemeToggle({ className }: { className?: string }) {
 }
 </file>
 
+<file path="components/ContactPageContent.tsx">
+// components/ContactPageContent.tsx
+"use client";
+
+import { useState, ChangeEvent } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { submitQuoteRequest } from "@/app/api/email/actions";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+
+const sanitizeInput = (str: string) => {
+  return str.replace(/[<>]/g, "");
+};
+
+export function ContactPageContent() {
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [phone, setPhone] = useState("");
+
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 10) value = value.slice(0, 10);
+    if (value.length > 6)
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+    else if (value.length > 3)
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    else if (value.length > 0) value = `(${value}`;
+    setPhone(value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    const formData = new FormData(e.currentTarget);
+    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    formData.append("eventId", eventId);
+
+    const win = window as Record<string, unknown>;
+    if (Array.isArray(win.dataLayer)) {
+      win.dataLayer.push({
+        event: "form_submitted",
+        event_id: eventId,
+        estimated_value: 0,
+      });
+    }
+
+    const result = await submitQuoteRequest(formData);
+
+    if (result.success) {
+      setStatus("success");
+    } else {
+      setStatus("idle");
+      alert("Submission failed. Please check your information and try again.");
+    }
+  };
+
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Contacts", path: "/contact" },
+  ];
+
+  return (
+    <div className="mx-auto max-w-7xl py-16 px-4 md:px-0">
+      <Breadcrumbs segments={breadcrumbSegments} />
+      <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+            Let&apos;s Refresh Your Space
+          </h1>
+          <p className="text-lg text-muted">
+            Have questions about our upholstery cleaning process? We&apos;re
+            here to help you get that fresh-home feeling back.
+          </p>
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center gap-3">
+              <span className="text-primary font-semibold">Email:</span>
+              <span>{process.env.NEXT_PUBLIC_COMPANY_EMAIL}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-primary font-semibold">Service Area:</span>
+              <span>Serving the greater area</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-primary/10 p-8 rounded-3xl border border-primary/30 min-h-[400px] flex items-center">
+          <AnimatePresence mode="wait">
+            {status === "success" ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="w-full text-center py-10"
+              >
+                <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg
+                    className="w-10 h-10 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold">Message Sent!</h3>
+              </motion.div>
+            ) : (
+              <motion.form
+                exit={{ opacity: 0 }}
+                onSubmit={handleSubmit}
+                className="w-full space-y-5"
+              >
+                <input
+                  name="name"
+                  placeholder="Your Name"
+                  required
+                  maxLength={50}
+                  onChange={(e) =>
+                    (e.target.value = sanitizeInput(e.target.value))
+                  }
+                  className="w-full p-4 rounded-xl border border-primary/30 bg-background focus:ring-2 focus:ring-primary outline-none transition"
+                />
+                <input
+                  name="phone"
+                  placeholder="(xxx) xxx-xxxx"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  required
+                  minLength={14}
+                  className="w-full p-4 rounded-xl border border-primary/30 bg-background focus:ring-2 focus:ring-primary outline-none transition"
+                />
+                <textarea
+                  name="message"
+                  placeholder="How can we help you?"
+                  rows={4}
+                  required
+                  maxLength={500}
+                  onChange={(e) =>
+                    (e.target.value = sanitizeInput(e.target.value))
+                  }
+                  className="w-full p-4 rounded-xl border border-primary/30 bg-background focus:ring-2 focus:ring-primary outline-none transition"
+                />
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="w-full py-4 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-50"
+                >
+                  {status === "loading" ? "SENDING..." : "Send Message"}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
 <file path="components/FAQSection.tsx">
 "use client";
 import React from "react";
@@ -878,6 +908,156 @@ export function GalleryGrid({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+</file>
+
+<file path="components/games/CarpetSliderPerks.tsx">
+"use client";
+
+import {
+  useEffect,
+  useRef,
+  useState,
+  MouseEvent as ReactMouseEvent,
+  TouchEvent as ReactTouchEvent,
+} from "react";
+import { Leaf, Clock, Zap } from "lucide-react";
+
+const perks = [
+  {
+    icon: Leaf,
+    title: "Eco-Friendly",
+    description:
+      "Best-in-class non-toxic shampoos safe for your family and pets.",
+  },
+  {
+    icon: Clock,
+    title: "Always On Time",
+    description: "We respect your schedule with punctual, reliable service.",
+  },
+  {
+    icon: Zap,
+    title: "Powerful Extraction",
+    description: "High-pressure equipment that leaves your carpet almost dry.",
+  },
+];
+
+export const CarpetSliderPerks = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [sliderX, setSliderX] = useState<number>(0);
+  const images = useRef<{
+    clean: HTMLImageElement;
+    dirty: HTMLImageElement;
+  } | null>(null);
+
+  // 1. Responsive Resizing
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      const height = width * 0.5625; // Maintain 16:9 aspect ratio
+      setDimensions({ width, height });
+      setSliderX(width / 2); // Initial center
+    });
+
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // 2. Load Images
+  useEffect(() => {
+    const clean = new Image();
+    const dirty = new Image();
+    clean.src = "/images/rug-after.jpg";
+    dirty.src = "/images/rug-before.jpg";
+    images.current = { clean, dirty };
+  }, []);
+
+  // 3. Render Loop
+  const draw = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !images.current || dimensions.width === 0) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(images.current.dirty, 0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, sliderX, canvas.height);
+    ctx.clip();
+    ctx.drawImage(images.current.clean, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    // Divider Line
+    ctx.beginPath();
+    ctx.moveTo(sliderX, 0);
+    ctx.lineTo(sliderX, canvas.height);
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+  };
+
+  useEffect(() => {
+    requestAnimationFrame(draw);
+  }, [sliderX, dimensions]);
+
+  // 4. Precise Event Handling
+  const handleMove = (
+    e: ReactMouseEvent<HTMLCanvasElement> | ReactTouchEvent<HTMLCanvasElement>,
+  ): void => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Use nativeEvent.offsetX for the most accurate positioning relative to the element
+    const clientX =
+      "touches" in e
+        ? e.touches[0].clientX - canvas.getBoundingClientRect().left
+        : (e.nativeEvent as MouseEvent).offsetX;
+
+    setSliderX(Math.max(0, Math.min(clientX, dimensions.width)));
+  };
+
+  return (
+    <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 p-8">
+      <div
+        ref={containerRef}
+        className="relative w-full md:w-3/5 touch-none select-none"
+      >
+        <canvas
+          ref={canvasRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          onMouseMove={handleMove}
+          onTouchMove={handleMove}
+          className="w-full h-auto cursor-ew-resize rounded-2xl shadow-2xl border-4 border-primary/20 block"
+        />
+      </div>
+
+      <div className="w-full md:w-2/5 space-y-10">
+        <h2 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground">
+          Professional Care
+        </h2>
+        <div className="space-y-8">
+          {perks.map((perk) => (
+            <div key={perk.title} className="flex items-start gap-4">
+              <div className="mt-1 p-4 bg-primary/10 rounded-2xl text-primary shrink-0">
+                <perk.icon size={32} />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-foreground mb-1">
+                  {perk.title}
+                </h3>
+                <p className="text-lg text-muted">{perk.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 </file>
 
 <file path="components/LatestProjectsService.tsx">
@@ -3457,160 +3637,34 @@ export default function CartPage() {
 }
 </file>
 
-<file path="app/policy/page.tsx">
-import Image from "next/image";
-import MainImage from "@/public/vasya_rug.webp";
-import {
-  Phone,
-  Mail,
-  ShieldCheck,
-  Lock,
-  FileText,
-  UserCircle,
-} from "lucide-react";
-import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+<file path="app/test/page.tsx">
+import { BorderLightButton } from "@/components/common/BorderLightButton";
+import { ButtonShiny } from "@/components/common/ButtonShiny";
+import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
+import SafetySection from "@/components/SafeShampoos";
+import { Metadata } from "next";
 
-export default function PrivacyPolicy() {
-  const phone = process.env.NEXT_PUBLIC_COMPANY_PHONE;
-  const email = process.env.NEXT_PUBLIC_COMPANY_EMAIL;
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
-  const highlights = [
-    { label: "No Data Sharing", icon: <ShieldCheck className="size-5" /> },
-    { label: "No Cookies/Tracking", icon: <Lock className="size-5" /> },
-    { label: "CCPA/CPRA Compliant", icon: <FileText className="size-5" /> },
-    { label: "Secure Local Storage", icon: <Lock className="size-5" /> },
-  ];
-  const breadcrumbSegments = [
-    { label: "Home", path: "/" },
-    { label: "Policy", path: "/policy" },
-  ];
+export default function Test() {
   return (
-    <main className="min-h-screen bg-background py-16 px-6 lg:py-24 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto">
-        <Breadcrumbs className="mb-8" segments={breadcrumbSegments} />
+    <>
+      <div className="max-w-full mx-auto mt-32">
+        <div className="my-16">
+          <CarpetSliderPerks />
+        </div>
+        <ButtonShiny />
+        <BorderLightButton className="mb-8" text="Border Light" />
       </div>
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
-        {/* Left Column: Personal Touch */}
-        <aside className="space-y-8">
-          <div className="relative aspect-4/5 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-primary/20">
-            <Image
-              src={MainImage}
-              alt="Owner of Angara Streamers"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-x-0 bottom-0 p-8 bg-linear-to-t from-primary-800/80 to-transparent">
-              <p className="text-2xl font-bold text-white leading-tight">
-                Dedicated to Your Trust
-              </p>
-              <p className="text-white/90 mt-2 font-medium">
-                Angara Streamers Upholstery Cleaning
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10">
-            <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-              <UserCircle className="text-primary" /> Our Commitment
-            </h3>
-            <div className="flex flex-col gap-3">
-              {highlights.map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center gap-3 text-muted bg-background/50 px-4 py-3 rounded-xl border border-primary/5"
-                >
-                  <span className="text-primary">{item.icon}</span>
-                  <span className="font-medium text-sm">{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        {/* Right Column: Editorial Content */}
-        <article className="bg-background border border-primary/10 p-8 md:p-12 rounded-[2.5rem] shadow-sm">
-          <header className="mb-12">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-foreground tracking-tight mb-4">
-              Your Privacy Matters.
-            </h1>
-            <p className="text-xl text-muted">
-              How we handle your data with respect and transparency.
-            </p>
-          </header>
-
-          <div className="text-foreground space-y-10 leading-relaxed">
-            <section>
-              <h2 className="text-2xl font-bold mb-3 text-primary">
-                What We Collect
-              </h2>
-              <p>
-                As a specialized upholstery cleaning service in Los Angeles, we
-                keep data collection minimal. We only request your{" "}
-                <strong>Name</strong>, <strong>Email Address</strong>, and{" "}
-                <strong>Phone Number</strong> to coordinate your cleaning
-                sessions.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold mb-3 text-primary">
-                How Your Data is Used
-              </h2>
-              <p>
-                Your information is used strictly for communication and
-                scheduling. We use it to send you booking confirmations and
-                necessary service updates via email or text. Your data resides
-                solely in our secure, private, local database.
-              </p>
-            </section>
-
-            <section className="bg-primary text-white p-8 rounded-2xl shadow-lg">
-              <h2 className="text-2xl font-bold mb-3">Strict Privacy Policy</h2>
-              <p className="text-white/90">
-                <strong>
-                  We do not sell, rent, or share your personal information with
-                  third parties under any circumstances.
-                </strong>{" "}
-                We believe your trust is the most important part of our service.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold mb-3 text-primary">
-                Cookies & Tracking
-              </h2>
-              <p>
-                Our website is designed for privacy. We do not use tracking
-                cookies. Any analytical tools are for internal performance
-                monitoring only—never for third-party advertising or profiling.
-              </p>
-            </section>
-          </div>
-
-          <footer className="mt-16 pt-10 border-t border-primary/10 grid md:grid-cols-2 gap-6">
-            <a
-              href={`mailto:${email}`}
-              className="flex items-center gap-4 p-4 rounded-xl hover:bg-primary/5 transition-colors text-foreground"
-            >
-              <div className="bg-primary/10 p-3 rounded-full text-primary">
-                <Mail className="size-6" />
-              </div>
-              <span className="font-semibold">{email || "Email Pending"}</span>
-            </a>
-            <a
-              href={`tel:${phone}`}
-              className="flex items-center gap-4 p-4 rounded-xl hover:bg-primary/5 transition-colors text-foreground"
-            >
-              <div className="bg-primary/10 p-3 rounded-full text-primary">
-                <Phone className="size-6" />
-              </div>
-              <span className="font-semibold">{phone || "Phone Pending"}</span>
-            </a>
-          </footer>
-        </article>
+      <div>
+        <SafetySection />
       </div>
-    </main>
+    </>
   );
 }
 </file>
@@ -5479,6 +5533,186 @@ export async function POST(req: Request) {
 }
 </file>
 
+<file path="app/policy/page.tsx">
+import Image from "next/image";
+import MainImage from "@/public/vasya_rug.webp";
+import {
+  Phone,
+  Mail,
+  ShieldCheck,
+  Lock,
+  FileText,
+  UserCircle,
+} from "lucide-react";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy & Terms | Angara Steamers",
+  description:
+    "Read the privacy policy, service terms, and conditions for Angara Steamers upholstery and carpet cleaning services in Los Angeles.",
+  alternates: {
+    canonical: "https://angaraprosteamers.com/policy",
+  },
+  openGraph: {
+    title: "Privacy Policy & Terms | Angara Steamers",
+    description: "Privacy policy and terms of service for Angara Steamers.",
+    url: "https://angaraprosteamers.com/policy",
+    siteName: "Angara Steamers",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export default function PrivacyPolicy() {
+  const phone = process.env.NEXT_PUBLIC_COMPANY_PHONE;
+  const email = process.env.NEXT_PUBLIC_COMPANY_EMAIL;
+
+  const highlights = [
+    { label: "No Data Sharing", icon: <ShieldCheck className="size-5" /> },
+    { label: "No Cookies/Tracking", icon: <Lock className="size-5" /> },
+    { label: "CCPA/CPRA Compliant", icon: <FileText className="size-5" /> },
+    { label: "Secure Local Storage", icon: <Lock className="size-5" /> },
+  ];
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "Policy", path: "/policy" },
+  ];
+  return (
+    <main className="min-h-screen bg-background py-16 px-6 lg:py-24 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto">
+        <Breadcrumbs className="mb-8" segments={breadcrumbSegments} />
+      </div>
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
+        {/* Left Column: Personal Touch */}
+        <aside className="space-y-8">
+          <div className="relative aspect-4/5 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-primary/20">
+            <Image
+              src={MainImage}
+              alt="Owner of Angara Streamers"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-x-0 bottom-0 p-8 bg-linear-to-t from-primary-800/80 to-transparent">
+              <p className="text-2xl font-bold text-white leading-tight">
+                Dedicated to Your Trust
+              </p>
+              <p className="text-white/90 mt-2 font-medium">
+                Angara Streamers Upholstery Cleaning
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10">
+            <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
+              <UserCircle className="text-primary" /> Our Commitment
+            </h3>
+            <div className="flex flex-col gap-3">
+              {highlights.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center gap-3 text-muted bg-background/50 px-4 py-3 rounded-xl border border-primary/5"
+                >
+                  <span className="text-primary">{item.icon}</span>
+                  <span className="font-medium text-sm">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        {/* Right Column: Editorial Content */}
+        <article className="bg-background border border-primary/10 p-8 md:p-12 rounded-[2.5rem] shadow-sm">
+          <header className="mb-12">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-foreground tracking-tight mb-4">
+              Your Privacy Matters.
+            </h1>
+            <p className="text-xl text-muted">
+              How we handle your data with respect and transparency.
+            </p>
+          </header>
+
+          <div className="text-foreground space-y-10 leading-relaxed">
+            <section>
+              <h2 className="text-2xl font-bold mb-3 text-primary">
+                What We Collect
+              </h2>
+              <p>
+                As a specialized upholstery cleaning service in Los Angeles, we
+                keep data collection minimal. We only request your{" "}
+                <strong>Name</strong>, <strong>Email Address</strong>, and{" "}
+                <strong>Phone Number</strong> to coordinate your cleaning
+                sessions.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold mb-3 text-primary">
+                How Your Data is Used
+              </h2>
+              <p>
+                Your information is used strictly for communication and
+                scheduling. We use it to send you booking confirmations and
+                necessary service updates via email or text. Your data resides
+                solely in our secure, private, local database.
+              </p>
+            </section>
+
+            <section className="bg-primary text-white p-8 rounded-2xl shadow-lg">
+              <h2 className="text-2xl font-bold mb-3">Strict Privacy Policy</h2>
+              <p className="text-white/90">
+                <strong>
+                  We do not sell, rent, or share your personal information with
+                  third parties under any circumstances.
+                </strong>{" "}
+                We believe your trust is the most important part of our service.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-bold mb-3 text-primary">
+                Cookies & Tracking
+              </h2>
+              <p>
+                Our website is designed for privacy. We do not use tracking
+                cookies. Any analytical tools are for internal performance
+                monitoring only—never for third-party advertising or profiling.
+              </p>
+            </section>
+          </div>
+
+          <footer className="mt-16 pt-10 border-t border-primary/10 grid md:grid-cols-2 gap-6">
+            <a
+              href={`mailto:${email}`}
+              className="flex items-center gap-4 p-4 rounded-xl hover:bg-primary/5 transition-colors text-foreground"
+            >
+              <div className="bg-primary/10 p-3 rounded-full text-primary">
+                <Mail className="size-6" />
+              </div>
+              <span className="font-semibold">{email || "Email Pending"}</span>
+            </a>
+            <a
+              href={`tel:${phone}`}
+              className="flex items-center gap-4 p-4 rounded-xl hover:bg-primary/5 transition-colors text-foreground"
+            >
+              <div className="bg-primary/10 p-3 rounded-full text-primary">
+                <Phone className="size-6" />
+              </div>
+              <span className="font-semibold">{phone || "Phone Pending"}</span>
+            </a>
+          </footer>
+        </article>
+      </div>
+    </main>
+  );
+}
+</file>
+
 <file path="app/prices/page.tsx">
 "use client";
 
@@ -6196,27 +6430,6 @@ export function stringUrl(
 }
 </file>
 
-<file path="next-sitemap.config.js">
-/** @type {import('next-sitemap').IConfig} */
-const config = {
-  siteUrl:
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE ?? "https://angaraprosteamers.com", // Replace with your actual domain
-  generateRobotsTxt: true,
-  // Optional: Add other settings here
-  exclude: ["/admin/*", "/secret-page", "/booking/*", "/styleguide"],
-  robotsTxtOptions: {
-    policies: [
-      {
-        userAgent: "*",
-        allow: "/", // This tells all bots NOT to crawl your site
-      },
-    ],
-  },
-};
-
-export default config;
-</file>
-
 <file path="types/common.ts">
 // Define a specific interface for your pagination or metadata
 import { StrapiRegion } from "@/types";
@@ -6482,413 +6695,6 @@ export async function POST(req: Request) {
 }
 </file>
 
-<file path="app/contact/page.tsx">
-"use client";
-import { useState, ChangeEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { submitQuoteRequest } from "@/app/api/email/actions";
-import { Breadcrumbs } from "@/components/common/BreadCrumbs";
-
-const sanitizeInput = (str: string) => {
-  return str.replace(/[<>]/g, "");
-};
-
-export default function ContactPage() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [phone, setPhone] = useState("");
-
-  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 10) value = value.slice(0, 10);
-    if (value.length > 6)
-      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
-    else if (value.length > 3)
-      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-    else if (value.length > 0) value = `(${value}`;
-    setPhone(value);
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setStatus("loading");
-
-    const formData = new FormData(e.currentTarget);
-    const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    formData.append("eventId", eventId);
-
-    // Track in GTM
-    const win = window as Record<string, unknown>;
-    if (Array.isArray(win.dataLayer)) {
-      win.dataLayer.push({
-        event: "form_submitted",
-        event_id: eventId,
-        estimated_value: 0,
-      });
-    }
-
-    // Track in Meta Pixel
-    // if (typeof win.fbq === "function") {
-    //   (win.fbq as (...args: unknown[]) => void)("track", "Lead", {
-    //     eventID: eventId,
-    //   });
-    // }
-
-    const result = await submitQuoteRequest(formData);
-
-    if (result.success) {
-      setStatus("success");
-    } else {
-      setStatus("idle");
-      alert("Submission failed. Please check your information and try again.");
-    }
-  };
-
-  const breadcrumbSegments = [
-    { label: "Home", path: "/" },
-    { label: "Contacts", path: "/contact" },
-  ];
-
-  return (
-    <div className="mx-auto max-w-7xl py-16 px-4 md:px-0">
-      <Breadcrumbs segments={breadcrumbSegments} />
-      <div className="grid md:grid-cols-2 gap-12 items-center">
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Let&apos;s Refresh Your Space
-          </h1>
-          <p className="text-lg text-muted">
-            Have questions about our upholstery cleaning process? We&apos;re
-            here to help you get that fresh-home feeling back.
-          </p>
-          <div className="space-y-4 pt-4">
-            <div className="flex items-center gap-3">
-              <span className="text-primary font-semibold">Email:</span>
-              <span>{process.env.NEXT_PUBLIC_COMPANY_EMAIL}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-primary font-semibold">Service Area:</span>
-              <span>Serving the greater area</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-primary/10 p-8 rounded-3xl border border-primary/30 min-h-[400px] flex items-center">
-          <AnimatePresence mode="wait">
-            {status === "success" ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="w-full text-center py-10"
-              >
-                <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg
-                    className="w-10 h-10 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold">Message Sent!</h3>
-              </motion.div>
-            ) : (
-              <motion.form
-                exit={{ opacity: 0 }}
-                onSubmit={handleSubmit}
-                className="w-full space-y-5"
-              >
-                <input
-                  name="name"
-                  placeholder="Your Name"
-                  required
-                  maxLength={50}
-                  onChange={(e) =>
-                    (e.target.value = sanitizeInput(e.target.value))
-                  }
-                  className="w-full p-4 rounded-xl border border-primary/30 bg-background focus:ring-2 focus:ring-primary outline-none transition"
-                />
-                <input
-                  name="phone"
-                  placeholder="(xxx) xxx-xxxx"
-                  value={phone}
-                  onChange={handlePhoneChange}
-                  required
-                  minLength={14}
-                  className="w-full p-4 rounded-xl border border-primary/30 bg-background focus:ring-2 focus:ring-primary outline-none transition"
-                />
-                <textarea
-                  name="message"
-                  placeholder="How can we help you?"
-                  rows={4}
-                  required
-                  maxLength={500}
-                  onChange={(e) =>
-                    (e.target.value = sanitizeInput(e.target.value))
-                  }
-                  className="w-full p-4 rounded-xl border border-primary/30 bg-background focus:ring-2 focus:ring-primary outline-none transition"
-                />
-                <button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="w-full py-4 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-50"
-                >
-                  {status === "loading" ? "SENDING..." : "Send Message"}
-                </button>
-              </motion.form>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-}
-</file>
-
-<file path="app/services/[pillar]/[slug]/page.tsx">
-import { Breadcrumbs } from "@/components/common/BreadCrumbs";
-import { RichTextRenderer } from "@/components/common/RichTextRenderer";
-import { SectionWrapper } from "@/components/common/SectionWrapper";
-import { CTA } from "@/components/CTA";
-import FAQ from "@/components/FAQ";
-import { Hero } from "@/components/Hero";
-import { LatestProjectsService } from "@/components/LatestProjectsService";
-import { LogoTicker } from "@/components/LogoTicker";
-import { Team } from "@/components/oldComponents/Team";
-import { VideoReviews } from "@/components/oldComponents/VideoReviews";
-import { WhyUs } from "@/components/oldComponents/WhyUs";
-import { ServiceServiceLinks } from "@/components/ServiceServiceLinks";
-import { Testimonials } from "@/components/Testimonials";
-import { generateServicePageSeo } from "@/data/meta-data/meta-service";
-import { fetchStrapi } from "@/lib/strapi";
-import { ServicePage, State, StrapiResponse } from "@/types";
-import { notFound } from "next/navigation";
-
-// 1. Tell Next.js which paths to pre-render at build time
-// app/[pillar]/[slug]/page.tsx
-
-export async function generateStaticParams() {
-  // 1. Fetch all services from Strapi
-  const services: StrapiResponse<ServicePage> = await fetchStrapi(
-    "service-pages",
-    {
-      populate: ["service_hub"],
-    },
-  );
-
-  // 2. Filter out items where service_hub is missing and map safely
-  return services.data
-    .filter((service) => service.service_hub?.slug) // Ensure hub and slug exist
-    .map((service) => ({
-      pillar: service.service_hub!.slug, // ! tells TS "we checked this above"
-      slug: service.slug,
-    }));
-}
-
-// const getQuery = (slug: string) => ({
-//   filters: {
-//     slug: {
-//       $eq: slug,
-//     },
-//   },
-//   populate: ["hero_image", "og_image", "faq", "service_hub", "projects"],
-// });
-const getQuery = (slug: string) => ({
-  filters: {
-    slug: {
-      $eq: slug,
-    },
-  },
-  populate: {
-    hero_image: true,
-    og_image: true,
-    faq: true,
-    service_hub: true,
-    projects: {
-      populate: ["location_page", "media_gallery"],
-    },
-  },
-});
-
-// 1. Generate Metadata
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ pillar: string; slug: string }>;
-}) {
-  const { pillar, slug } = await params;
-
-  // 1. Ignore collision routes
-  if (pillar === "projects") return {};
-
-  // 2. Fetch Data
-  const response: StrapiResponse<ServicePage> = await fetchStrapi(
-    "service-pages",
-    getQuery(slug),
-  );
-
-  // 3. Fail-Safe: If no data, return empty metadata instead of crashing
-  if (!response?.data?.[0]) {
-    console.error(
-      `[SEO CRASH PREVENTION]: No service found for /${pillar}/${slug}`,
-    );
-    return { title: "Page Not Found" };
-  }
-
-  // 4. Generate Metadata
-  const { metadata } = generateServicePageSeo(
-    response,
-    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
-  );
-
-  return metadata;
-}
-
-// 2. Render Page and JSON-LD
-export default async function ServicePagePage({
-  params,
-}: {
-  params: { pillar: string; slug: string };
-}) {
-  const { pillar, slug } = await params;
-  const data: StrapiResponse<ServicePage> = await fetchStrapi(
-    "service-pages",
-    getQuery(slug),
-  );
-  if (!data?.data?.length) {
-    notFound();
-  }
-  const service = data.data[0];
-
-  const statesData: StrapiResponse<State> = await fetchStrapi("states");
-  const { combinedJsonLd } = generateServicePageSeo(
-    data,
-    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
-    statesData,
-  );
-  const heroImageUrl =
-    process.env.NEXT_PUBLIC_STRAPI_URL + service.hero_image.url || "";
-  const projects = service.projects || [];
-  // console.log(projects[0].location_page);
-  const validProjects = projects.filter(
-    (p): p is typeof p & { date: string } => p.createdAt !== undefined,
-  );
-  const latestProjects = [...validProjects]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt ?? 0).getTime() -
-        new Date(a.createdAt ?? 0).getTime(),
-    )
-    .map((project) => {
-      // Check if the date exists; if not, return null to filter it out later
-      if (!project.createdAt) return null;
-
-      // Return the project with the valid date
-      return {
-        ...project,
-        date: new Date(project.createdAt),
-      };
-    })
-    // Filter out the nulls so we are left with only projects that have valid dates
-    .filter((p): p is typeof p & { date: Date } => p !== null)
-    // Now take the top 8
-    .slice(0, 8);
-  const allServices: StrapiResponse<ServicePage> = await fetchStrapi(
-    "service-pages",
-    { populate: "*" },
-  );
-  const services = allServices.data;
-  // Inside ServicePagePage component
-  const breadcrumbSegments = [
-    { label: "Home", path: "/" },
-    // { label: "Services", path: "/services" },
-    {
-      label: service.service_hub?.title || "Category",
-      path: `/services/${pillar}`,
-    },
-    { label: service.title, path: `/services/${pillar}/${slug}` },
-  ];
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedJsonLd) }}
-      />
-      <main>
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-4 md:mx-0">
-            <Breadcrumbs className="my-4" segments={breadcrumbSegments} />
-            {/* Inject Schema as a Script Tag */}
-            <Hero
-              header={data.data[0].title}
-              heroImage={heroImageUrl}
-              video={false}
-              subheader={service.h2_subheadning}
-            />
-            {/* <pre>{JSON.stringify(combinedJsonLd, null, 2)}</pre> */}
-          </div>
-        </div>
-        <section className="bg-primary/10 py-16 mt-8 md:mt-16">
-          <LogoTicker />
-        </section>
-        <section className="mx-auto max-w-7xl mt-16 md:mt-32">
-          <WhyUs />
-        </section>
-        <section className="mx-auto max-w-7xl">
-          <SectionWrapper>
-            <Testimonials />
-          </SectionWrapper>
-        </section>
-        <section>
-          <Team />
-        </section>
-        {latestProjects.length && (
-          <section>
-            <LatestProjectsService
-              projects={latestProjects || []}
-              service={service}
-            />
-          </section>
-        )}
-        <section className="py-16 md:py-32 mx-4">
-          <CTA />
-        </section>
-        {service.faq.length && (
-          <SectionWrapper>
-            <FAQ items={service.faq} serviceName={service.title} />
-          </SectionWrapper>
-        )}
-        <section className="py-16 md:py-32 mx-auto max-w-5xl px-4 md:px-0">
-          <RichTextRenderer content={service.seo_text} />
-        </section>
-        <SectionWrapper>
-          <div className="max-w-7xl px-4 mx-auto">
-            <h2 className="heading-h2 text-primary-800">Related services</h2>
-            <ServiceServiceLinks
-              allServices={services}
-              currentSlug={service.slug}
-              limit={8}
-            />
-          </div>
-        </SectionWrapper>
-        <section className="mx-auto max-w-5xl my-16">
-          <CTA className="mx-4" />
-        </section>
-        <section className="py-16 md:py-32">
-          <VideoReviews />
-        </section>
-      </main>
-    </>
-  );
-}
-</file>
-
 <file path="components/common/Footer.tsx">
 import Link from "next/link";
 import { ServiceHub } from "@/types";
@@ -7086,6 +6892,27 @@ export async function fetchStrapi<T>(
 }
 </file>
 
+<file path="next-sitemap.config.js">
+/** @type {import('next-sitemap').IConfig} */
+const config = {
+  siteUrl:
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE ?? "https://angaraprosteamers.com", // Replace with your actual domain
+  generateRobotsTxt: true,
+  // Optional: Add other settings here
+  exclude: ["/admin/*", "/test", "/booking/*", "/styleguide"],
+  robotsTxtOptions: {
+    policies: [
+      {
+        userAgent: "*",
+        allow: "/", // This tells all bots NOT to crawl your site
+      },
+    ],
+  },
+};
+
+export default config;
+</file>
+
 <file path="app/api/email/actions.ts">
 "use server";
 
@@ -7230,146 +7057,6 @@ export default async function ProjectsPage() {
           <LogoTicker />
         </section>
         <section className="my-16">
-          <CTA />
-        </section>
-      </main>
-    </>
-  );
-}
-</file>
-
-<file path="app/services/[pillar]/page.tsx">
-import { Breadcrumbs } from "@/components/common/BreadCrumbs";
-import { CTA } from "@/components/CTA";
-import { LogoTicker } from "@/components/LogoTicker";
-import { Hero } from "@/components/Hero";
-import { ServiceGrid } from "@/components/ServiseGrid";
-import { Testimonials } from "@/components/Testimonials";
-import { generateHubSeo } from "@/data/meta-data/meta-services";
-import { fetchStrapi } from "@/lib/strapi";
-import { StrapiResponse, ServiceHub } from "@/types";
-import { notFound } from "next/navigation";
-import { WaveDivider } from "@/components/common/WaveDivider";
-
-interface PageProps {
-  params: { pillar: string };
-}
-//Static params generation
-export async function generateStaticParams() {
-  const services: StrapiResponse<ServiceHub> = await fetchStrapi(
-    "service-hubs",
-    {
-      fields: ["slug"],
-    },
-  );
-
-  const paths = services.data.map((item: ServiceHub) => ({
-    pillar: item.slug,
-  }));
-  // console.log("GENERATING STATIC PATHS:", paths);
-  return paths;
-}
-
-// Generate metaData
-export async function generateMetadata({ params }: PageProps) {
-  const { pillar } = await params;
-
-  try {
-    const response: StrapiResponse<ServiceHub> = await fetchStrapi(
-      "service-hubs",
-      {
-        filters: { slug: { $eq: pillar } },
-        populate: ["service_pages"],
-      },
-    );
-
-    if (!response?.data?.length) {
-      return { title: "Page Not Found" };
-    }
-
-    const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}`;
-    const { metadata } = generateHubSeo(response, baseUrl);
-    return metadata;
-  } catch (error) {
-    console.error("Metadata fetch failed for:", pillar, error);
-    // Return default metadata so the page still builds even if Strapi is unhappy
-    return { title: "Our Services | Angara Steamers" };
-  }
-}
-
-// Page itself code
-
-export default async function ServicesPage({
-  params,
-}: {
-  params: { pillar: string };
-}) {
-  const { pillar } = await params;
-  // console.log(pillar);
-  // 2. Fetch only the data for THIS specific pillar
-  // This acts as your "existence check"
-  const getQuery = (pillar: string) => ({
-    filters: { slug: { $eq: pillar } },
-    populate: ["service_pages", "service_pages.hero_image"],
-  });
-  const response: StrapiResponse<ServiceHub> = await fetchStrapi(
-    "service-hubs",
-    getQuery(pillar),
-  );
-
-  // 3. If no hub exists with this slug, return 404 immediately
-  if (!response?.data?.length) {
-    notFound();
-  }
-
-  const servicesData = await response.data[0];
-
-  const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}`;
-  const { jsonLd } = generateHubSeo(response, baseUrl);
-
-  const breadcrumbSegments = [
-    { label: "Home", path: "/" },
-    // { label: "Services", path: "/services" },
-    {
-      label: servicesData.title || "Category",
-      path: `/services/${pillar}`,
-    },
-  ];
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <main>
-        <section className="px-4 mx-auto max-w-7xl">
-          <Breadcrumbs className="mt-8" segments={breadcrumbSegments} />
-          <Hero video />
-        </section>
-
-        <section>{/* <pre>{JSON.stringify(jsonLd, null, 2)}</pre> */}</section>
-        <section className="py-16 bg-primary/10 mb-16">
-          <LogoTicker />
-        </section>
-        <section className="relative">
-          <div className="absolute bottom-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-background to-primary/10"></div>
-          <WaveDivider position="bottom" fill="var(--color-background)" />
-          <div className="px-4 max-w-7xl mx-auto mb-16 pb-32">
-            {/* Pass the array directly to the Grid component */}
-            <h2 className="heading-h2 text-center py-8 md:py-16">
-              {servicesData.meta_title}
-            </h2>
-            <ServiceGrid
-              services={servicesData.service_pages}
-              parentSlug={pillar}
-            />
-          </div>
-        </section>
-        <section className="px-4 my-16 max-w-7xl mx-auto">
-          <Testimonials />
-        </section>
-        <section className="px-4 max-w-5xl mx-auto my-32">
           <CTA />
         </section>
       </main>
@@ -7653,47 +7340,6 @@ export function generateProjectPageSeo(
   };
 
   return { metadata, jsonLd };
-}
-</file>
-
-<file path="app/about/page.tsx">
-import { HeroAbout } from "@/components/HeroAbout";
-import { Breadcrumbs } from "@/components/common/BreadCrumbs";
-import MeVasya from "@/public/images/me_vasya.webp";
-import { Problem } from "@/components/Problem";
-import { VideoReviews } from "@/components/oldComponents/VideoReviews";
-import { SectionWrapper } from "@/components/common/SectionWrapper";
-import { Prices } from "@/components/Prices";
-export default function AboutPage() {
-  // Inside ServicePagePage component
-  const breadcrumbSegments = [
-    { label: "Home", path: "/" },
-    { label: "About", path: "/about" },
-  ];
-  return (
-    <main>
-      <div className="mx-auto max-w-7xl px-4 md:px-0">
-        <Breadcrumbs className="mt-8" segments={breadcrumbSegments} />
-        <HeroAbout
-          video="/videos/land_process.mp4"
-          video_webm="/videos/land_process.webm"
-          poster={MeVasya.src}
-        />
-      </div>
-      <SectionWrapper>
-        <section>
-          <Problem />
-        </section>
-      </SectionWrapper>
-
-      <section className="pb-16">
-        <VideoReviews />
-      </section>
-      <section>
-        <Prices />
-      </section>
-    </main>
-  );
 }
 </file>
 
@@ -8114,6 +7760,354 @@ export default async function Location({ params }: PageProps) {
 }
 </file>
 
+<file path="app/services/[pillar]/[slug]/page.tsx">
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { RichTextRenderer } from "@/components/common/RichTextRenderer";
+import { SectionWrapper } from "@/components/common/SectionWrapper";
+import { CTA } from "@/components/CTA";
+import FAQ from "@/components/FAQ";
+import { Hero } from "@/components/Hero";
+import { LatestProjectsService } from "@/components/LatestProjectsService";
+import { LogoTicker } from "@/components/LogoTicker";
+import { Team } from "@/components/oldComponents/Team";
+import { VideoReviews } from "@/components/oldComponents/VideoReviews";
+import { WhyUs } from "@/components/oldComponents/WhyUs";
+import { ServiceServiceLinks } from "@/components/ServiceServiceLinks";
+import { Testimonials } from "@/components/Testimonials";
+import { generateServicePageSeo } from "@/data/meta-data/meta-service";
+import { fetchStrapi } from "@/lib/strapi";
+import { ServicePage, State, StrapiResponse } from "@/types";
+import { notFound } from "next/navigation";
+
+export async function generateStaticParams() {
+  const services: StrapiResponse<ServicePage> = await fetchStrapi(
+    "service-pages",
+    {
+      populate: ["service_hub"],
+    },
+  );
+
+  return services.data
+    .filter((service) => service.service_hub?.slug)
+    .map((service) => ({
+      pillar: service.service_hub!.slug,
+      slug: service.slug,
+    }));
+}
+
+const getQuery = (slug: string) => ({
+  filters: { slug: { $eq: slug } },
+  populate: {
+    hero_image: true,
+    og_image: true,
+    faq: true,
+    service_hub: true,
+    projects: { populate: ["location_page", "media_gallery"] },
+  },
+});
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ pillar: string; slug: string }>;
+}) {
+  const { pillar, slug } = await params;
+  if (pillar === "projects") return {};
+
+  const response: StrapiResponse<ServicePage> = await fetchStrapi(
+    "service-pages",
+    getQuery(slug),
+  );
+
+  if (!response?.data?.[0]) return { title: "Page Not Found" };
+
+  const service = response.data[0];
+
+  // Canonical Guard: Only generate metadata if the URL pillar matches the DB pillar
+  if (service.service_hub?.slug !== pillar) return { title: "Page Not Found" };
+
+  const { metadata } = generateServicePageSeo(
+    response,
+    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
+  );
+
+  return metadata;
+}
+
+export default async function ServicePagePage({
+  params,
+}: {
+  params: Promise<{ pillar: string; slug: string }>;
+}) {
+  const { pillar, slug } = await params;
+  const data: StrapiResponse<ServicePage> = await fetchStrapi(
+    "service-pages",
+    getQuery(slug),
+  );
+
+  if (!data?.data?.length) notFound();
+
+  const service = data.data[0];
+
+  // Logic Guard: Force 404 if the pillar in the URL is incorrect
+  if (service.service_hub?.slug !== pillar) notFound();
+
+  const statesData: StrapiResponse<State> = await fetchStrapi("states");
+  const { combinedJsonLd } = generateServicePageSeo(
+    data,
+    `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
+    statesData,
+  );
+
+  const heroImageUrl = service.hero_image
+    ? process.env.NEXT_PUBLIC_STRAPI_URL + service.hero_image.url
+    : "";
+  const projects = service.projects || [];
+
+  const latestProjects = projects
+    .filter((p): p is typeof p & { createdAt: string } => !!p.createdAt)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    .map((p) => ({ ...p, date: new Date(p.createdAt) }))
+    .slice(0, 8);
+
+  const allServices: StrapiResponse<ServicePage> = await fetchStrapi(
+    "service-pages",
+    { populate: "*" },
+  );
+  const services = allServices.data;
+
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    {
+      label: service.service_hub?.title || "Category",
+      path: `/services/${pillar}`,
+    },
+    { label: service.title, path: `/services/${pillar}/${slug}` },
+  ];
+  const relatedServices = allServices.data.filter(
+    (s) => s.service_hub?.slug === pillar,
+  );
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedJsonLd) }}
+      />
+      <main>
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-4 md:mx-0">
+            <Breadcrumbs className="my-4" segments={breadcrumbSegments} />
+            <Hero
+              header={service.title}
+              heroImage={heroImageUrl}
+              video={false}
+              subheader={service.h2_subheadning}
+            />
+          </div>
+        </div>
+        <section className="bg-primary/10 py-16 mt-8 md:mt-16">
+          <LogoTicker />
+        </section>
+        <section className="mx-auto max-w-7xl mt-16 md:mt-32">
+          <WhyUs />
+        </section>
+        <section className="mx-auto max-w-7xl">
+          <SectionWrapper>
+            <Testimonials />
+          </SectionWrapper>
+        </section>
+        <section>
+          <Team />
+        </section>
+        {latestProjects.length > 0 && (
+          <section>
+            <LatestProjectsService
+              projects={latestProjects}
+              service={service}
+            />
+          </section>
+        )}
+        <section className="py-16 md:py-32 mx-4">
+          <CTA />
+        </section>
+        {service.faq?.length > 0 && (
+          <SectionWrapper>
+            <FAQ items={service.faq} serviceName={service.title} />
+          </SectionWrapper>
+        )}
+        <section className="py-16 md:py-32 mx-auto max-w-5xl px-4 md:px-0">
+          <RichTextRenderer content={service.seo_text} />
+        </section>
+        <SectionWrapper>
+          <div className="max-w-7xl px-4 mx-auto">
+            <h2 className="heading-h2 text-primary-800">Related services</h2>
+            <ServiceServiceLinks
+              allServices={relatedServices}
+              currentSlug={service.slug}
+              limit={8}
+            />
+          </div>
+        </SectionWrapper>
+        <section className="mx-auto max-w-5xl my-16">
+          <CTA className="mx-4" />
+        </section>
+        <section className="py-16 md:py-32">
+          <VideoReviews />
+        </section>
+      </main>
+    </>
+  );
+}
+</file>
+
+<file path="app/services/[pillar]/page.tsx">
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { CTA } from "@/components/CTA";
+import { LogoTicker } from "@/components/LogoTicker";
+import { Hero } from "@/components/Hero";
+import { ServiceGrid } from "@/components/ServiseGrid";
+import { Testimonials } from "@/components/Testimonials";
+import { generateHubSeo } from "@/data/meta-data/meta-services";
+import { fetchStrapi } from "@/lib/strapi";
+import { StrapiResponse, ServiceHub } from "@/types";
+import { notFound } from "next/navigation";
+import { WaveDivider } from "@/components/common/WaveDivider";
+import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
+
+interface PageProps {
+  params: { pillar: string };
+}
+//Static params generation
+export async function generateStaticParams() {
+  const services: StrapiResponse<ServiceHub> = await fetchStrapi(
+    "service-hubs",
+    {
+      fields: ["slug"],
+    },
+  );
+
+  const paths = services.data.map((item: ServiceHub) => ({
+    pillar: item.slug,
+  }));
+  // console.log("GENERATING STATIC PATHS:", paths);
+  return paths;
+}
+
+// Generate metaData
+export async function generateMetadata({ params }: PageProps) {
+  const { pillar } = await params;
+
+  try {
+    const response: StrapiResponse<ServiceHub> = await fetchStrapi(
+      "service-hubs",
+      {
+        filters: { slug: { $eq: pillar } },
+        populate: ["service_pages"],
+      },
+    );
+
+    if (!response?.data?.length) {
+      return { title: "Page Not Found" };
+    }
+
+    const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}`;
+    const { metadata } = generateHubSeo(response, baseUrl);
+    return metadata;
+  } catch (error) {
+    console.error("Metadata fetch failed for:", pillar, error);
+    // Return default metadata so the page still builds even if Strapi is unhappy
+    return { title: "Our Services | Angara Steamers" };
+  }
+}
+
+// Page itself code
+
+export default async function ServicesPage({
+  params,
+}: {
+  params: { pillar: string };
+}) {
+  const { pillar } = await params;
+  // console.log(pillar);
+  // 2. Fetch only the data for THIS specific pillar
+  // This acts as your "existence check"
+  const getQuery = (pillar: string) => ({
+    filters: { slug: { $eq: pillar } },
+    populate: ["service_pages", "service_pages.hero_image"],
+  });
+  const response: StrapiResponse<ServiceHub> = await fetchStrapi(
+    "service-hubs",
+    getQuery(pillar),
+  );
+
+  // 3. If no hub exists with this slug, return 404 immediately
+  if (!response?.data?.length) {
+    notFound();
+  }
+
+  const servicesData = await response.data[0];
+
+  const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}`;
+  const { jsonLd } = generateHubSeo(response, baseUrl);
+
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    // { label: "Services", path: "/services" },
+    {
+      label: servicesData.title || "Category",
+      path: `/services/${pillar}`,
+    },
+  ];
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <main>
+        <section className="px-4 mx-auto max-w-7xl">
+          <Breadcrumbs className="mt-8" segments={breadcrumbSegments} />
+          <Hero video />
+        </section>
+
+        <section>{/* <pre>{JSON.stringify(jsonLd, null, 2)}</pre> */}</section>
+        <section className="py-16 bg-primary/10 mb-16">
+          <LogoTicker />
+        </section>
+        <section>
+          <CarpetSliderPerks />
+        </section>
+        <section className="relative">
+          <div className="absolute bottom-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-background to-primary/10"></div>
+          <WaveDivider position="bottom" fill="var(--color-background)" />
+          <div className="px-4 max-w-7xl mx-auto mb-16 pb-32">
+            {/* Pass the array directly to the Grid component */}
+            <h2 className="heading-h2 text-center py-8 md:py-16">
+              Related Professional Services
+            </h2>
+            <ServiceGrid
+              services={servicesData.service_pages}
+              parentSlug={pillar}
+            />
+          </div>
+        </section>
+        <section className="px-4 my-16 max-w-7xl mx-auto">
+          <Testimonials />
+        </section>
+        <section className="px-4 max-w-5xl mx-auto my-32">
+          <CTA />
+        </section>
+      </main>
+    </>
+  );
+}
+</file>
+
 <file path="components/common/BreadCrumbs.tsx">
 import Link from "next/link";
 import { BreadcrumbsProps } from "@/types";
@@ -8296,122 +8290,6 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
 }
 
 export { Hero };
-</file>
-
-<file path="components/MobileMenu.tsx">
-"use client";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-  SheetClose,
-  SheetDescription,
-} from "@/components/ui/sheet";
-import Link from "next/link";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { NavbarProps } from "@/types";
-import { motion } from "framer-motion";
-
-export function MobileMenu({
-  navItems = [],
-  currentHubSlug,
-  staticItems = [],
-}: NavbarProps) {
-  const activeHub = navItems.find((h) => h.slug === currentHubSlug);
-
-  return (
-    <Sheet>
-      <SheetTrigger className="sm:hidden p-3 rounded-xl touch-feedback hover:bg-muted/10 transition-colors">
-        <svg
-          className="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-      </SheetTrigger>
-
-      <SheetContent
-        side="right"
-        className="w-full border-none sm:w-[350px] bg-background border-l-0 p-0 shadow-2xl"
-      >
-        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-        <SheetDescription className="sr-only">
-          Main site navigation for Angara Streamers.
-        </SheetDescription>
-
-        <motion.nav
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex flex-col h-full py-12 px-8"
-        >
-          {/* Main Links */}
-          <div className="flex flex-col gap-8 mb-12">
-            {(navItems || []).map((item) => (
-              <SheetClose asChild key={item.slug}>
-                <Link
-                  href={`/services/${item.slug}`}
-                  className="text-2xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
-                >
-                  {item.title}
-                </Link>
-              </SheetClose>
-            ))}
-            {(staticItems || []).map((item) => (
-              <SheetClose asChild key={item.slug}>
-                <Link
-                  href={`/${item.slug}`}
-                  className="text-2xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
-                >
-                  {item.title}
-                </Link>
-              </SheetClose>
-            ))}
-          </div>
-
-          {/* Service Links */}
-          {activeHub?.service_pages && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="space-y-6"
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
-                {activeHub.title} Services
-              </p>
-              <div className="flex flex-col gap-4">
-                {activeHub.service_pages.map((page) => (
-                  <SheetClose asChild key={page.slug}>
-                    <Link
-                      href={`/services/${activeHub.slug}/${page.slug}`}
-                      className="text-lg text-foreground/70 hover:text-primary transition-colors capitalize"
-                    >
-                      {page.title}
-                    </Link>
-                  </SheetClose>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          <div className="mt-auto pt-12 border-t border-primary/40">
-            <ThemeToggle className="bg-primary/40" />
-          </div>
-        </motion.nav>
-      </SheetContent>
-    </Sheet>
-  );
-}
 </file>
 
 <file path="components/NavbarClient.tsx">
@@ -8602,72 +8480,6 @@ export * from "./testimonials";
 export * from "./prices";
 export * from "./capi";
 export * from "./navigation";
-</file>
-
-<file path="app/layout.tsx">
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./styles/buttons.css";
-import "./globals.css";
-import { LoadingBar } from "@/components/common/LoadingBar";
-import { ThemeProvider } from "next-themes";
-import { SmoothScroll } from "@/components/common/SmoothScroll";
-import { GoogleTagManager } from "@next/third-parties/google";
-import { fetchStrapi } from "@/lib/strapi";
-import { StrapiResponse, ServiceHub } from "@/types";
-import { NavbarClient } from "@/components/NavbarClient";
-import { Footer } from "@/components/common/Footer";
-import { STATIC_PAGES } from "@/data/links";
-import ScrollToTop from "@/components/common/ScrollToTop";
-
-const GTM = process.env.NEXT_PUBLIC_GTM || "GTM-TJF7Q4JF";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Professional Upholstery & Carpet Cleaning Service in LA",
-  description:
-    "Restore your furniture's freshness with Angara Steamers. We provide top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles. Fast, reliable results for families and pets.",
-};
-const navData: StrapiResponse<ServiceHub> = await fetchStrapi("service-hubs", {
-  populate: ["service_pages"],
-});
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <GoogleTagManager gtmId={GTM} />
-      <body className="min-h-full flex flex-col">
-        <LoadingBar />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {/* <SmoothScroll> */}
-          <NavbarClient staticItems={STATIC_PAGES} navItems={navData.data} />
-          <main className="flex-1">{children}</main>
-          <Footer navItems={navData.data} />
-          <ScrollToTop />
-          {/* </SmoothScroll> */}
-        </ThemeProvider>
-        <div id="portal-root"></div>
-      </body>
-    </html>
-  );
-}
 </file>
 
 <file path="app/locations/page.tsx">
@@ -9247,6 +9059,122 @@ export function CTA({ className }: { className?: string }) {
 }
 </file>
 
+<file path="components/MobileMenu.tsx">
+"use client";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetClose,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import Link from "next/link";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { NavbarProps } from "@/types";
+import { motion } from "framer-motion";
+
+export function MobileMenu({
+  navItems = [],
+  currentHubSlug,
+  staticItems = [],
+}: NavbarProps) {
+  const activeHub = navItems.find((h) => h.slug === currentHubSlug);
+
+  return (
+    <Sheet>
+      <SheetTrigger className="sm:hidden p-3 rounded-xl touch-feedback hover:bg-muted/10 transition-colors">
+        <svg
+          className="h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
+        </svg>
+      </SheetTrigger>
+
+      <SheetContent
+        side="right"
+        className="w-full border-none sm:w-[350px] bg-background border-l-0 p-0 shadow-2xl"
+      >
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Main site navigation for Angara Streamers.
+        </SheetDescription>
+
+        <motion.nav
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="flex flex-col h-full py-12 px-8"
+        >
+          {/* Main Links */}
+          <div className="flex flex-col gap-8 mb-12">
+            {(navItems || []).map((item) => (
+              <SheetClose asChild key={item.slug}>
+                <Link
+                  href={`/services/${item.slug}`}
+                  className="text-2xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
+                >
+                  {item.title}
+                </Link>
+              </SheetClose>
+            ))}
+            {(staticItems || []).map((item) => (
+              <SheetClose asChild key={item.slug}>
+                <Link
+                  href={`/${item.slug}`}
+                  className="text-2xl font-medium tracking-tight text-foreground/90 hover:text-primary transition-colors"
+                >
+                  {item.title}
+                </Link>
+              </SheetClose>
+            ))}
+          </div>
+
+          {/* Service Links */}
+          {activeHub?.service_pages && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="space-y-6"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+                {activeHub.title} Services
+              </p>
+              <div className="flex flex-col gap-4">
+                {activeHub.service_pages.map((page) => (
+                  <SheetClose asChild key={page.slug}>
+                    <Link
+                      href={`/services/${activeHub.slug}/${page.slug}`}
+                      className="text-lg text-foreground/70 hover:text-primary transition-colors capitalize"
+                    >
+                      {page.title}
+                    </Link>
+                  </SheetClose>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          <div className="mt-auto pt-12 border-t border-primary/40">
+            <ThemeToggle className="bg-primary/40" />
+          </div>
+        </motion.nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+</file>
+
 <file path="package.json">
 {
   "name": "angara-stamers",
@@ -9308,6 +9236,170 @@ export function CTA({ className }: { className?: string }) {
 }
 </file>
 
+<file path="app/about/page.tsx">
+import { HeroAbout } from "@/components/HeroAbout";
+import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import MeVasya from "@/public/images/me_vasya.webp";
+import { Problem } from "@/components/Problem";
+import { VideoReviews } from "@/components/oldComponents/VideoReviews";
+import { SectionWrapper } from "@/components/common/SectionWrapper";
+import { Prices } from "@/components/Prices";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Angara Steamers | Expert Upholstery & Carpet Cleaning",
+  description:
+    "Learn about Angara Steamers, our commitment to quality cleaning, eco-friendly practices, and our mission to serve the Los Angeles community with premium upholstery and carpet care.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Angara Steamers | Expert Upholstery & Carpet Cleaning",
+    description:
+      "Expert upholstery and carpet cleaning services based in Los Angeles. Providing professional care for your home since our founding.",
+    url: "/about",
+    siteName: "Angara Steamers",
+    type: "website",
+  },
+};
+
+export default function AboutPage() {
+  // Inside ServicePagePage component
+  const breadcrumbSegments = [
+    { label: "Home", path: "/" },
+    { label: "About", path: "/about" },
+  ];
+  return (
+    <main>
+      <div className="mx-auto max-w-7xl px-4 md:px-0">
+        <Breadcrumbs className="mt-8" segments={breadcrumbSegments} />
+        <HeroAbout
+          video="/videos/land_process.mp4"
+          video_webm="/videos/land_process.webm"
+          poster={MeVasya.src}
+        />
+      </div>
+      <SectionWrapper>
+        <section>
+          <Problem />
+        </section>
+      </SectionWrapper>
+
+      <section className="pb-16">
+        <VideoReviews />
+      </section>
+      <section>
+        <Prices />
+      </section>
+    </main>
+  );
+}
+</file>
+
+<file path="app/contact/page.tsx">
+// app/contact/page.tsx
+import { Metadata } from "next";
+import { ContactPageContent } from "@/components/ContactPageContent";
+
+export const metadata: Metadata = {
+  title: "Contact Angara Steamers | Upholstery & Carpet Cleaning in LA",
+  description:
+    "Get in touch with Angara Steamers for professional upholstery, carpet, and mattress cleaning services in Los Angeles. Request a free quote today.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact Angara Steamers | Upholstery & Carpet Cleaning in LA",
+    description:
+      "Professional upholstery and carpet cleaning services in the Los Angeles area.",
+    url: "/contact",
+    siteName: "Angara Steamers",
+    type: "website",
+  },
+};
+
+export default function ContactPage() {
+  return <ContactPageContent />;
+}
+</file>
+
+<file path="app/layout.tsx">
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./styles/buttons.css";
+import "./globals.css";
+import { LoadingBar } from "@/components/common/LoadingBar";
+import { ThemeProvider } from "next-themes";
+import { SmoothScroll } from "@/components/common/SmoothScroll";
+import { GoogleTagManager } from "@next/third-parties/google";
+import { fetchStrapi } from "@/lib/strapi";
+import { StrapiResponse, ServiceHub } from "@/types";
+import { NavbarClient } from "@/components/NavbarClient";
+import { Footer } from "@/components/common/Footer";
+import { STATIC_PAGES } from "@/data/links";
+import ScrollToTop from "@/components/common/ScrollToTop";
+
+const GTM = process.env.NEXT_PUBLIC_GTM || "GTM-TJF7Q4JF";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com",
+  ),
+  alternates: {
+    canonical: "/",
+  },
+  title: "Professional Upholstery & Carpet Cleaning Service in LA",
+  description:
+    "Restore your furniture's freshness with Angara Steamers. We provide top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles. Fast, reliable results for families and pets.",
+};
+const navData: StrapiResponse<ServiceHub> = await fetchStrapi("service-hubs", {
+  populate: ["service_pages"],
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <GoogleTagManager gtmId={GTM} />
+      <body className="min-h-full flex flex-col">
+        <LoadingBar />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SmoothScroll>
+            <NavbarClient staticItems={STATIC_PAGES} navItems={navData.data} />
+            <main className="flex-1">{children}</main>
+            <Footer navItems={navData.data} />
+            <ScrollToTop />
+          </SmoothScroll>
+        </ThemeProvider>
+        <div id="portal-root"></div>
+      </body>
+    </html>
+  );
+}
+</file>
+
 <file path="app/page.tsx">
 import { Team } from "@/components/oldComponents/Team";
 import { VideoReviews } from "@/components/oldComponents/VideoReviews";
@@ -9319,6 +9411,9 @@ import { WaveDivider } from "@/components/common/WaveDivider";
 import SafeShampoos from "@/components/SafeShampoos";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
 import { Metadata } from "next";
+import { LogoTicker } from "@/components/LogoTicker";
+import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
+import { CTA } from "@/components/CTA";
 
 export const metadata: Metadata = {
   title:
@@ -9383,6 +9478,12 @@ export default function HomePage() {
       <section className="px-4">
         <Hero video={false} />
       </section>
+      <section className="py-8 md:py-16">
+        <LogoTicker />
+      </section>
+      <section className="py-8 md:py-16">
+        <CarpetSliderPerks />
+      </section>
 
       <section className="relative pt-32 pb-32">
         <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/10 to-background"></div>
@@ -9407,6 +9508,9 @@ export default function HomePage() {
       </SectionWrapper>
       <section className="mb-16">
         <VideoReviews />
+      </section>
+      <section className="max-w-6xl mx-auto mb-16">
+        <CTA />
       </section>
     </div>
   );
