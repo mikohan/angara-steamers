@@ -16,11 +16,7 @@ import { fetchStrapi } from "@/lib/strapi";
 import { ServicePage, State, StrapiResponse } from "@/types";
 import { notFound } from "next/navigation";
 
-// 1. Tell Next.js which paths to pre-render at build time
-// app/[pillar]/[slug]/page.tsx
-
 export async function generateStaticParams() {
-  // 1. Fetch all services from Strapi
   const services: StrapiResponse<ServicePage> = await fetchStrapi(
     "service-pages",
     {
@@ -28,66 +24,45 @@ export async function generateStaticParams() {
     },
   );
 
-  // 2. Filter out items where service_hub is missing and map safely
   return services.data
-    .filter((service) => service.service_hub?.slug) // Ensure hub and slug exist
+    .filter((service) => service.service_hub?.slug)
     .map((service) => ({
-      pillar: service.service_hub!.slug, // ! tells TS "we checked this above"
+      pillar: service.service_hub!.slug,
       slug: service.slug,
     }));
 }
 
-// const getQuery = (slug: string) => ({
-//   filters: {
-//     slug: {
-//       $eq: slug,
-//     },
-//   },
-//   populate: ["hero_image", "og_image", "faq", "service_hub", "projects"],
-// });
 const getQuery = (slug: string) => ({
-  filters: {
-    slug: {
-      $eq: slug,
-    },
-  },
+  filters: { slug: { $eq: slug } },
   populate: {
     hero_image: true,
     og_image: true,
     faq: true,
     service_hub: true,
-    projects: {
-      populate: ["location_page", "media_gallery"],
-    },
+    projects: { populate: ["location_page", "media_gallery"] },
   },
 });
 
-// 1. Generate Metadata
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ pillar: string; slug: string }>;
 }) {
   const { pillar, slug } = await params;
-
-  // 1. Ignore collision routes
   if (pillar === "projects") return {};
 
-  // 2. Fetch Data
   const response: StrapiResponse<ServicePage> = await fetchStrapi(
     "service-pages",
     getQuery(slug),
   );
 
-  // 3. Fail-Safe: If no data, return empty metadata instead of crashing
-  if (!response?.data?.[0]) {
-    console.error(
-      `[SEO CRASH PREVENTION]: No service found for /${pillar}/${slug}`,
-    );
-    return { title: "Page Not Found" };
-  }
+  if (!response?.data?.[0]) return { title: "Page Not Found" };
 
-  // 4. Generate Metadata
+  const service = response.data[0];
+
+  // Canonical Guard: Only generate metadata if the URL pillar matches the DB pillar
+  if (service.service_hub?.slug !== pillar) return { title: "Page Not Found" };
+
   const { metadata } = generateServicePageSeo(
     response,
     `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
@@ -96,21 +71,23 @@ export async function generateMetadata({
   return metadata;
 }
 
-// 2. Render Page and JSON-LD
 export default async function ServicePagePage({
   params,
 }: {
-  params: { pillar: string; slug: string };
+  params: Promise<{ pillar: string; slug: string }>;
 }) {
   const { pillar, slug } = await params;
   const data: StrapiResponse<ServicePage> = await fetchStrapi(
     "service-pages",
     getQuery(slug),
   );
-  if (!data?.data?.length) {
-    notFound();
-  }
+
+  if (!data?.data?.length) notFound();
+
   const service = data.data[0];
+
+  // Logic Guard: Force 404 if the pillar in the URL is incorrect
+  if (service.service_hub?.slug !== pillar) notFound();
 
   const statesData: StrapiResponse<State> = await fetchStrapi("states");
   const { combinedJsonLd } = generateServicePageSeo(
@@ -118,48 +95,36 @@ export default async function ServicePagePage({
     `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${pillar}/${slug}`,
     statesData,
   );
-  const heroImageUrl =
-    process.env.NEXT_PUBLIC_STRAPI_URL + service.hero_image.url || "";
+
+  const heroImageUrl = service.hero_image
+    ? process.env.NEXT_PUBLIC_STRAPI_URL + service.hero_image.url
+    : "";
   const projects = service.projects || [];
-  // console.log(projects[0].location_page);
-  const validProjects = projects.filter(
-    (p): p is typeof p & { date: string } => p.createdAt !== undefined,
-  );
-  const latestProjects = [...validProjects]
+
+  const latestProjects = projects
+    .filter((p): p is typeof p & { createdAt: string } => !!p.createdAt)
     .sort(
       (a, b) =>
-        new Date(b.createdAt ?? 0).getTime() -
-        new Date(a.createdAt ?? 0).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
-    .map((project) => {
-      // Check if the date exists; if not, return null to filter it out later
-      if (!project.createdAt) return null;
-
-      // Return the project with the valid date
-      return {
-        ...project,
-        date: new Date(project.createdAt),
-      };
-    })
-    // Filter out the nulls so we are left with only projects that have valid dates
-    .filter((p): p is typeof p & { date: Date } => p !== null)
-    // Now take the top 8
+    .map((p) => ({ ...p, date: new Date(p.createdAt) }))
     .slice(0, 8);
+
   const allServices: StrapiResponse<ServicePage> = await fetchStrapi(
     "service-pages",
     { populate: "*" },
   );
   const services = allServices.data;
-  // Inside ServicePagePage component
+
   const breadcrumbSegments = [
     { label: "Home", path: "/" },
-    // { label: "Services", path: "/services" },
     {
       label: service.service_hub?.title || "Category",
       path: `/services/${pillar}`,
     },
     { label: service.title, path: `/services/${pillar}/${slug}` },
   ];
+
   return (
     <>
       <script
@@ -170,14 +135,12 @@ export default async function ServicePagePage({
         <div className="mx-auto max-w-7xl">
           <div className="mx-4 md:mx-0">
             <Breadcrumbs className="my-4" segments={breadcrumbSegments} />
-            {/* Inject Schema as a Script Tag */}
             <Hero
-              header={data.data[0].title}
+              header={service.title}
               heroImage={heroImageUrl}
               video={false}
               subheader={service.h2_subheadning}
             />
-            {/* <pre>{JSON.stringify(combinedJsonLd, null, 2)}</pre> */}
           </div>
         </div>
         <section className="bg-primary/10 py-16 mt-8 md:mt-16">
@@ -194,10 +157,10 @@ export default async function ServicePagePage({
         <section>
           <Team />
         </section>
-        {latestProjects.length && (
+        {latestProjects.length > 0 && (
           <section>
             <LatestProjectsService
-              projects={latestProjects || []}
+              projects={latestProjects}
               service={service}
             />
           </section>
@@ -205,7 +168,7 @@ export default async function ServicePagePage({
         <section className="py-16 md:py-32 mx-4">
           <CTA />
         </section>
-        {service.faq.length && (
+        {service.faq?.length > 0 && (
           <SectionWrapper>
             <FAQ items={service.faq} serviceName={service.title} />
           </SectionWrapper>

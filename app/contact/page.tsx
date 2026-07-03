@@ -1,9 +1,26 @@
 "use client";
 import { useState, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { submitQuoteRequest } from "@/app/api/email/actions";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Angara Steamers | Upholstery & Carpet Cleaning in LA",
+  description:
+    "Get in touch with Angara Steamers for professional upholstery, carpet, and mattress cleaning services in Los Angeles. Request a free quote today.",
+  alternates: {
+    canonical: "https://angaraprosteamers.com/contact",
+  },
+  openGraph: {
+    title: "Contact Angara Steamers | Upholstery & Carpet Cleaning in LA",
+    description:
+      "Professional upholstery and carpet cleaning services in the Los Angeles area.",
+    url: "https://angaraprosteamers.com/contact",
+    siteName: "Angara Steamers",
+    type: "website",
+  },
+};
 
 const sanitizeInput = (str: string) => {
   return str.replace(/[<>]/g, "");

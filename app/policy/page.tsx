@@ -10,6 +10,28 @@ import {
 } from "lucide-react";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy & Terms | Angara Steamers",
+  description:
+    "Read the privacy policy, service terms, and conditions for Angara Steamers upholstery and carpet cleaning services in Los Angeles.",
+  alternates: {
+    canonical: "https://angaraprosteamers.com/policy",
+  },
+  openGraph: {
+    title: "Privacy Policy & Terms | Angara Steamers",
+    description: "Privacy policy and terms of service for Angara Steamers.",
+    url: "https://angaraprosteamers.com/policy",
+    siteName: "Angara Steamers",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
 export default function PrivacyPolicy() {
   const phone = process.env.NEXT_PUBLIC_COMPANY_PHONE;
   const email = process.env.NEXT_PUBLIC_COMPANY_EMAIL;
