@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   description:
     "Learn about Angara Steamers, our commitment to quality cleaning, eco-friendly practices, and our mission to serve the Los Angeles community with premium upholstery and carpet care.",
   alternates: {
-    canonical: "https://angaraprosteamers.com/about",
+    canonical: "/about",
   },
   openGraph: {
     title: "About Angara Steamers | Expert Upholstery & Carpet Cleaning",
     description:
       "Expert upholstery and carpet cleaning services based in Los Angeles. Providing professional care for your home since our founding.",
-    url: "https://angaraprosteamers.com/about",
+    url: "/about",
     siteName: "Angara Steamers",
     type: "website",
   },
