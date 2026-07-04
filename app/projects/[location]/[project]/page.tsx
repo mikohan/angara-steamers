@@ -76,7 +76,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ project: string; location: string }>; // Added location
 }) {
-  const { project } = await params; // You can still just use project for the query
+  const { project, location } = await params; // You can still just use project for the query
 
   const response: StrapiResponse<Project> = await fetchStrapi(
     "projects",
@@ -88,7 +88,8 @@ export async function generateMetadata({
     return { title: "Project Not Found" };
   }
 
-  const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/projects/${response.data[0].location_page?.slug}/${project}`;
+  // const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/projects/${response.data[0].location_page?.slug}/${project}`;
+  const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/projects/${location}/${project}`;
   const { metadata } = generateProjectPageSeo(response, baseUrl);
 
   return metadata;
