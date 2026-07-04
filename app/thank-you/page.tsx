@@ -6,6 +6,16 @@ import { useCart } from "@/store/useCart";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import familyPhoto from "@/public/images/family.webp"; // Replace with your generated image path
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Thank you page | Angara Steamers",
+  description: "Our commitment to protecting your data at Angara Steamers.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ThankYouPage() {
   const { cart } = useCart();

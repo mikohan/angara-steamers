@@ -6,6 +6,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowLeft, CreditCard } from "lucide-react";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cart | Angara Steamers",
+  robots: {
+    index: false,
+    follow: false, // This ensures search engines do not follow links within the cart
+  },
+};
 
 export default function CartPage() {
   const [hasHydrated, setHasHydrated] = useState<boolean>(false);
