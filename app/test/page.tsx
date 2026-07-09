@@ -3,6 +3,7 @@ import { ButtonShiny } from "@/components/common/ButtonShiny";
 import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
 import SafetySection from "@/components/SafeShampoos";
 import { Metadata } from "next";
+import { Cloud, CloudUpload, CloudSun } from "lucide-react";
 
 export const metadata: Metadata = {
   robots: {
@@ -23,6 +24,11 @@ export default function Test() {
       </div>
       <div>
         <SafetySection />
+      </div>
+      <div>
+        <Cloud />
+        <CloudUpload />
+        <CloudSun />
       </div>
     </>
   );
