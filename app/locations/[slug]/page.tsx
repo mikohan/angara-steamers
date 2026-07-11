@@ -256,7 +256,7 @@ export default async function Location({ params }: PageProps) {
           <FAQ cityName={location.city_name} items={location.faq} />
         </section>
 
-        <section className="mb-16 px-4">
+        <section className="mb-16 px-4 max-w-6xl mx-auto">
           <GoogleMap
             lat={location.map_component.latitude}
             lng={location.map_component.longitude}
