@@ -4932,7 +4932,7 @@ export function generateBreadcrumbs(pathname: string) {
   // Split path into segments (e.g., /locations/playa-vista -> ["", "locations", "playa-vista"])
   const segments = pathname.split("/").filter(Boolean);
   const baseUrl =
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com";
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
 
   const itemListElement = [
     {
@@ -5553,12 +5553,12 @@ export const metadata: Metadata = {
   description:
     "Read the privacy policy, service terms, and conditions for Angara Steamers upholstery and carpet cleaning services in Los Angeles.",
   alternates: {
-    canonical: "https://angaraprosteamers.com/policy",
+    canonical: "https://angarasteamers.com/policy",
   },
   openGraph: {
     title: "Privacy Policy & Terms | Angara Steamers",
     description: "Privacy policy and terms of service for Angara Steamers.",
-    url: "https://angaraprosteamers.com/policy",
+    url: "https://angarasteamers.com/policy",
     siteName: "Angara Steamers",
     type: "website",
   },
@@ -6300,7 +6300,7 @@ import { Metadata } from "next";
 export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
   const canonical = baseUrl;
   const companyWebsite =
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com";
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
 
   // Define primary image
   const primaryImageUrl =
@@ -6896,7 +6896,7 @@ export async function fetchStrapi<T>(
 /** @type {import('next-sitemap').IConfig} */
 const config = {
   siteUrl:
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE ?? "https://angaraprosteamers.com", // Replace with your actual domain
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE ?? "https://angarasteamers.com", // Replace with your actual domain
   generateRobotsTxt: true,
   // Optional: Add other settings here
   exclude: ["/admin/*", "/test", "/booking/*", "/styleguide"],
@@ -9358,7 +9358,7 @@ export const metadata: Metadata = {
     maximumScale: 5,
   },
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com",
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com",
   ),
   alternates: {
     canonical: "/",
@@ -9421,7 +9421,7 @@ export const metadata: Metadata = {
   description:
     "Restore your furniture's freshness with Angara Steamers. Top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles. Fast, reliable results for families and pets.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com",
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com",
   ),
   openGraph: {
     title: "Angara Steamers | Professional Upholstery Cleaning in LA",
@@ -9451,7 +9451,7 @@ export default function HomePage() {
             "@context": "https://schema.org",
             "@type": "ProfessionalService",
             name: process.env.NEXT_PUBLIC_COMPANY_NAME,
-            image: "https://angaraprosteamers.com/og-image.jpg",
+            image: "https://angarasteamers.com/og-image.jpg",
             url: process.env.NEXT_PUBLIC_COMPANY_WEBSITE,
             telephone: process.env.NEXT_PUBLIC_COMPANY_PHONE,
             email: process.env.NEXT_PUBLIC_COMPANY_EMAIL,

@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com",
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com",
   ),
   alternates: {
     canonical: "/",

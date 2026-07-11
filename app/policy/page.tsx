@@ -17,12 +17,12 @@ export const metadata: Metadata = {
   description:
     "Read the privacy policy, service terms, and conditions for Angara Steamers upholstery and carpet cleaning services in Los Angeles.",
   alternates: {
-    canonical: "https://angaraprosteamers.com/policy",
+    canonical: "https://angarasteamers.com/policy",
   },
   openGraph: {
     title: "Privacy Policy & Terms | Angara Steamers",
     description: "Privacy policy and terms of service for Angara Steamers.",
-    url: "https://angaraprosteamers.com/policy",
+    url: "https://angarasteamers.com/policy",
     siteName: "Angara Steamers",
     type: "website",
   },

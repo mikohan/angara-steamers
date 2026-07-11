@@ -2,7 +2,7 @@ export function generateBreadcrumbs(pathname: string) {
   // Split path into segments (e.g., /locations/playa-vista -> ["", "locations", "playa-vista"])
   const segments = pathname.split("/").filter(Boolean);
   const baseUrl =
-    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angaraprosteamers.com";
+    process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
 
   const itemListElement = [
     {
