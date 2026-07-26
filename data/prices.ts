@@ -123,16 +123,16 @@ export const prices: IPrice[] = [
     url: "https://ik.imagekit.io/angara/Couch/prices/carpet.png",
     category: "Carpets",
     item: "1 room carpet",
-    priceBefore: 120,
-    priceAfter: 90,
+    priceBefore: 170,
+    priceAfter: 135,
   },
   {
     img: CarpetImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/carpet.png",
     category: "Carpets",
     item: "3 rooms carpet",
-    priceBefore: 290,
-    priceAfter: 240,
+    priceBefore: 390,
+    priceAfter: 285,
   },
 
   // --- Area Rugs ---
