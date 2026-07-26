@@ -64,7 +64,7 @@ export default function ServiceListingPage() {
         offers: {
           "@type": "Offer",
           priceCurrency: "USD",
-          price: service.priceAfter.toFixed(2),
+          price: service.priceAfter.toFixed(0),
         },
       },
     })),

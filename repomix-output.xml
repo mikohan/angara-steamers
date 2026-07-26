@@ -1322,7 +1322,7 @@ export const MiniCartSummary = () => {
             Total
           </p>
           <p className="text-2xl font-black text-teal-800 tabular-nums">
-            ${cartTotal.toFixed(2)}
+            ${cartTotal.toFixed(0)}
           </p>
         </div>
       </div>
@@ -1339,7 +1339,7 @@ export const MiniCartSummary = () => {
             </div>
             <div className="flex items-center gap-4">
               <span className="font-semibold tabular-nums">
-                ${(item.priceAfter * item.quantity).toFixed(2)}
+                ${(item.priceAfter * item.quantity).toFixed(0)}
               </span>
               <button
                 onClick={() => removeFromCart(item.item)}
@@ -1517,10 +1517,10 @@ export const PriceCard = ({
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="line-through text-red-600 text-base font-semibold">
-              ${finalPriceBefore.toFixed(2)}
+              ${finalPriceBefore.toFixed(0)}
             </span>
             <span className="text-2xl text-primary font-black">
-              ${(finalPriceAfter * quantity).toFixed(2)}
+              ${(finalPriceAfter * quantity).toFixed(0)}
             </span>
           </div>
           <div className="flex items-center gap-1 border border-muted/20 rounded-lg p-1">
@@ -3542,7 +3542,7 @@ export default function CartPage() {
                   {product.item}
                 </h3>
                 <p className="text-xs text-muted">
-                  ${product.priceAfter.toFixed(2)} each
+                  ${product.priceAfter.toFixed(0)} each
                 </p>
               </div>
 
@@ -3574,7 +3574,7 @@ export default function CartPage() {
                 {/* Sub-price and deletion metrics */}
                 <div className="flex items-center gap-4">
                   <div className="text-right w-20 font-black text-foreground text-lg tabular-nums">
-                    ${(product.priceAfter * product.quantity).toFixed(2)}
+                    ${(product.priceAfter * product.quantity).toFixed(0)}
                   </div>
                   <button
                     onClick={() => removeFromCart(product.item)}
@@ -3598,13 +3598,13 @@ export default function CartPage() {
               <div className="flex justify-between text-muted">
                 <span>Subtotal</span>
                 <span className="font-semibold tabular-nums">
-                  ${subtotal.toFixed(2)}
+                  ${subtotal.toFixed(0)}
                 </span>
               </div>
               <div className="flex justify-between text-muted">
                 {/* <span>Estimated Tax (8%)</span>
                 <span className="font-semibold tabular-nums">
-                  ${tax.toFixed(2)}
+                  ${tax.toFixed(0)}
                 </span> */}
               </div>
             </div>
@@ -3612,7 +3612,7 @@ export default function CartPage() {
             <div className="flex justify-between items-baseline font-bold text-lg text-foreground">
               <span>Total Cost</span>
               <span className="text-2xl font-black text-teal-800 dark:text-teal-400 tabular-nums">
-                ${total.toFixed(2)}
+                ${total.toFixed(0)}
               </span>
             </div>
 
@@ -3721,7 +3721,7 @@ export default function ThankYouPage() {
                     {item.quantity} x {item.item}
                   </span>
                   <span className="tabular-nums">
-                    ${(item.priceAfter * item.quantity).toFixed(2)}
+                    ${(item.priceAfter * item.quantity).toFixed(0)}
                   </span>
                 </div>
               ))}
@@ -3729,7 +3729,7 @@ export default function ThankYouPage() {
             <div className="pt-4 border-t border-foreground/10 flex justify-between items-center">
               <span className="font-bold text-lg">Total Paid</span>
               <span className="text-2xl font-black text-teal-800 tabular-nums">
-                ${total.toFixed(2)}
+                ${total.toFixed(0)}
               </span>
             </div>
           </div>
@@ -5837,10 +5837,10 @@ function BigServiceCard({ service }: { service: IPrice }) {
         <div className="mt-6 pt-4 border-t border-muted/10 flex items-center justify-between">
           <div className="flex flex-row gap-2 items-center">
             <div className="text-base font-black text-red-600 line-through tabular-nums">
-              ${(service.priceBefore * quantity).toFixed(2)}
+              ${(service.priceBefore * quantity).toFixed(0)}
             </div>
             <div className="text-2xl font-black text-price-green tabular-nums">
-              ${(service.priceAfter * quantity).toFixed(2)}
+              ${(service.priceAfter * quantity).toFixed(0)}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -5898,7 +5898,7 @@ function SidebarLedger() {
                 {item.item}
               </p>
               <p className="text-foreground/70 text-[10px]">
-                {item.quantity} x ${item.priceAfter.toFixed(2)}
+                {item.quantity} x ${item.priceAfter.toFixed(0)}
               </p>
             </div>
             <button
@@ -5915,7 +5915,7 @@ function SidebarLedger() {
           Grand Total
         </p>
         <p className="text-4xl font-black text-foreground mt-1 tabular-nums">
-          ${total.toFixed(2)}
+          ${total.toFixed(0)}
         </p>
 
         <Link href="/cart">
@@ -6673,12 +6673,12 @@ export async function POST(req: Request) {
         ${lineItems.data
           .map(
             (item) => `
-          <li>${item.description} - $${(item.amount_total! / 100).toFixed(2)}</li>
+          <li>${item.description} - $${(item.amount_total! / 100).toFixed(0)}</li>
         `,
           )
           .join("")}
       </ul>
-      <p><strong>Total Paid:</strong> $${(session.amount_total! / 100).toFixed(2)}</p>
+      <p><strong>Total Paid:</strong> $${(session.amount_total! / 100).toFixed(0)}</p>
     `;
 
     await sendEmail(

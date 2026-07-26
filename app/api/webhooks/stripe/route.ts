@@ -43,12 +43,12 @@ export async function POST(req: Request) {
         ${lineItems.data
           .map(
             (item) => `
-          <li>${item.description} - $${(item.amount_total! / 100).toFixed(2)}</li>
+          <li>${item.description} - $${(item.amount_total! / 100).toFixed(0)}</li>
         `,
           )
           .join("")}
       </ul>
-      <p><strong>Total Paid:</strong> $${(session.amount_total! / 100).toFixed(2)}</p>
+      <p><strong>Total Paid:</strong> $${(session.amount_total! / 100).toFixed(0)}</p>
     `;
 
     await sendEmail(

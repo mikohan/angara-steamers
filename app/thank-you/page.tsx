@@ -49,7 +49,7 @@ export default function ThankYouPage() {
                     {item.quantity} x {item.item}
                   </span>
                   <span className="tabular-nums">
-                    ${(item.priceAfter * item.quantity).toFixed(2)}
+                    ${(item.priceAfter * item.quantity).toFixed(0)}
                   </span>
                 </div>
               ))}
@@ -57,7 +57,7 @@ export default function ThankYouPage() {
             <div className="pt-4 border-t border-foreground/10 flex justify-between items-center">
               <span className="font-bold text-lg">Total Paid</span>
               <span className="text-2xl font-black text-teal-800 tabular-nums">
-                ${total.toFixed(2)}
+                ${total.toFixed(0)}
               </span>
             </div>
           </div>

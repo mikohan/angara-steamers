@@ -112,7 +112,7 @@ export default function CartClient() {
                   {product.item}
                 </h3>
                 <p className="text-xs text-muted">
-                  ${product.priceAfter.toFixed(2)} each
+                  ${product.priceAfter.toFixed(0)} each
                 </p>
               </div>
 
@@ -142,7 +142,7 @@ export default function CartClient() {
 
                 <div className="flex items-center gap-4">
                   <div className="text-right w-20 font-black text-foreground text-lg tabular-nums">
-                    ${(product.priceAfter * product.quantity).toFixed(2)}
+                    ${(product.priceAfter * product.quantity).toFixed(0)}
                   </div>
                   <button
                     onClick={() => removeFromCart(product.item)}
@@ -165,7 +165,7 @@ export default function CartClient() {
               <div className="flex justify-between text-muted">
                 <span>Subtotal</span>
                 <span className="font-semibold tabular-nums">
-                  ${subtotal.toFixed(2)}
+                  ${subtotal.toFixed(0)}
                 </span>
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function CartClient() {
             <div className="flex justify-between items-baseline font-bold text-lg text-foreground">
               <span>Total Cost</span>
               <span className="text-2xl font-black text-teal-800 dark:text-teal-400 tabular-nums">
-                ${total.toFixed(2)}
+                ${total.toFixed(0)}
               </span>
             </div>
 

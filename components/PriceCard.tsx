@@ -61,10 +61,10 @@ export const PriceCard = ({
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="line-through text-red-600 text-base font-semibold">
-              ${finalPriceBefore.toFixed(2)}
+              ${finalPriceBefore.toFixed(0)}
             </span>
             <span className="text-2xl text-primary font-black">
-              ${(finalPriceAfter * quantity).toFixed(2)}
+              ${(finalPriceAfter * quantity).toFixed(0)}
             </span>
           </div>
           <div className="flex items-center gap-1 border border-muted/20 rounded-lg p-1">

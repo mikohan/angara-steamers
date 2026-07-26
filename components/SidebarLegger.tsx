@@ -35,7 +35,7 @@ export function SidebarLedger() {
                       {item.item}
                     </p>
                     <p className="text-foreground/70 text-[10px]">
-                      {item.quantity} x ${item.priceAfter.toFixed(2)}
+                      {item.quantity} x ${item.priceAfter.toFixed(0)}
                     </p>
                   </div>
                   <button
@@ -54,7 +54,7 @@ export function SidebarLedger() {
               Grand Total
             </p>
             <p className="text-4xl font-black text-foreground mt-1 tabular-nums">
-              ${total.toFixed(2)}
+              ${total.toFixed(0)}
             </p>
 
             <Link href="/cart">

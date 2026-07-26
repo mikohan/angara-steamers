@@ -30,7 +30,7 @@ export const MiniCartSummary = () => {
             Total
           </p>
           <p className="text-2xl font-black text-teal-800 tabular-nums">
-            ${cartTotal.toFixed(2)}
+            ${cartTotal.toFixed(0)}
           </p>
         </div>
       </div>
@@ -47,7 +47,7 @@ export const MiniCartSummary = () => {
             </div>
             <div className="flex items-center gap-4">
               <span className="font-semibold tabular-nums">
-                ${(item.priceAfter * item.quantity).toFixed(2)}
+                ${(item.priceAfter * item.quantity).toFixed(0)}
               </span>
               <button
                 onClick={() => removeFromCart(item.item)}
