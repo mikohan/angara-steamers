@@ -61,10 +61,10 @@ function BigServiceCard({ service }: { service: IPrice }) {
         <div className="mt-6 pt-4 border-t border-muted/10 flex items-center justify-between">
           <div className="flex flex-row gap-2 items-center">
             <div className="text-base font-black text-red-600 line-through tabular-nums">
-              ${(service.priceBefore * quantity).toFixed(2)}
+              ${(service.priceBefore * quantity).toFixed(0)}
             </div>
             <div className="text-2xl font-black text-price-green tabular-nums">
-              ${(service.priceAfter * quantity).toFixed(2)}
+              ${(service.priceAfter * quantity).toFixed(0)}
             </div>
           </div>
           <div className="flex items-center gap-2">
