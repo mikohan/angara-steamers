@@ -20,6 +20,10 @@ export function MobileMenu({
 }: NavbarProps) {
   const activeHub = navItems.find((h) => h.slug === currentHubSlug);
 
+  const phoneHref =
+    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12135987763";
+  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 598-7763";
+
   return (
     <Sheet>
       <SheetTrigger className="sm:hidden p-3 rounded-xl touch-feedback hover:bg-muted/10 transition-colors">
@@ -44,14 +48,14 @@ export function MobileMenu({
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <SheetDescription className="sr-only">
-          Main site navigation for Angara Streamers.
+          Main site navigation for Angara Steamers.
         </SheetDescription>
 
         <motion.nav
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex flex-col h-full py-12 px-8"
+          className="flex flex-col h-full py-12 px-8 overflow-y-auto"
         >
           {/* Main Links */}
           <div className="flex flex-col gap-8 mb-12">
@@ -75,6 +79,14 @@ export function MobileMenu({
                 </Link>
               </SheetClose>
             ))}
+            <SheetClose asChild>
+              <Link
+                href={`tel:${phoneHref}`}
+                className="text-2xl font-bold tracking-tight text-foreground/90 hover:text-primary transition-colors"
+              >
+                {phoneTitle}
+              </Link>
+            </SheetClose>
           </div>
 
           {/* Service Links */}

@@ -21,6 +21,10 @@ export function NavbarClient({ navItems }: NavbarProps) {
     pathname?.startsWith(`/services/${hub.slug}`),
   );
 
+  const phoneHref =
+    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12135987763";
+  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 598-7763";
+
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md shadow-sm ">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -63,6 +67,12 @@ export function NavbarClient({ navItems }: NavbarProps) {
               {item.title}
             </Link>
           ))}
+          <Link
+            href={`tel:${phoneHref}`}
+            className="relative transition-all duration-300 hover:text-primary after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full hover:scale-105 text-primary-800 font-bold"
+          >
+            {phoneTitle}
+          </Link>
           <div className="pl-2 border-l border-primary/20 text-primary-800">
             <ThemeToggle />
           </div>
