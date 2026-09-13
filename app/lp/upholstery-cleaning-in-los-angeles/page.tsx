@@ -13,17 +13,19 @@ import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
 import { CTA } from "@/components/CTA";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title:
-    "Professional Upholstery & Carpet Cleaning Service in LA | Angara Steamers",
+    "Upholstery Cleaning in Los Angeles — Safe for Kids & Pets | Angara Steamers",
   description:
-    "Restore your furniture's freshness with Angara Steamers. Top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles. Fast, reliable results for families and pets.",
+    "Professional upholstery cleaning in Los Angeles, steamed at 200°F with shampoos safe for kids and pets. If a stain comes back, we re-clean it free. Book now.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com",
   ),
   openGraph: {
-    title: "Angara Steamers | Professional Upholstery Cleaning in LA",
+    title:
+      "Upholstery Cleaning in Los Angeles — Safe for Kids & Pets | Angara Steamers",
     description:
-      "Expert eco-friendly steam cleaning for couches, carpets, and mattresses. Serving all of Los Angeles.",
+      "Professional upholstery cleaning in Los Angeles, steamed at 200°F with shampoos safe for kids and pets. If a stain comes back, we re-clean it free. Book now.",
     url: process.env.NEXT_PUBLIC_COMPANY_WEBSITE,
     siteName: process.env.NEXT_PUBLIC_COMPANY_NAME,
     images: [
