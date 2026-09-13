@@ -34,7 +34,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
 
   const h1 = header
     ? header
-    : "Couch and Upholstery Professional Steam Cleaning in LA";
+    : "Upholstery & Carpet Professional Steam Cleaning in LA";
   const heroImageUrl = heroImage ? heroImage : MyImage.src;
   const h2 = subheader
     ? subheader
@@ -72,45 +72,47 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                 </ButtonShiny>
               </QuoteDialog>
 
-              <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="xxl"
-                    className="rounded-full px-8 border-primary/50 text-lg font-bold"
+              {!video && (
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="xxl"
+                      className="rounded-full px-8 border-primary/50 text-lg font-bold"
+                    >
+                      Watch Our Process
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent
+                    showCloseButton={false}
+                    className="max-w-sm w-[90vw] p-0 overflow-hidden ring-0 border-none flex flex-col items-center justify-center bg-transparent"
                   >
-                    Watch Our Process
-                  </Button>
-                </DialogTrigger>
-                <DialogContent
-                  showCloseButton={false}
-                  className="max-w-sm w-[90vw] p-0 overflow-hidden ring-0 border-none flex flex-col items-center justify-center bg-transparent"
-                >
-                  <VisuallyHidden>
-                    <DialogTitle>Our Upholstery Cleaning Process</DialogTitle>
-                    <DialogDescription>
-                      A short video showing our steam cleaning technique.
-                    </DialogDescription>
-                  </VisuallyHidden>
+                    <VisuallyHidden>
+                      <DialogTitle>Our Upholstery Cleaning Process</DialogTitle>
+                      <DialogDescription>
+                        A short video showing our steam cleaning technique.
+                      </DialogDescription>
+                    </VisuallyHidden>
 
-                  {/* Vertical container (9:16) */}
-                  <div className="relative w-full aspect-9/16 bg-black rounded-2xl overflow-hidden max-w-[90%] md:max-w-full">
-                    {isOpen && (
-                      <VideoComponent
-                        source_webm="/videos/land_process.webm"
-                        source_mp4="/videos/land_process.mp4"
-                        className="w-full h-full"
-                        autoPlay={true}
-                        muted={true}
-                      />
-                    )}
-                  </div>
-                  <DialogClose className="absolute right-10 md:right-4 top-4 rounded-full p-3 transition-opacity hover:bg-neutral-100 focus:outline-none">
-                    <X className="size-8" strokeWidth={2.5} />
-                    <span className="sr-only">Close</span>
-                  </DialogClose>
-                </DialogContent>
-              </Dialog>
+                    {/* Vertical container (9:16) */}
+                    <div className="relative w-full aspect-9/16 bg-black rounded-2xl overflow-hidden max-w-[90%] md:max-w-full">
+                      {isOpen && (
+                        <VideoComponent
+                          source_webm="/videos/land_process.webm"
+                          source_mp4="/videos/land_process.mp4"
+                          className="w-full h-full"
+                          autoPlay={true}
+                          muted={true}
+                        />
+                      )}
+                    </div>
+                    <DialogClose className="absolute right-10 md:right-4 top-4 rounded-full p-3 transition-opacity hover:bg-neutral-100 focus:outline-none">
+                      <X className="size-8" strokeWidth={2.5} />
+                      <span className="sr-only">Close</span>
+                    </DialogClose>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </div>
         </div>

@@ -68,7 +68,11 @@ export default function HomePage() {
         }}
       />
       <section className="px-4">
-        <Hero video={true} />
+        <Hero
+          video={true}
+          header="Odors, Dust, Stains, and Dander — Removal. Upholstery & Carpet Cleaning."
+          subheader="Cleaned with safe shampoos, gentle enough for kids and pets. Guaranteed — if the stain comes back, we re-clean it free."
+        />
       </section>
       <section className="py-8 md:py-16">
         <LogoTicker />

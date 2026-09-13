@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { submitQuoteRequest } from "@/app/api/email/actions";
-import BeforeImage from "@/public/images/before1.webp";
+import BeforeImage from "@/public/images/before-after-1.jpg";
 
 // Extend the window object for Facebook Pixel
 declare global {
@@ -106,7 +106,8 @@ export function CTA({ className }: { className?: string }) {
                 className="w-full flex flex-col gap-6"
               >
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-                  Is your couch looking TIRED?
+                  Service Guarantee: If a stain comes back, we come back and
+                  reclean it free.
                 </h2>
                 <p className="text-xl text-muted">
                   We’ll make it look <strong>brand new again!</strong>
