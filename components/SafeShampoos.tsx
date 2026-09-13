@@ -3,11 +3,14 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Shampoo from "@/public/images/shampoo.jpg";
+import ShampooOne from "@/public/images/shampoo-1.jpg";
+import ShampooTwo from "@/public/images/shampoo-2.jpg";
 
 const GRID_IMAGES = [
   {
     id: "img-1",
-    src: "https://picsum.photos/seed/upholstery1/800/600",
+    src: Shampoo,
     alt: "Professional upholstery cleaning process",
     className: "col-span-2 h-64",
     sizes: "(max-width: 768px) 100vw, 50vw",
@@ -15,14 +18,14 @@ const GRID_IMAGES = [
   },
   {
     id: "img-2",
-    src: "https://picsum.photos/seed/upholstery2/400/400",
+    src: ShampooOne,
     alt: "Family and pets on clean furniture",
     className: "h-40",
     sizes: "(max-width: 768px) 50vw, 25vw",
   },
   {
     id: "img-3",
-    src: "https://picsum.photos/seed/upholstery3/400/400",
+    src: ShampooTwo,
     alt: "Fresh clean living room",
     className: "h-40",
     sizes: "(max-width: 768px) 50vw, 25vw",
