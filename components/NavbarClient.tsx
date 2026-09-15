@@ -29,7 +29,7 @@ export function NavbarClient({ navItems }: NavbarProps) {
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md shadow-sm ">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex gap-4 items-center">
-          <div className="relative h-8 w-16">
+          <div className="relative h-8 w-8">
             <Image
               src={ASLogo}
               fill

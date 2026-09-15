@@ -1,21 +1,17 @@
 "use client";
 import { useState, ChangeEvent } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { submitQuoteRequest } from "@/app/api/email/actions";
 import BeforeImage from "@/public/images/before-after-1.jpg";
 
-// Extend the window object for Facebook Pixel
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
-  }
-}
-
 export function CTA({ className }: { className?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [phone, setPhone] = useState("");
+
+  const searchParams = useSearchParams();
 
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
@@ -31,19 +27,37 @@ export function CTA({ className }: { className?: string }) {
   const handleSubmit = async (formData: FormData) => {
     setStatus("loading");
 
-    // Generate the eventId at the start so it is identical for both browser and server
+    // Generate the exact same eventId for Meta CAPI and browser event deduplication
     const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-
-    // Append to FormData so the Server Action receives it
     formData.append("eventId", eventId);
 
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: "form_submitted",
-      // These keys MUST match the "Data Layer Variable Name" in GTM
-      event_id: eventId, // Matches 'dlv - event_id'
-      estimated_value: 0, // Matches 'dlv - estimated_value'
-    });
+    // Extract UTM parameters from URL query string
+    const utmSource = searchParams.get("utm_source") || "direct";
+    const utmMedium = searchParams.get("utm_medium") || "none";
+    const utmCampaign = searchParams.get("utm_campaign") || "none";
+    const utmContent = searchParams.get("utm_content") || "none";
+    const utmTerm = searchParams.get("utm_term") || "none";
+
+    // Append UTM parameters to FormData so the Server Action reads them cleanly
+    formData.append("utmSource", utmSource);
+    formData.append("utmMedium", utmMedium);
+    formData.append("utmCampaign", utmCampaign);
+    formData.append("utmContent", utmContent);
+    formData.append("utmTerm", utmTerm);
+
+    // Safely push to dataLayer without conflicting global declarations
+    if (typeof window !== "undefined") {
+      const win = window as unknown as { dataLayer: Record<string, unknown>[] };
+      win.dataLayer = win.dataLayer || [];
+      win.dataLayer.push({
+        event: "form_submitted",
+        event_id: eventId, // Matches your GTM 'dlv - event_id'
+        estimated_value: 0, // Matches your GTM 'dlv - estimated_value'
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_campaign: utmCampaign,
+      });
+    }
 
     const result = await submitQuoteRequest(formData);
 

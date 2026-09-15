@@ -2,6 +2,7 @@ export interface MetaUser {
   email?: string;
   phone: string;
   firstName: string;
+  lastName: string;
   clientIpAddress: string;
   clientUserAgent: string;
   fbc?: string;
@@ -30,6 +31,7 @@ export interface MetaPayloadEvent {
   user_data: {
     ph: string;
     fn: string;
+    ln: string;
     client_ip_address: string;
     client_user_agent: string;
     em?: string;

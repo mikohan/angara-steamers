@@ -1,5 +1,6 @@
 "use client";
 import { useState, ChangeEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { submitQuoteRequest } from "@/app/api/email/actions";
 
@@ -8,7 +9,9 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState(""); // <-- 1. Add message state
+  const [message, setMessage] = useState("");
+
+  const searchParams = useSearchParams();
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^a-zA-Z\s]/g, "");
@@ -29,12 +32,32 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
   const handleSubmit = async (formData: FormData) => {
     setStatus("loading");
 
+    // Preserve exact deduplication ID structure for Meta CAPI
     const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     formData.append("eventId", eventId);
 
+    // Capture UTM parameters for attribution
+    const utmSource = searchParams.get("utm_source") || "direct";
+    const utmMedium = searchParams.get("utm_medium") || "none";
+    const utmCampaign = searchParams.get("utm_campaign") || "none";
+    const utmContent = searchParams.get("utm_content") || "none";
+    const utmTerm = searchParams.get("utm_term") || "none";
+
+    formData.append("utmSource", utmSource);
+    formData.append("utmMedium", utmMedium);
+    formData.append("utmCampaign", utmCampaign);
+    formData.append("utmContent", utmContent);
+    formData.append("utmTerm", utmTerm);
+
     if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: "form_submitted", event_id: eventId });
+      window.dataLayer.push({
+        event: "form_submitted",
+        event_id: eventId,
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_campaign: utmCampaign,
+      });
     }
 
     const result = await submitQuoteRequest(formData);
@@ -46,7 +69,7 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
         setStatus("idle");
         setName("");
         setPhone("");
-        setMessage(""); // <-- 2. Reset message state on close
+        setMessage("");
       }, 3000);
     } else {
       setStatus("idle");
@@ -92,7 +115,6 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
               minLength={14}
               className="w-full px-4 py-3 rounded-lg bg-primary/5 border border-primary/10 focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
             />
-            {/* <-- 3. Add the required message input field --> */}
             <input
               name="message"
               placeholder="What do you need cleaned?"
