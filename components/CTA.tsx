@@ -31,6 +31,12 @@ function CTAForm({ className }: { className?: string }) {
     const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     formData.append("eventId", eventId);
 
+    // Split full name into first and last name to match server-side Meta CAPI data (browser advanced matching)
+    const rawName = (formData.get("name") as string) || "";
+    const nameParts = rawName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
     // Extract UTM parameters from URL query string
     const utmSource = searchParams.get("utm_source") || "direct";
     const utmMedium = searchParams.get("utm_medium") || "none";
@@ -53,6 +59,8 @@ function CTAForm({ className }: { className?: string }) {
         event: "form_submitted",
         event_id: eventId, // Matches your GTM 'dlv - event_id'
         estimated_value: 0, // Matches your GTM 'dlv - estimated_value'
+        first_name: firstName,
+        last_name: lastName,
         utm_source: utmSource,
         utm_medium: utmMedium,
         utm_campaign: utmCampaign,

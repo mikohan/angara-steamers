@@ -36,6 +36,11 @@ function QuoteDialogInner({ children }: { children: React.ReactNode }) {
     const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     formData.append("eventId", eventId);
 
+    // Split full name into first and last name to match server-side Meta CAPI data (browser advanced matching)
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
     // Capture UTM parameters for attribution
     const utmSource = searchParams.get("utm_source") || "direct";
     const utmMedium = searchParams.get("utm_medium") || "none";
@@ -54,6 +59,8 @@ function QuoteDialogInner({ children }: { children: React.ReactNode }) {
       window.dataLayer.push({
         event: "form_submitted",
         event_id: eventId,
+        first_name: firstName,
+        last_name: lastName,
         utm_source: utmSource,
         utm_medium: utmMedium,
         utm_campaign: utmCampaign,
