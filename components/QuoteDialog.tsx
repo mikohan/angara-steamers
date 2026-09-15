@@ -1,10 +1,10 @@
 "use client";
-import { useState, ChangeEvent } from "react";
+import { Suspense, useState, ChangeEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { submitQuoteRequest } from "@/app/api/email/actions";
 
-export function QuoteDialog({ children }: { children: React.ReactNode }) {
+function QuoteDialogInner({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [name, setName] = useState("");
@@ -142,5 +142,13 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function QuoteDialog({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <QuoteDialogInner>{children}</QuoteDialogInner>
+    </Suspense>
   );
 }

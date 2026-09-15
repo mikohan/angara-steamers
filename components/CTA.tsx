@@ -1,5 +1,5 @@
 "use client";
-import { useState, ChangeEvent } from "react";
+import { Suspense, useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { submitQuoteRequest } from "@/app/api/email/actions";
 import BeforeImage from "@/public/images/before-after-1.jpg";
 
-export function CTA({ className }: { className?: string }) {
+function CTAForm({ className }: { className?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [phone, setPhone] = useState("");
 
@@ -185,5 +185,13 @@ export function CTA({ className }: { className?: string }) {
         </div>
       </div>
     </section>
+  );
+}
+
+export function CTA({ className }: { className?: string }) {
+  return (
+    <Suspense fallback={null}>
+      <CTAForm className={className} />
+    </Suspense>
   );
 }
