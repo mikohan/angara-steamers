@@ -7,7 +7,7 @@ import { MobileMenu } from "./MobileMenu";
 import { NavbarProps } from "@/types";
 import { STATIC_PAGES } from "@/data/links";
 import Image from "next/image";
-import ASLogo from "@/public/images/new_logo_as.webp";
+import ASLogo from "@/public/images/logo_as_drops.webp";
 
 // Define your static pages here
 

@@ -8,9 +8,9 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState(""); // <-- 1. Add message state
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // Only allow letters and spaces
     const value = e.target.value.replace(/[^a-zA-Z\s]/g, "");
     setName(value);
   };
@@ -29,27 +29,24 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
   const handleSubmit = async (formData: FormData) => {
     setStatus("loading");
 
-    // Generate unique ID
     const eventId = `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     formData.append("eventId", eventId);
 
-    // Browser Tracking
     if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event: "form_submitted", event_id: eventId });
     }
 
-    // Submit to Server
     const result = await submitQuoteRequest(formData);
 
     if (result.success) {
       setStatus("success");
-      // Auto-close after 3 seconds
       setTimeout(() => {
         setOpen(false);
         setStatus("idle");
         setName("");
         setPhone("");
+        setMessage(""); // <-- 2. Reset message state on close
       }, 3000);
     } else {
       setStatus("idle");
@@ -61,7 +58,6 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      {/* DialogContent uses theme-aware variables from global.css */}
       <DialogContent className="sm:max-w-md bg-background border border-primary/20 p-8 shadow-2xl rounded-2xl">
         {status === "success" ? (
           <div className="text-center py-8">
@@ -94,6 +90,15 @@ export function QuoteDialog({ children }: { children: React.ReactNode }) {
               onChange={handlePhoneChange}
               required
               minLength={14}
+              className="w-full px-4 py-3 rounded-lg bg-primary/5 border border-primary/10 focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
+            />
+            {/* <-- 3. Add the required message input field --> */}
+            <input
+              name="message"
+              placeholder="What do you need cleaned?"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
               className="w-full px-4 py-3 rounded-lg bg-primary/5 border border-primary/10 focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
             />
 
