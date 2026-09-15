@@ -133,7 +133,8 @@ export function CTA({ className }: { className?: string }) {
                   />
                   <input
                     name="message"
-                    placeholder="What do you need cleaned? (optional)"
+                    required
+                    placeholder="What do you need cleaned? (required)"
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
                   />
                   <button
