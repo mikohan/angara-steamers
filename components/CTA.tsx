@@ -55,16 +55,21 @@ function CTAForm({ className }: { className?: string }) {
     if (typeof window !== "undefined") {
       const win = window as unknown as { dataLayer: Record<string, unknown>[] };
       win.dataLayer = win.dataLayer || [];
-      win.dataLayer.push({
+      const dataLayerPayload: Record<string, unknown> = {
         event: "form_submitted",
         event_id: eventId, // Matches your GTM 'dlv - event_id'
         estimated_value: 0, // Matches your GTM 'dlv - estimated_value'
         first_name: firstName,
-        last_name: lastName,
         utm_source: utmSource,
         utm_medium: utmMedium,
         utm_campaign: utmCampaign,
-      });
+      };
+      // Only include last_name if we actually have one — avoids pushing an empty string
+      // when someone submits a single-word name
+      if (lastName) {
+        dataLayerPayload.last_name = lastName;
+      }
+      win.dataLayer.push(dataLayerPayload);
     }
 
     const result = await submitQuoteRequest(formData);

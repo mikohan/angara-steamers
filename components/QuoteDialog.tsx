@@ -56,15 +56,20 @@ function QuoteDialogInner({ children }: { children: React.ReactNode }) {
 
     if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
+      const dataLayerPayload: Record<string, unknown> = {
         event: "form_submitted",
         event_id: eventId,
         first_name: firstName,
-        last_name: lastName,
         utm_source: utmSource,
         utm_medium: utmMedium,
         utm_campaign: utmCampaign,
-      });
+      };
+      // Only include last_name if we actually have one — avoids pushing an empty string
+      // when someone submits a single-word name
+      if (lastName) {
+        dataLayerPayload.last_name = lastName;
+      }
+      window.dataLayer.push(dataLayerPayload);
     }
 
     const result = await submitQuoteRequest(formData);
