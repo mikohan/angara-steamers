@@ -32,76 +32,127 @@ export const CarpetSliderPerks = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [aspectRatio, setAspectRatio] = useState<number>(0.88); // Default to vertical image ratio
   const [sliderX, setSliderX] = useState<number>(0);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
+
   const images = useRef<{
     clean: HTMLImageElement;
     dirty: HTMLImageElement;
   } | null>(null);
 
-  // 1. Responsive Resizing
+  // 1. Load Images & Calculate Natural Aspect Ratio
+  useEffect(() => {
+    const clean = new Image();
+    const dirty = new Image();
+
+    let loadedCount = 0;
+    const handleLoad = () => {
+      loadedCount++;
+      if (loadedCount === 2) {
+        // Calculate aspect ratio (height / width) based on the natural dimensions of the image
+        if (dirty.naturalWidth > 0) {
+          const ratio = dirty.naturalHeight / dirty.naturalWidth;
+          setAspectRatio(ratio);
+        }
+        images.current = { clean, dirty };
+        setImagesLoaded(true);
+      }
+    };
+
+    clean.onload = handleLoad;
+    dirty.onload = handleLoad;
+
+    clean.src = "/images/rug-after.jpg";
+    dirty.src = "/images/rug-before-mites.jpg";
+  }, []);
+
+  // 2. Responsive Resizing Based on Dynamic Aspect Ratio
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
       const { width } = entries[0].contentRect;
-      const height = width * 0.5625; // Maintain 16:9 aspect ratio
+      if (width === 0) return;
+
+      const height = width * aspectRatio;
       setDimensions({ width, height });
-      setSliderX(width / 2); // Initial center
+      setSliderX((prev) => (prev === 0 ? width / 2 : prev));
     });
 
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [aspectRatio]);
 
-  // 2. Load Images
-  useEffect(() => {
-    const clean = new Image();
-    const dirty = new Image();
-    clean.src = "/images/rug-after.jpg";
-    dirty.src = "/images/rug-before.jpg";
-    images.current = { clean, dirty };
-  }, []);
-
-  // 3. Render Loop
+  // 3. Render Loop with Crisp Retain & Un-distorted Canvas Scale
   const draw = () => {
     const canvas = canvasRef.current;
-    if (!canvas || !images.current || dimensions.width === 0) return;
+    if (!canvas || !images.current || !imagesLoaded || dimensions.width === 0)
+      return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(images.current.dirty, 0, 0, canvas.width, canvas.height);
+    const dpr = window.devicePixelRatio || 1;
 
+    // Handle High-DPI Display Sharpness
+    canvas.width = dimensions.width * dpr;
+    canvas.height = dimensions.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Draw Dirty Image (Before)
+    ctx.clearRect(0, 0, dimensions.width, dimensions.height);
+    ctx.drawImage(
+      images.current.dirty,
+      0,
+      0,
+      dimensions.width,
+      dimensions.height,
+    );
+
+    // Draw Clean Image (After) with Clip
     ctx.save();
     ctx.beginPath();
-    ctx.rect(0, 0, sliderX, canvas.height);
+    ctx.rect(0, 0, sliderX, dimensions.height);
     ctx.clip();
-    ctx.drawImage(images.current.clean, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      images.current.clean,
+      0,
+      0,
+      dimensions.width,
+      dimensions.height,
+    );
     ctx.restore();
 
     // Divider Line
     ctx.beginPath();
     ctx.moveTo(sliderX, 0);
-    ctx.lineTo(sliderX, canvas.height);
+    ctx.lineTo(sliderX, dimensions.height);
     ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Slider Handle Knob
+    ctx.beginPath();
+    ctx.arc(sliderX, dimensions.height / 2, 18, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.15)";
+    ctx.lineWidth = 2;
     ctx.stroke();
   };
 
   useEffect(() => {
     requestAnimationFrame(draw);
-  }, [sliderX, dimensions]);
+  }, [sliderX, dimensions, imagesLoaded]);
 
-  // 4. Precise Event Handling
+  // 4. Interaction Handling
   const handleMove = (
     e: ReactMouseEvent<HTMLCanvasElement> | ReactTouchEvent<HTMLCanvasElement>,
   ): void => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Use nativeEvent.offsetX for the most accurate positioning relative to the element
+    const rect = canvas.getBoundingClientRect();
     const clientX =
-      "touches" in e
-        ? e.touches[0].clientX - canvas.getBoundingClientRect().left
-        : (e.nativeEvent as MouseEvent).offsetX;
+      "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
 
     setSliderX(Math.max(0, Math.min(clientX, dimensions.width)));
   };
@@ -110,20 +161,19 @@ export const CarpetSliderPerks = () => {
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 p-8">
       <div
         ref={containerRef}
-        className="relative w-full md:w-3/5 touch-none select-none"
+        className="relative w-full md:w-1/2 touch-none select-none"
       >
         <canvas
           ref={canvasRef}
-          width={dimensions.width}
-          height={dimensions.height}
+          style={{ width: dimensions.width, height: dimensions.height }}
           onMouseMove={handleMove}
           onTouchMove={handleMove}
           className="w-full h-auto cursor-ew-resize rounded-2xl shadow-2xl border-4 border-primary/20 block"
         />
       </div>
 
-      <div className="w-full md:w-2/5 space-y-10">
-        <h2 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground">
+      <div className="w-full md:w-1/2 space-y-10">
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
           Professional Care
         </h2>
         <div className="space-y-8">

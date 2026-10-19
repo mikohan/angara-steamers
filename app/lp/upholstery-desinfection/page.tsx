@@ -12,6 +12,7 @@ import { LogoTicker } from "@/components/LogoTicker";
 import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
 import { Enemy } from "@/components/Enemy";
 import { CTA } from "@/components/CTA";
+import { CarpetSliderPerksMites } from "@/components/games/CarpetSliderPerksMites";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -79,7 +80,7 @@ export default function HomePage() {
         <LogoTicker />
       </section>
       <section className="py-8 md:py-16">
-        <Enemy />
+        <CarpetSliderPerksMites />
       </section>
 
       <section className="relative pt-32 pb-32">
