@@ -1,12 +1,20 @@
 import { IPrice } from "@/types";
 import SmalCouchImage from "@/public/oldMedia/couch/prices/sofa.png";
+import Sofa3SeatImage from "@/public/media/pricing-v2/sofa-3-seat.png";
 import SmalLShapedImage from "@/public/oldMedia/couch/prices/smallLShaped.png";
+import LShaped56Image from "@/public/media/pricing-v2/l-shaped-5-6-seater.png";
 import LargeSectionalImage from "@/public/oldMedia/couch/prices/largeSecional.png";
+import Sectional9PlusImage from "@/public/media/pricing-v2/sectional-9-plus-seater.png";
 import ArmChairImage from "@/public/oldMedia/couch/prices/armchair.png";
+import DiningChairImage from "@/public/media/pricing-v2/dining-chair.png";
 import MattressImage from "@/public/oldMedia/couch/prices/mattress.png";
+import MattressKingImage from "@/public/media/pricing-v2/mattress-king.png";
 import BedImage from "@/public/oldMedia/couch/prices/bed.png";
-import RugImage from "@/public/oldMedia/couch/prices/rug.png";
+import BedFrameImage from "@/public/media/pricing-v2/bed-frame.png";
 import CarpetImage from "@/public/oldMedia/couch/prices/carpet.png";
+import Carpet3RoomsImage from "@/public/media/pricing-v2/carpet-3-rooms.png";
+import RugImage from "@/public/oldMedia/couch/prices/rug.png";
+import AreaRug5x5Image from "@/public/media/pricing-v2/area-rug-5x5.png";
 
 export const prices: IPrice[] = [
   // --- Sofas ---
@@ -19,7 +27,7 @@ export const prices: IPrice[] = [
     priceAfter: 145,
   },
   {
-    img: SmalCouchImage,
+    img: Sofa3SeatImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/sofa.png",
     category: "Sofas",
     item: "3 seat Sofa",
@@ -37,7 +45,7 @@ export const prices: IPrice[] = [
     priceAfter: 195,
   },
   {
-    img: SmalLShapedImage,
+    img: LShaped56Image,
     url: "https://ik.imagekit.io/angara/Couch/prices/smallLShaped.png",
     category: "L-Shaped Couch",
     item: "5-6 seater",
@@ -55,7 +63,7 @@ export const prices: IPrice[] = [
     priceAfter: 295,
   },
   {
-    img: LargeSectionalImage,
+    img: Sectional9PlusImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/largeSecional.png",
     category: "Large Sectional",
     item: "9+ Seater",
@@ -73,7 +81,7 @@ export const prices: IPrice[] = [
     priceAfter: 85,
   },
   {
-    img: ArmChairImage,
+    img: DiningChairImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/armchair.png",
     category: "Chairs",
     item: "Dining Chair",
@@ -91,7 +99,7 @@ export const prices: IPrice[] = [
     priceAfter: 115,
   },
   {
-    img: MattressImage,
+    img: MattressKingImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/mattress.png",
     category: "Mattresses",
     item: "King",
@@ -109,7 +117,7 @@ export const prices: IPrice[] = [
     priceAfter: 85,
   },
   {
-    img: BedImage,
+    img: BedFrameImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/bed.png",
     category: "Bed",
     item: "Bed Frame",
@@ -127,7 +135,7 @@ export const prices: IPrice[] = [
     priceAfter: 135,
   },
   {
-    img: CarpetImage,
+    img: Carpet3RoomsImage,
     url: "https://ik.imagekit.io/angara/Couch/prices/carpet.png",
     category: "Carpets",
     item: "3 rooms carpet",
@@ -145,7 +153,7 @@ export const prices: IPrice[] = [
     priceAfter: 90,
   },
   {
-    img: RugImage,
+    img: AreaRug5x5Image,
     url: "https://ik.imagekit.io/angara/Couch/prices/rug.png",
     category: "Area Rugs",
     item: "5x5 Area Rug",
