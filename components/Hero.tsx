@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GoogleStars } from "./oldComponents/GoogleStars";
+import { BUSINESS_CONFIG } from "@/data/business-config";
 import { AvatarGroup } from "./oldComponents/AvatarGroup";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -51,7 +52,11 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
         <div className="md:flex-1">
           <div className="inline-flex gap-2 w-full justify-center md:justify-start">
             <AvatarGroup />
-            <GoogleStars starsCount={5} rating="" />
+            <GoogleStars
+              starsCount={5}
+              rating={BUSINESS_CONFIG.rating}
+              text={`(${BUSINESS_CONFIG.review_count}+ Reviews)`}
+            />
           </div>
 
           <div className="flex flex-col md:items-start text-center md:text-left">

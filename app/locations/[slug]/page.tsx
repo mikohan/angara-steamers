@@ -16,6 +16,22 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateStaticParams() {
+  const locations: StrapiResponse<LocationPage> = await fetchStrapi(
+    "location-pages",
+    {
+      fields: ["slug"],
+      pagination: { page: 1, pageSize: 100 },
+    },
+  );
+
+  return locations.data
+    .filter((location) => location.slug)
+    .map((location) => ({
+      slug: location.slug,
+    }));
+}
+
 /**
  * Pure math helper: Calculates great-circle distance between two coordinate nodes
  */
