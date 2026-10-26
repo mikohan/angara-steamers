@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, ArrowUpRight } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDate, firstImage } from "@/lib/utils";
 import { Project } from "@/types";
 
 interface LatestProjectsProps {
@@ -55,7 +55,7 @@ export function LatestProjects({
         <div className="grid gap-6 sm:grid-cols-4">
           {projects.map((project, index) => {
             // Securely grab the first image out of the media gallery as your thumbnail
-            const thumbnailMedia = project.media_gallery?.[0];
+            const thumbnailMedia = firstImage(project.media_gallery);
             const thumbnailUrl = thumbnailMedia
               ? `${strapiUrl}${thumbnailMedia.url}`
               : "/images/og_image.webp";

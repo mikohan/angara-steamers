@@ -3,6 +3,7 @@ import { Project, StrapiResponse } from "@/types";
 import { generateProjectsListSeo } from "@/data/meta-data/meta-projects";
 import Image from "next/image";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { firstImage } from "@/lib/utils";
 import { LogoTicker } from "@/components/LogoTicker";
 import { CTA } from "@/components/CTA";
 
@@ -21,8 +22,8 @@ export default async function ProjectsPage() {
         fields: ["slug"],
       },
       media_gallery: true,
-      video: true,
     },
+    sort: ["completion_date:desc"],
   });
   const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/projects`;
   const response: StrapiResponse<Project> = await fetchStrapi(
@@ -66,20 +67,28 @@ export default async function ProjectsPage() {
                 key={project.slug}
                 className="border flex flex-col gap-4 justify-between border-primary/10 shadow-2xl rounded-xl overflow-hidden hover:shadow-xl transition-shadow"
               >
-                {project.media_gallery?.[0] && (
+                {firstImage(project.media_gallery) && (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${project.media_gallery[0].url}`}
+                    src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${firstImage(project.media_gallery)!.url}`}
                     alt={
-                      project.media_gallery[0].alternativeText || project.title
+                      firstImage(project.media_gallery)!.alternativeText ||
+                      project.title
                     }
                     className="w-full h-64 object-cover"
-                    height={project.media_gallery[0].height}
-                    width={project.media_gallery[0].width}
+                    height={firstImage(project.media_gallery)!.height}
+                    width={firstImage(project.media_gallery)!.width}
                     loading="eager"
                   />
                 )}
                 <div className="p-6 flex flex-col gap-4 h-full justify-between">
-                  <h2 className="text-2xl font-bold mb-2">{project.title}</h2>
+                  <h2 className="text-2xl font-bold mb-2">
+                    <a
+                      href={`/projects/${project.location_page?.slug}/${project.slug}`}
+                      className="hover:text-primary hover:underline transition-colors"
+                    >
+                      {project.title}
+                    </a>
+                  </h2>
                   <p className="text-muted mb-4">
                     {project.seo_text.substring(0, 100)}...
                   </p>

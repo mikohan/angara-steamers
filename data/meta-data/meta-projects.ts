@@ -1,6 +1,7 @@
 import { Project } from "@/types";
 import { BUSINESS_CONFIG } from "@/data/business-config";
 import { Metadata } from "next";
+import { firstImage } from "@/lib/utils";
 
 export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
   const canonical = baseUrl;
@@ -8,10 +9,11 @@ export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
     process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com";
 
   // Define primary image
-  const primaryImageUrl =
-    projects.length > 0 && projects[0].media_gallery?.[0]?.url
-      ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${projects[0].media_gallery[0].url}`
-      : `${companyWebsite}/og-image.png`;
+  const firstProjectImage =
+    projects.length > 0 ? firstImage(projects[0].media_gallery) : undefined;
+  const primaryImageUrl = firstProjectImage?.url
+    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${firstProjectImage.url}`
+    : `${companyWebsite}/og-image.png`;
 
   const metadata: Metadata = {
     metadataBase: new URL(companyWebsite),
@@ -61,8 +63,8 @@ export function generateProjectsListSeo(baseUrl: string, projects: Project[]) {
             position: index + 1,
             name: project.title,
             url: projectUrl,
-            image: project.media_gallery?.[0]?.url
-              ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${project.media_gallery[0].url}`
+            image: firstImage(project.media_gallery)?.url
+              ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${firstImage(project.media_gallery)!.url}`
               : undefined,
           };
         }),

@@ -6,7 +6,7 @@ import { ProjectImage } from "@/components/ProjectImage";
 import { ProjectVideo } from "@/components/ProjectVideo";
 import GoogleMap from "@/components/GoogleMap";
 import { RichTextRenderer } from "@/components/common/RichTextRenderer";
-import { formatDate } from "@/lib/utils";
+import { formatDate, splitMedia } from "@/lib/utils";
 import { CTA } from "@/components/CTA";
 import { LogoTicker } from "@/components/LogoTicker";
 import DefaultServiceImage from "@/public/images/og_image.webp";
@@ -42,7 +42,6 @@ const getQuery = (slug: string) => ({
   filters: { slug: { $eq: slug } },
   populate: {
     media_gallery: true,
-    video: true,
     service_page: {
       populate: {
         service_hub: { fields: ["slug"] }, // Explicitly get the hub
@@ -159,6 +158,9 @@ export default async function ProjectPage({
   ];
   const mapData = projectInstance.location_page?.map_component;
   const hasMap = mapData?.latitude && mapData?.longitude;
+  const { images: galleryImages, videos: galleryVideos } = splitMedia(
+    projectInstance.media_gallery,
+  );
   return (
     <>
       {/* Inject the full JSON-LD Graph */}
@@ -200,7 +202,7 @@ export default async function ProjectPage({
                 Images gallery {projectInstance.title}
               </h3>
               <GalleryGrid>
-                {projectInstance.media_gallery.map((img) => (
+                {galleryImages.map((img) => (
                   <ProjectImage
                     key={img.url}
                     src={img.url}
@@ -217,18 +219,23 @@ export default async function ProjectPage({
                   />
                 ))}
               </GalleryGrid>
-              <GalleryGrid>
-                {projectInstance.video?.map((vid) => {
-                  return (
-                    <ProjectVideo
-                      key={vid.url}
-                      url={vid.url}
-                      type={vid.mime}
-                      caption={vid.caption}
-                    />
-                  );
-                })}
-              </GalleryGrid>
+              {galleryVideos.length > 0 && (
+                <>
+                  <h3 className="text-2xl font-semibold text-muted mt-12">
+                    Video {projectInstance.title}
+                  </h3>
+                  <GalleryGrid>
+                    {galleryVideos.map((vid) => (
+                      <ProjectVideo
+                        key={vid.url}
+                        url={vid.url}
+                        type={vid.mime}
+                        caption={vid.caption}
+                      />
+                    ))}
+                  </GalleryGrid>
+                </>
+              )}
             </div>
           </article>
         )}

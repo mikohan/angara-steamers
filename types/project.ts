@@ -13,8 +13,7 @@ export interface Project extends StrapiBase {
   meta_description: string;
   completion_date?: string;
 
-  media_gallery: StrapiMedia[]; // multiple media
-  video?: StrapiMedia[];
+  media_gallery: StrapiMedia[]; // multiple media: images + videos together, split by mime in the UI
 
   location_page?: LocationPage | null; // many-to-one
   service_page?: ServicePage | null;

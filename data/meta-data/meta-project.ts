@@ -1,6 +1,7 @@
 import { Project, StrapiMedia, StrapiResponse } from "@/types";
 import { BUSINESS_CONFIG } from "@/data/business-config";
 import { Metadata } from "next";
+import { isImageMedia } from "@/lib/utils";
 
 export function generateProjectPageSeo(
   response: StrapiResponse<Project>,
@@ -37,7 +38,7 @@ export function generateProjectPageSeo(
       title: data.meta_title,
       description: data.meta_description,
       siteName: BUSINESS_CONFIG.business_name,
-      images: (data.media_gallery || []).map((img) => {
+      images: (data.media_gallery || []).filter(isImageMedia).map((img) => {
         // Safely extract the path, preferring medium, then original, or empty
         const path = img.formats?.medium?.url || img.url || "";
 
@@ -117,10 +118,12 @@ export function generateProjectPageSeo(
         headline: data.meta_title,
         description: data.meta_description,
         datePublished: data.completion_date,
-        image: data.media_gallery.map(
-          (img: StrapiMedia) =>
-            `${cmsBase}${img.formats?.small?.url || img.url}`,
-        ),
+        image: data.media_gallery
+          .filter(isImageMedia)
+          .map(
+            (img: StrapiMedia) =>
+              `${cmsBase}${img.formats?.small?.url || img.url}`,
+          ),
         mainEntity: {
           "@type": "Service",
           name: "Professional Upholstery Cleaning", // Update to match your actual service name
