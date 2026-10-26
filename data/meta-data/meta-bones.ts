@@ -93,10 +93,6 @@ export function generateWeaponsGradeSeo(
     // Building the Schema dynamically
     areaServed: [
       data.city_name && { "@type": "City", name: data.city_name },
-      data.region?.name && {
-        "@type": "AdministrativeArea",
-        name: data.region.name,
-      },
       data.state?.name && { "@type": "State", name: data.state.name },
     ].filter(Boolean),
     sameAs: data.same_as ?? BUSINESS_CONFIG.same_as,

@@ -1,6 +1,4 @@
 // Define a specific interface for your pagination or metadata
-import { StrapiRegion } from "@/types";
-
 export interface FormatRecord {
   ext: string;
   url: string;
@@ -85,7 +83,6 @@ export interface MapConfig {
 export interface SeoPageData {
   business_name: string;
   city_name: string;
-  region: StrapiRegion;
   slogan: string;
   founding_date: string;
   founding_location: string;

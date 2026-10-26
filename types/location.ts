@@ -39,7 +39,6 @@ export interface LocationPage extends StrapiBase, SeoPageData {
   seo_text: StrapiBlock[];
 
   state?: State | null;
-  region: StrapiRegion;
   location_faq: ServiceFaq[];
 
   projects: Project[];
@@ -64,8 +63,3 @@ export interface LocationPage extends StrapiBase, SeoPageData {
 //     };
 //   };
 // }
-export interface StrapiRegion {
-  id: number;
-  slug: string;
-  name: string;
-}

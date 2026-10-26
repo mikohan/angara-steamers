@@ -57,13 +57,12 @@ function getDistanceInMiles(
 
 // const getQuery = (slug: string) => ({
 //   filters: { slug: { $eq: slug } },
-//   populate: ["state", "region", "og_image", "faq", "map_component", "projects"],
+//   populate: ["state", "og_image", "faq", "map_component", "projects"],
 // });
 const getQuery = (slug: string) => ({
   filters: { slug: { $eq: slug } },
   populate: {
     state: true,
-    region: true,
     og_image: true,
     faq: true,
     map_component: true,
@@ -102,23 +101,23 @@ export async function getAllServicesData(): Promise<ServicePage[]> {
 }
 
 /**
- * NEW: Queries peer locations in the same region and sorts them by geographic distance
+ * NEW: Queries peer locations in the same state and sorts them by geographic distance
  */
 export async function getNeighboringLocations(
   currentLocation: LocationPage,
 ): Promise<LocationPage[]> {
-  const regionId = currentLocation.region?.id;
+  const stateId = currentLocation.state?.id;
   const pivotLat = currentLocation.map_component?.latitude;
   const pivotLng = currentLocation.map_component?.longitude;
 
   // Failsafe exit check if relation parameters are missing
-  if (!regionId || pivotLat === undefined || pivotLng === undefined) {
+  if (!stateId || pivotLat === undefined || pivotLng === undefined) {
     return [];
   }
 
   const query = {
     filters: {
-      region: { id: { $eq: regionId } },
+      state: { id: { $eq: stateId } },
       id: { $ne: currentLocation.id }, // Exclude the current location page itself
     },
     fields: ["city_name", "slug", "h2_subheadning"],
@@ -153,7 +152,7 @@ export async function getNeighboringLocations(
       .map((item) => item.loc)
       .slice(0, 2); // Return exactly the top 2 closest neighbors
   } catch (error) {
-    console.error("Failed fetching regional neighbors:", error);
+    console.error("Failed fetching state neighbors:", error);
     return [];
   }
 }

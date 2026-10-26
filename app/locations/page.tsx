@@ -7,7 +7,7 @@ import Image from "next/image";
 
 // 1. Define Metadata for Next.js
 const getQuery = () => ({
-  populate: ["state", "region", "og_image", "faq", "map_component", "projects"],
+  populate: ["state", "og_image", "faq", "map_component", "projects"],
 });
 
 const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/locations`;
@@ -34,15 +34,12 @@ export default async function LocationsPage() {
   const groupedLocations = response.data.reduce(
     (acc, loc) => {
       const state = loc.state?.name || "Other";
-      const region = loc.region?.name || "General";
 
-      if (!acc[state]) acc[state] = {};
-      if (!acc[state][region]) acc[state][region] = [];
-
-      acc[state][region].push(loc);
+      if (!acc[state]) acc[state] = [];
+      acc[state].push(loc);
       return acc;
     },
-    {} as Record<string, Record<string, typeof response.data>>,
+    {} as Record<string, typeof response.data>,
   );
 
   const breadcrumbSegments = [
@@ -70,46 +67,36 @@ export default async function LocationsPage() {
           </h2>
         </div>
         <div className="space-y-16">
-          {Object.entries(groupedLocations).map(([state, regions]) => (
+          {Object.entries(groupedLocations).map(([state, cities]) => (
             <section key={state}>
               <h2 className="text-3xl font-bold mb-8 text-primary">{state}</h2>
 
-              <div className="space-y-10">
-                {Object.entries(regions).map(([region, cities]) => (
-                  <div key={region}>
-                    <h3 className="text-xl font-semibold mb-4 text-foreground/80 border-l-4 border-primary pl-4">
-                      {region}
-                    </h3>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {cities.map((loc) => {
-                        const img =
-                          (process.env.NEXT_PUBLIC_STRAPI_URL ||
-                            "https://cms.angaracleaning.com") +
-                            loc.og_image.formats?.thumbnail.url ||
-                          "images/og_image.webp";
-                        return (
-                          <div
-                            key={loc.slug}
-                            className="p-4 rounded-xl bg-primary/10 flex flex-col gap-4 justify-between"
-                          >
-                            <Image
-                              src={img}
-                              alt={loc.city_name}
-                              width={300}
-                              height={200}
-                            />
-                            <a href={`/locations/${loc.slug}`}>
-                              <span className="font-medium text-sm text-foreground">
-                                {loc.city_name}
-                              </span>
-                            </a>
-                          </div>
-                        );
-                      })}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {cities.map((loc) => {
+                  const img =
+                    (process.env.NEXT_PUBLIC_STRAPI_URL ||
+                      "https://cms.angaracleaning.com") +
+                      loc.og_image.formats?.thumbnail.url ||
+                    "images/og_image.webp";
+                  return (
+                    <div
+                      key={loc.slug}
+                      className="p-4 rounded-xl bg-primary/10 flex flex-col gap-4 justify-between"
+                    >
+                      <Image
+                        src={img}
+                        alt={loc.city_name}
+                        width={300}
+                        height={200}
+                      />
+                      <a href={`/locations/${loc.slug}`}>
+                        <span className="font-medium text-sm text-foreground">
+                          {loc.city_name}
+                        </span>
+                      </a>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
           ))}
