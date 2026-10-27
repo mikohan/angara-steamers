@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import PlayIcon from "@/public/oldMedia/couch/videoIcon.png";
-import { useState } from "react";
 
 import { VideoCopmpnent } from "@/types";
 
@@ -18,10 +17,46 @@ export function VideoComponentTestimonials({
   poster,
 }: VideoCopmpnent) {
   const vid = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(autoPlay); // 2. Initialize state
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  // Don't fetch or play the video until it's actually about to be visible --
+  // these are 5MB+ files and were previously downloading on every homepage
+  // load regardless of scroll position.
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || isInView) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }, // start loading a little before it scrolls into view
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isInView]);
+
+  useEffect(() => {
+    if (!isInView || !autoPlay) return;
+    const video = vid.current;
+    if (!video) return;
+    video.play().catch((err) => {
+      console.error("Autoplay failed:", err);
+    });
+  }, [isInView, autoPlay]);
+
   const handlePlay = async () => {
     const video = vid.current;
     if (!video) return;
+
+    if (!isInView) {
+      setIsInView(true);
+    }
 
     try {
       if (!video.paused) {
@@ -38,13 +73,12 @@ export function VideoComponentTestimonials({
   };
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative">
       <video
         ref={vid}
         width={width}
         height={height}
-        preload="auto"
-        autoPlay={autoPlay}
+        preload={isInView ? "auto" : "none"}
         loop={loop}
         muted={muted}
         className="rounded-2xl w-full h-auto"
@@ -54,8 +88,12 @@ export function VideoComponentTestimonials({
         onPause={() => setIsPlaying(false)} // Sync state when video pauses
         onClick={handlePlay}
       >
-        <source src={source_mp4} type="video/mp4" />
-        <source src={source_webm} type="video/webm" />
+        {isInView && (
+          <>
+            <source src={source_mp4} type="video/mp4" />
+            <source src={source_webm} type="video/webm" />
+          </>
+        )}
       </video>
 
       {/* Use a button element for better accessibility. 
