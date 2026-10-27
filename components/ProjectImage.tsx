@@ -24,6 +24,7 @@ export function ProjectImage({
           width={width}
           height={height}
           className="w-full h-auto"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
       </div>
 
