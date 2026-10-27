@@ -40,6 +40,13 @@ export const metadata: Metadata = {
   title: "Professional Upholstery & Carpet Cleaning Service in LA",
   description:
     "Restore your furniture's freshness with Angara Steamers. We provide top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles. Fast, reliable results for families and pets.",
+  twitter: {
+    card: "summary_large_image",
+    title: "Professional Upholstery & Carpet Cleaning Service in LA",
+    description:
+      "Restore your furniture's freshness with Angara Steamers. Top-rated, safe, and professional upholstery and carpet cleaning across Los Angeles.",
+    images: ["/images/og_image.webp"],
+  },
 };
 const navData: StrapiResponse<ServiceHub> = await fetchStrapi("service-hubs", {
   populate: ["service_pages"],

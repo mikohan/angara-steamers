@@ -16,6 +16,14 @@ export const metadata: Metadata = {
     url: "/contact",
     siteName: "Angara Steamers",
     type: "website",
+    images: [
+      {
+        url: "/images/og_image.webp",
+        width: 1200,
+        height: 630,
+        alt: "Angara Steamers Professional Upholstery Cleaning",
+      },
+    ],
   },
 };
 

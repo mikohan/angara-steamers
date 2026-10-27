@@ -49,10 +49,12 @@ export function generateServicePageSeo(
       siteName: BUSINESS_CONFIG.business_name,
       images: [
         {
-          url: process.env.NEXT_PUBLIC_STRAPI_URL + data.og_image.url,
+          url: data.og_image?.url
+            ? process.env.NEXT_PUBLIC_STRAPI_URL + data.og_image.url
+            : "/images/og_image.webp",
           width: 1200,
           height: 630,
-          alt: data.og_image.alternativeText || data.title,
+          alt: data.og_image?.alternativeText || data.title,
         },
       ],
     },
@@ -64,10 +66,10 @@ export function generateServicePageSeo(
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://www.angaracleaning.com/#organization",
+        "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/#organization",
         name: BUSINESS_CONFIG.business_name,
         url: process.env.NEXT_PUBLIC_COMPANY_WEBSITE,
-        logo: process.env.NEXT_PUBLIC_STRAPI_URL + "/uploads/logo.png",
+        logo: process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/images/logo_as.png",
         sameAs: BUSINESS_CONFIG.same_as,
         founder: { "@type": "Person", name: BUSINESS_CONFIG.founder },
         contactPoint: {
@@ -85,7 +87,9 @@ export function generateServicePageSeo(
         provider: {
           "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#organization",
         },
-        image: process.env.NEXT_PUBLIC_STRAPI_URL + data.hero_image.url,
+        image: data.hero_image?.url
+          ? process.env.NEXT_PUBLIC_STRAPI_URL + data.hero_image.url
+          : process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/images/og_image.webp",
         priceRange: "$$",
         description: data.meta_description,
         knowsAbout: BUSINESS_CONFIG.knowsAbout,

@@ -66,7 +66,7 @@ export function generateProjectPageSeo(
         "@id": `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/#organization`,
         name: BUSINESS_CONFIG.business_name,
         url: process.env.NEXT_PUBLIC_COMPANY_WEBSITE,
-        logo: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/logo.png`,
+        logo: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/images/logo_as.png`,
         sameAs: BUSINESS_CONFIG.same_as,
         founder: { "@type": "Person", name: BUSINESS_CONFIG.founder },
         contactPoint: {
@@ -102,8 +102,8 @@ export function generateProjectPageSeo(
             addressRegion: "CA",
             addressCountry: "US",
           },
-          ...(loc.map_component.latitude &&
-            loc.map_component.longitude && {
+          ...(loc.map_component?.latitude &&
+            loc.map_component?.longitude && {
               geo: {
                 "@type": "GeoCoordinates",
                 latitude: loc.map_component.latitude,

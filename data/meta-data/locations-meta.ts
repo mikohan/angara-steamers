@@ -83,7 +83,7 @@ export function generateLocationsListSeo(
     "@type": "Organization",
     name: BUSINESS_CONFIG.business_name,
     url: process.env.NEXT_PUBLIC_COMPANY_WEBSITE,
-    logo: process.env.NEXT_PUBLIC_STRAPI_URL + "/uploads/logo.png",
+    logo: process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/images/logo_as.png",
     contactPoint: {
       "@type": "ContactPoint",
       telephone: BUSINESS_CONFIG.phone,
