@@ -11,6 +11,8 @@ import { LatestProjects } from "@/components/LatestProjects";
 import LocalServicesGrid from "@/components/LocalServicesGrid";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
+import { RichTextRenderer } from "@/components/common/RichTextRenderer";
+import { StrapiBlock } from "@/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -53,6 +55,23 @@ function getDistanceInMiles(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return EARTH_RADIUS_MILES * c;
+}
+
+/**
+ * Strapi "blocks" rich-text fields on location pages were authored as plain
+ * markdown pasted line-by-line, so every block is just a paragraph node whose
+ * text already contains markdown syntax (#, ##, *, etc). Flatten back into a
+ * markdown string so RichTextRenderer (react-markdown) can render it properly.
+ */
+function blocksToMarkdown(blocks?: StrapiBlock[]): string {
+  if (!blocks?.length) return "";
+  return blocks
+    .map((block) =>
+      (block.children || [])
+        .map((child) => child.text || "")
+        .join(""),
+    )
+    .join("\n");
 }
 
 // const getQuery = (slug: string) => ({
@@ -234,6 +253,7 @@ export default async function Location({ params }: PageProps) {
           <Hero
             video={false}
             header={location.h1_heading}
+            subheader={location.h2_subheadning}
             heroImage={
               process.env.NEXT_PUBLIC_STRAPI_URL + location.og_image.url
             }
@@ -243,6 +263,12 @@ export default async function Location({ params }: PageProps) {
         <section>
           <LogoTicker />
         </section>
+
+        {location.seo_text?.length > 0 && (
+          <section className="py-16 md:py-24 mx-auto max-w-5xl px-4 md:px-0">
+            <RichTextRenderer content={blocksToMarkdown(location.seo_text)} />
+          </section>
+        )}
 
         <section className="relative py-16 md:py-32 my-8 md:my-16">
           <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/10 to-background"></div>
