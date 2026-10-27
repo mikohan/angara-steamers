@@ -87,7 +87,7 @@ export default function LocalServicesGrid({
                       src={thumbnailUrl}
                       alt={imgTarget?.alternativeText || service.title}
                       fill
-                      sizes="(max-w-7xl) 50vw, 100vw"
+                      sizes="(max-width: 768px) 100vw, 25vw"
                       priority={index < 2}
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />

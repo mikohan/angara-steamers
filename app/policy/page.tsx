@@ -59,6 +59,7 @@ export default function PrivacyPolicy() {
               src={MainImage}
               alt="Owner of Angara Streamers"
               fill
+              sizes="(max-width: 768px) 100vw, 40vw"
               className="object-cover"
               priority
             />

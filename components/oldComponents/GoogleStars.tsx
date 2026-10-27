@@ -23,6 +23,7 @@ function GoogleStars({ rating, text, starsCount, inline = true }: GoogleProps) {
               alt="Review stars"
               priority
               fill
+              sizes="20px"
               className="object-contain"
             />
           </div>

@@ -80,7 +80,7 @@ export function LatestProjects({
                       src={thumbnailUrl}
                       alt={thumbnailMedia?.alternativeText || project.title}
                       fill
-                      sizes="(max-w-7xl) 25vw, 50vw"
+                      sizes="(max-width: 640px) 100vw, 25vw"
                       className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-background/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

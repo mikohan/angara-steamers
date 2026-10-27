@@ -77,6 +77,7 @@ export default async function ProjectsPage() {
                     className="w-full h-64 object-cover"
                     height={firstImage(project.media_gallery)!.height}
                     width={firstImage(project.media_gallery)!.width}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="eager"
                   />
                 )}
