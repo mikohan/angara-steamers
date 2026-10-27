@@ -35,7 +35,7 @@ export function NavbarClient({ navItems }: NavbarProps) {
               fill
               priority
               alt="Angara Steamers Logo"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="32px"
             />
           </div>
 
