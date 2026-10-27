@@ -85,7 +85,7 @@ export function generateServicePageSeo(
         "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#business",
         name: BUSINESS_CONFIG.business_name,
         provider: {
-          "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "#organization",
+          "@id": process.env.NEXT_PUBLIC_COMPANY_WEBSITE + "/#organization",
         },
         image: data.hero_image?.url
           ? process.env.NEXT_PUBLIC_STRAPI_URL + data.hero_image.url
