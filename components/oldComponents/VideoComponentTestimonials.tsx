@@ -45,10 +45,17 @@ export function VideoComponentTestimonials({
     if (!isInView || !autoPlay) return;
     const video = vid.current;
     if (!video) return;
+    // React does not reliably sync the `muted` prop onto the live DOM
+    // node once the element re-renders (a well-known React/<video> quirk) --
+    // set it imperatively right before calling play() so a muted autoplay
+    // loop never ends up actually unmuted (which either plays audio
+    // unexpectedly or gets silently blocked by the browser's autoplay
+    // policy for unmuted video).
+    video.muted = muted;
     video.play().catch((err) => {
       console.error("Autoplay failed:", err);
     });
-  }, [isInView, autoPlay]);
+  }, [isInView, autoPlay, muted]);
 
   const handlePlay = async () => {
     const video = vid.current;
