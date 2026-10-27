@@ -73,11 +73,16 @@ export default async function LocationsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {cities.map((loc) => {
-                  const img =
-                    (process.env.NEXT_PUBLIC_STRAPI_URL ||
-                      "https://cms.angaracleaning.com") +
-                      loc.og_image.formats?.thumbnail.url ||
-                    "images/og_image.webp";
+                  const strapiBase =
+                    process.env.NEXT_PUBLIC_STRAPI_URL ||
+                    "https://cms.angaracleaning.com";
+                  const imagePath =
+                    loc.og_image?.formats?.medium?.url ||
+                    loc.og_image?.formats?.small?.url ||
+                    loc.og_image?.url;
+                  const img = imagePath
+                    ? strapiBase + imagePath
+                    : "/images/og_image.webp";
                   return (
                     <div
                       key={loc.slug}
