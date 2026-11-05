@@ -45,10 +45,10 @@ export default function PrivacyPolicy() {
   const email = process.env.NEXT_PUBLIC_COMPANY_EMAIL;
 
   const highlights = [
-    { label: "No Data Sharing", icon: <ShieldCheck className="size-5" /> },
-    { label: "No Cookies/Tracking", icon: <Lock className="size-5" /> },
+    { label: "Your Data Is Never Sold", icon: <ShieldCheck className="size-5" /> },
+    { label: "Clear Cookie Choices", icon: <Lock className="size-5" /> },
     { label: "CCPA/CPRA Compliant", icon: <FileText className="size-5" /> },
-    { label: "Secure Local Storage", icon: <Lock className="size-5" /> },
+    { label: "Secure Storage", icon: <Lock className="size-5" /> },
   ];
   const breadcrumbSegments = [
     { label: "Home", path: "/" },
@@ -131,8 +131,8 @@ export default function PrivacyPolicy() {
               <p>
                 Your information is used strictly for communication and
                 scheduling. We use it to send you booking confirmations and
-                necessary service updates via email or text. Your data resides
-                solely in our secure, private, local database.
+                necessary service updates via email or text. Your data is kept
+                in our secure, private database.
               </p>
             </section>
 
@@ -140,10 +140,12 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-3">Strict Privacy Policy</h2>
               <p className="text-white/90">
                 <strong>
-                  We do not sell, rent, or share your personal information with
-                  third parties under any circumstances.
+                  We never sell or rent your personal information.
                 </strong>{" "}
-                We believe your trust is the most important part of our service.
+                We share it only with the service providers that help us run
+                the business: payment processing, email delivery, and the
+                analytics and advertising tools described below. We believe your
+                trust is the most important part of our service.
               </p>
             </section>
 
@@ -151,11 +153,31 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-3 text-primary">
                 Cookies & Tracking
               </h2>
-              <p>
-                Our website is designed for privacy. We do not use tracking
-                cookies. Any analytical tools are for internal performance
-                monitoring only—never for third-party advertising or profiling.
-              </p>
+              <div className="space-y-4">
+                <p>
+                  Our website uses cookies and similar tools from Google
+                  Analytics, Google Tag Manager, Meta Pixel and Yandex Metrica.
+                  They count visits, show us which pages help visitors, and
+                  measure how well our ads work.
+                </p>
+                <p>
+                  When you send a quote request or booking, we also tell Meta
+                  that a request happened, together with your contact details
+                  in hashed (scrambled) form, so Meta can match it to our ads.
+                  These providers handle this data under their own policies:{" "}
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google</a>,{" "}
+                  <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Meta</a>{" "}
+                  and{" "}
+                  <a href="https://yandex.com/legal/confidential/" target="_blank" rel="noopener noreferrer" className="text-primary underline">Yandex</a>.
+                </p>
+                <p>
+                  You can block or delete cookies in your browser settings, opt
+                  out of Google Analytics with the{" "}
+                  <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google Analytics opt-out add-on</a>,
+                  and manage ad preferences in your Facebook or Instagram
+                  settings.
+                </p>
+              </div>
             </section>
 
             <section>
