@@ -157,6 +157,65 @@ export default function PrivacyPolicy() {
                 monitoring only—never for third-party advertising or profiling.
               </p>
             </section>
+
+            <section>
+              <h2 className="text-2xl font-bold mb-3 text-primary">
+                YouTube API Services
+              </h2>
+              <div className="space-y-4">
+                <p>
+                  We use YouTube API Services to upload videos of our own
+                  cleaning work to our own YouTube channels. Watching our videos
+                  on YouTube is covered by the{" "}
+                  <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                    YouTube Terms of Service
+                  </a>{" "}
+                  and the{" "}
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                    Google Privacy Policy
+                  </a>
+                  .
+                </p>
+                <p>
+                  Our upload tool connects only to YouTube channels owned by our
+                  company. It stores only what it needs to publish: an access
+                  token for our own channel, kept on our private server, and the
+                  IDs and titles of the videos we upload. It collects no
+                  information about website visitors or other YouTube users.
+                </p>
+                <p>
+                  The channel owner can revoke this access at any time in{" "}
+                  <a href="https://security.google.com/settings/security/permissions" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                    Google security settings
+                  </a>
+                  . We delete stored tokens within 7 days after access is
+                  revoked, or sooner on request to {email || "our email"}.
+                </p>
+              </div>
+            </section>
+
+            <section id="terms">
+              <h2 className="text-2xl font-bold mb-3 text-primary">
+                Terms of Service
+              </h2>
+              <div className="space-y-4">
+                <p>
+                  Angara Steamers provides upholstery, carpet and rug cleaning
+                  in the Los Angeles area. Prices and the scope of each job are
+                  confirmed with you before the cleaning starts.
+                </p>
+                <p>
+                  Photos and videos on this website and on our social media
+                  channels show our own work and belong to Angara Lab LLC. You
+                  may share links to them; please ask us before reusing the
+                  files themselves.
+                </p>
+                <p>
+                  Questions about these terms: {email || "contact us by email"}
+                  {phone ? ` or ${phone}` : ""}.
+                </p>
+              </div>
+            </section>
           </div>
 
           <footer className="mt-16 pt-10 border-t border-primary/10 grid md:grid-cols-2 gap-6">
