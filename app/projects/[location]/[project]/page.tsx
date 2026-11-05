@@ -6,7 +6,7 @@ import { ProjectImage } from "@/components/ProjectImage";
 import { ProjectVideo } from "@/components/ProjectVideo";
 import GoogleMap from "@/components/GoogleMap";
 import { RichTextRenderer } from "@/components/common/RichTextRenderer";
-import { formatDate, splitMedia } from "@/lib/utils";
+import { formatDate, splitMedia, videoCover } from "@/lib/utils";
 import { CTA } from "@/components/CTA";
 import { LogoTicker } from "@/components/LogoTicker";
 import DefaultServiceImage from "@/public/images/og_image.webp";
@@ -158,7 +158,11 @@ export default async function ProjectPage({
   ];
   const mapData = projectInstance.location_page?.map_component;
   const hasMap = mapData?.latitude && mapData?.longitude;
-  const { images: galleryImages, videos: galleryVideos } = splitMedia(
+  const {
+    images: galleryImages,
+    videos: galleryVideos,
+    covers: galleryCovers,
+  } = splitMedia(
     projectInstance.media_gallery,
   );
   return (
@@ -225,14 +229,22 @@ export default async function ProjectPage({
                     Video {projectInstance.title}
                   </h3>
                   <GalleryGrid>
-                    {galleryVideos.map((vid) => (
-                      <ProjectVideo
-                        key={vid.url}
-                        url={vid.url}
-                        type={vid.mime}
-                        caption={vid.caption}
-                      />
-                    ))}
+                    {galleryVideos.map((vid) => {
+                      const cover = videoCover(
+                        vid,
+                        galleryCovers,
+                        galleryVideos.length,
+                      );
+                      return (
+                        <ProjectVideo
+                          key={vid.url}
+                          url={vid.url}
+                          type={vid.mime}
+                          caption={vid.caption}
+                          poster={cover?.formats?.large?.url || cover?.url}
+                        />
+                      );
+                    })}
                   </GalleryGrid>
                 </>
               )}

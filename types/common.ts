@@ -51,6 +51,7 @@ export interface StrapiResponse<T> {
 }
 export interface StrapiMedia {
   id: number;
+  name?: string;
   url: string;
   mime: string;
   size: number;
