@@ -1,8 +1,9 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { sendEmail } from "@/lib/email";
 import { MetaEventParams } from "@/types";
+import { sendLeadToGhl } from "@/lib/ghl";
 
 export async function submitQuoteRequest(
   formData: FormData,
@@ -61,11 +62,32 @@ export async function submitQuoteRequest(
     </div>
   `;
 
-  const result = await sendEmail(
-    `New Lead: ${rawName} (${utmSource})`,
-    emailHtml,
-    metaParams,
-  );
+  // Meta browser IDs set by the pixel (_fbc comes from an ad click's fbclid)
+  const cookieStore = await cookies();
+  const fbc = cookieStore.get("_fbc")?.value;
+  const fbp = cookieStore.get("_fbp")?.value;
+
+  // Email + Meta CAPI decide the result exactly as before; the GHL send runs
+  // in parallel and never fails the form (sendLeadToGhl does not throw).
+  const [result] = await Promise.all([
+    sendEmail(`New Lead: ${rawName} (${utmSource})`, emailHtml, metaParams),
+    sendLeadToGhl({
+      firstName,
+      lastName,
+      phone,
+      message,
+      eventId,
+      utm: {
+        source: utmSource,
+        medium: utmMedium,
+        campaign: utmCampaign,
+        content: utmContent,
+        term: utmTerm,
+      },
+      fbc,
+      fbp,
+    }),
+  ]);
 
   return result;
 }
