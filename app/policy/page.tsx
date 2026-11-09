@@ -216,6 +216,36 @@ export default function PrivacyPolicy() {
               </div>
             </section>
 
+            <section id="sms">
+              <h2 className="text-2xl font-bold mb-3 text-primary">
+                Text Messages (SMS)
+              </h2>
+              <div className="space-y-4">
+                <p>
+                  When you give us your phone number and agree to receive
+                  texts, Angara Lab LLC (Angara Steamers) may text you about
+                  your quote, your booking, your cleaning, and occasional
+                  offers. Message frequency varies. Message and data rates may
+                  apply.
+                </p>
+                <p>
+                  Reply STOP at any time to stop receiving texts, or HELP for
+                  help. You can also reach us at {email || "our email"}
+                  {phone ? ` or ${phone}` : ""}. Agreeing to texts is not a
+                  condition of any purchase.
+                </p>
+                <p>
+                  <strong>
+                    We do not share or sell your mobile phone number or your
+                    text message opt-in consent with any third parties or
+                    affiliates for their marketing or promotional purposes.
+                  </strong>{" "}
+                  The only parties that handle your number are the providers
+                  that deliver our messages.
+                </p>
+              </div>
+            </section>
+
             <section id="terms">
               <h2 className="text-2xl font-bold mb-3 text-primary">
                 Terms of Service
