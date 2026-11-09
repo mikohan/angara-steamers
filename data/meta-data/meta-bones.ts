@@ -27,6 +27,11 @@ export function generateWeaponsGradeSeo(
   const canonical =
     baseUrl || `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/${data.slug}`;
 
+  // og_image is optional in Strapi: fall back to the site-wide default image.
+  const ogImageUrl = data.og_image
+    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${data.og_image.url}`
+    : `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}${OG_IMAGE.src}`;
+
   // 1. Next.js Metadata
   const metadata: Metadata = {
     title: data.meta_title,
@@ -38,18 +43,21 @@ export function generateWeaponsGradeSeo(
       title: data.meta_title,
       description: data.meta_description,
       siteName: BUSINESS_CONFIG.business_name,
-      images: data.og_image
-        ? [
-            {
-              url:
-                process.env.NEXT_PUBLIC_STRAPI_URL + data.og_image.url ||
-                OG_IMAGE.src,
+      images: [
+        data.og_image
+          ? {
+              url: ogImageUrl,
               width: data.og_image.width,
               height: data.og_image.height,
               alt: data.og_image.alternativeText || data.meta_title,
+            }
+          : {
+              url: ogImageUrl,
+              width: OG_IMAGE.width,
+              height: OG_IMAGE.height,
+              alt: data.meta_title,
             },
-          ]
-        : [],
+      ],
     },
   };
 
@@ -60,7 +68,7 @@ export function generateWeaponsGradeSeo(
     "@id": `${canonical}#business`,
     name: BUSINESS_CONFIG.business_name,
     slogan: BUSINESS_CONFIG.slogan,
-    image: process.env.NEXT_PUBLIC_STRAPI_URL + data.og_image.url,
+    image: ogImageUrl,
     url: canonical,
     telephone: BUSINESS_CONFIG.phone,
     priceRange: "$$",

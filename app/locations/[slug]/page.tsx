@@ -255,7 +255,9 @@ export default async function Location({ params }: PageProps) {
             header={location.h1_heading}
             subheader={location.h2_subheadning}
             heroImage={
-              process.env.NEXT_PUBLIC_STRAPI_URL + location.og_image.url
+              location.og_image
+                ? process.env.NEXT_PUBLIC_STRAPI_URL + location.og_image.url
+                : undefined
             }
           />
         </section>
