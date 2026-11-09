@@ -19,6 +19,27 @@ export function Footer({ navItems }: FooterProps) {
           <p className="text-md text-primary leading-relaxed max-w-xs">
             Premium upholstery and carpet cleaning services in Los Angeles.
           </p>
+          <address className="not-italic text-sm leading-relaxed opacity-80">
+            Angara Lab LLC
+            <br />
+            13163 Fountain Park Dr 112
+            <br />
+            Playa Vista, CA 90094
+            <br />
+            <a
+              href={`tel:${process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK}`}
+              className="hover:text-primary transition-colors"
+            >
+              {process.env.NEXT_PUBLIC_COMPANY_PHONE}
+            </a>
+            <br />
+            <a
+              href={`mailto:${process.env.NEXT_PUBLIC_COMPANY_EMAIL}`}
+              className="hover:text-primary transition-colors"
+            >
+              {process.env.NEXT_PUBLIC_COMPANY_EMAIL}
+            </a>
+          </address>
         </div>
 
         {/* Dynamic Pillar Anchors */}
