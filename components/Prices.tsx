@@ -1,6 +1,7 @@
 import { prices } from "@/data/prices";
 import { PriceCard } from "@/components/PriceCard";
 import { MiniCartSummary } from "@/components/MiniSummary";
+import { AddOns } from "@/components/AddOns";
 
 export const Prices = () => (
   <section className="bg-primary/10 py-16">
@@ -24,6 +25,8 @@ export const Prices = () => (
           <PriceCard key={i} {...price} />
         ))}
       </div>
+
+      <AddOns className="mt-12" />
     </div>
   </section>
 );

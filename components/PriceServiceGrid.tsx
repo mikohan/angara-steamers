@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCart } from "@/store/useCart";
 import { Plus, Minus, ShoppingBag, Check } from "lucide-react";
 import { IPrice } from "@/types";
+import { AddOns } from "@/components/AddOns";
 
 export function ServiceGrid({
   groupedServices,
@@ -25,6 +26,7 @@ export function ServiceGrid({
           </div>
         </div>
       ))}
+      <AddOns />
     </div>
   );
 }
