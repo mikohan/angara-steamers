@@ -28,9 +28,19 @@ interface IProps {
   subheader?: string;
   heroImage?: string;
   video: boolean;
+  ctaText?: string; // main button text; ButtonShiny default when omitted
+  showProcessButton?: boolean; // "Watch Our Process" button (image hero only)
 }
 
-function Hero({ header, className, heroImage, video, subheader }: IProps) {
+function Hero({
+  header,
+  className,
+  heroImage,
+  video,
+  subheader,
+  ctaText,
+  showProcessButton = true,
+}: IProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const h1 = header
@@ -70,6 +80,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
             <div className="w-full flex flex-col md:flex-row gap-4 mt-8 md:mt-12 justify-center md:justify-start">
               <QuoteDialog>
                 <ButtonShiny
+                  text={ctaText}
                   size="lg"
                   className="rounded-full px-8 text-white text-lg font-bold"
                 >
@@ -77,7 +88,7 @@ function Hero({ header, className, heroImage, video, subheader }: IProps) {
                 </ButtonShiny>
               </QuoteDialog>
 
-              {!video && (
+              {!video && showProcessButton && (
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
                   <DialogTrigger asChild>
                     <Button

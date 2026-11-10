@@ -38,10 +38,15 @@ const TestimonialsColumn = (props: {
   </div>
 );
 
-function Testimonials() {
-  const firstCol = testimonials.slice(0, 9);
-  const secondCol = testimonials.slice(9, 18);
-  const thridCol = testimonials.slice(18, 27);
+function Testimonials({ only }: { only?: string[] } = {}) {
+  // `only`: reviewer names to show (e.g. Angara steam-cleaning reviews only)
+  const list = only
+    ? testimonials.filter((t) => only.includes(t.userName))
+    : testimonials;
+  const perCol = Math.ceil(list.length / 3);
+  const firstCol = list.slice(0, perCol);
+  const secondCol = list.slice(perCol, perCol * 2);
+  const thridCol = list.slice(perCol * 2, perCol * 3);
   const GMB =
     process.env.NEXT_PUBLIC_COMPANY_GMB ||
     "https://share.google/oDULc3KpCXQC52z9f";

@@ -133,11 +133,12 @@ function CTAForm({ className }: { className?: string }) {
                 className="w-full flex flex-col gap-6"
               >
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-                  Service Guarantee: If a stain comes back, we come back and
-                  reclean it free.
+                  Exact price before we start. Re-clean on the spot before we
+                  leave.
                 </h2>
                 <p className="text-xl text-muted">
-                  We’ll make it look <strong>brand new again!</strong>
+                  Deep steam clean, <strong>safe for kids and pets</strong> the
+                  same day.
                 </p>
                 <form
                   action={handleSubmit}

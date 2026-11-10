@@ -28,7 +28,7 @@ import { LpFooter } from "@/components/lp/LpFooter";
 import { QuoteDialog } from "@/components/QuoteDialog";
 import { prices } from "@/data/prices";
 import { fetchStrapi } from "@/lib/strapi";
-import { firstImage } from "@/lib/utils";
+import { firstImage, splitMedia } from "@/lib/utils";
 import { ServicePage, StrapiResponse } from "@/types";
 
 const TITLE =
@@ -60,17 +60,29 @@ export const metadata: Metadata = {
   },
 };
 
-// Carpet service page from the CMS: real carpet projects (photos) and the FAQ.
-async function getCarpetService(): Promise<ServicePage | undefined> {
+// Carpet and area-rug service pages from the CMS: real jobs and the FAQ.
+async function getCarpetServices(): Promise<ServicePage[]> {
   const res: StrapiResponse<ServicePage> = await fetchStrapi("service-pages", {
-    filters: { slug: { $eq: "carpet-cleaning" } },
+    filters: { slug: { $in: ["carpet-cleaning", "area-rugs"] } },
     populate: {
       faq: true,
       projects: { populate: ["location_page", "media_gallery"] },
     },
   });
-  return res?.data?.[0];
+  return res?.data || [];
 }
+
+// Reviews about Angara's steam cleaning (carpets, rugs, couches).
+const ANGARA_REVIEWS = [
+  "Brianna Villa",
+  "Bankroll Bombshell",
+  "Blanka Dominguez",
+  "Woman in the World",
+  "Luis Ortiz",
+  "Rosa Chen",
+  "Betsy Brooks",
+  "Dias Sarbay",
+];
 
 const offerPoints = [
   {
@@ -147,11 +159,22 @@ function GetPriceButton({ label = "Get my exact price" }: { label?: string }) {
 }
 
 export default async function CarpetCleaningLandingPage() {
-  const service = await getCarpetService();
+  const services = await getCarpetServices();
+  const service = services.find((s) => s.slug === "carpet-cleaning");
   const strapiUrl =
     process.env.NEXT_PUBLIC_STRAPI_URL || "https://cms.angaracleaning.com";
 
-  const projects = (service?.projects || [])
+  // Jobs with at least one real photo (video-only jobs have no thumbnail).
+  const seen = new Set<string>();
+  const projects = services
+    .flatMap((s) => s.projects || [])
+    .filter((p) => {
+      const key = String(p.id ?? p.slug);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .filter((p) => splitMedia(p.media_gallery).images.length > 0)
     .filter((p): p is typeof p & { createdAt: string } => !!p.createdAt)
     .sort(
       (a, b) =>
@@ -179,6 +202,8 @@ export default async function CarpetCleaningLandingPage() {
         <Hero
           video={false}
           heroImage={heroImage}
+          ctaText="Get my exact price"
+          showProcessButton={false}
           header="Carpet Steam Cleaning in Los Angeles. Exact Price Before We Start."
           subheader="Hot steam pulls dirt, dust mites and pet odors out of your carpet. Safe for kids and pets the same day. Free pet hair removal ($50 value)."
         />
@@ -282,7 +307,7 @@ export default async function CarpetCleaningLandingPage() {
       {/* 8. Reviews */}
       <section className="mx-auto max-w-7xl">
         <SectionWrapper>
-          <Testimonials />
+          <Testimonials only={ANGARA_REVIEWS} />
         </SectionWrapper>
       </section>
 
