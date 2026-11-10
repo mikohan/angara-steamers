@@ -7,15 +7,14 @@ import { CTA } from "@/components/CTA";
 import { PriceCard } from "@/components/PriceCard";
 import { AddOns } from "@/components/AddOns";
 import { SectionWrapper } from "@/components/common/SectionWrapper";
-import { GoogleStars } from "@/components/oldComponents/GoogleStars";
 import { VideoComponentTestimonials } from "@/components/oldComponents/VideoComponentTestimonials";
 import { LpTopBar } from "@/components/lp/LpTopBar";
 import { LpStickyBar } from "@/components/lp/LpStickyBar";
 import { LpCartBar } from "@/components/lp/LpCartBar";
 import { LpFooter } from "@/components/lp/LpFooter";
 import { LpHeroVideo } from "@/components/lp/LpHeroVideo";
+import { GoogleRatingBadge } from "@/components/lp/GoogleRatingBadge";
 import { QuoteDialog } from "@/components/QuoteDialog";
-import { BUSINESS_CONFIG } from "@/data/business-config";
 import { prices } from "@/data/prices";
 import { fetchStrapi } from "@/lib/strapi";
 import { splitMedia } from "@/lib/utils";
@@ -179,7 +178,7 @@ export default async function CarpetCleaningLandingPage() {
         <div className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
           <div className="text-center md:text-left">
             <div className="flex justify-center md:justify-start">
-              <GoogleStars starsCount={5} rating={BUSINESS_CONFIG.rating} text="" />
+              <GoogleRatingBadge />
             </div>
             <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
               Carpet steam cleaning in LA. You know the exact price before we
