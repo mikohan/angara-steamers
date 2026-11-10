@@ -5,6 +5,7 @@ export interface IPrice {
   url: string;
   category: string;
   item: string;
+  size?: string; // short size line shown under the item name
   priceBefore: number;
   priceAfter: number;
 }

@@ -138,3 +138,110 @@ export async function sendLeadToGhl(lead: GhlLead): Promise<void> {
     console.error("GHL: exception", error);
   }
 }
+
+export interface GhlPaidOrder {
+  name: string;
+  email: string;
+  phone: string;
+  items: { description: string; quantity: number; amount: number }[]; // amount in $
+  total: number; // $ paid
+  stripeSessionId: string;
+}
+
+// Paid online order from the website cart (Stripe checkout). Upserts the
+// contact, adds the order as a note, and puts the paid total on the card's
+// value. The card goes to New Lead: the job still needs a date, and moving it
+// to Booked/Done stays a manual step (that is what sends Schedule/Purchase to
+// Meta). Never throws.
+export async function sendPaidOrderToGhl(order: GhlPaidOrder): Promise<void> {
+  const token = process.env.GHL_API_TOKEN;
+  const locationId = process.env.GHL_LOCATION_ID;
+  const pipelineId = process.env.GHL_PIPELINE_ID;
+  const stageId = process.env.GHL_STAGE_NEW_LEAD;
+
+  if (!token || !locationId || !pipelineId || !stageId) {
+    console.warn("GHL: env vars missing, paid order not sent to GHL");
+    return;
+  }
+  if (!order.email && !order.phone) {
+    console.warn("GHL: paid order has no email or phone, not sent");
+    return;
+  }
+
+  try {
+    const headers = ghlHeaders(token);
+    const [firstName, ...rest] = order.name.trim().split(/\s+/);
+
+    const upsertRes = await fetch(`${GHL_API}/contacts/upsert`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        locationId,
+        firstName: firstName || undefined,
+        lastName: rest.join(" ") || undefined,
+        ...(order.email ? { email: order.email } : {}),
+        ...(order.phone ? { phone: toE164(order.phone) } : {}),
+        source: "Website cart (paid)",
+        tags: ["website lead", "paid online"],
+      }),
+    });
+    const upsert = await upsertRes.json();
+    const contactId: string | undefined = upsert?.contact?.id;
+    if (!upsertRes.ok || !contactId) {
+      console.error("GHL: paid order contact upsert failed", upsertRes.status, upsert);
+      return;
+    }
+
+    const lines = order.items
+      .map((i) => `- ${i.description} x${i.quantity}: $${i.amount.toFixed(0)}`)
+      .join("\n");
+    await fetch(`${GHL_API}/contacts/${contactId}/notes`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        body: `PAID ONLINE $${order.total.toFixed(0)} (Stripe ${order.stripeSessionId})\n${lines}\nNeeds a date: call to schedule.`,
+      }),
+    }).catch((e) => console.error("GHL: paid order note failed", e));
+
+    // Open card for this contact? Put the paid total on it. Otherwise open one.
+    const searchUrl =
+      `${GHL_API}/opportunities/search?location_id=${locationId}` +
+      `&pipeline_id=${pipelineId}&contact_id=${contactId}&status=open`;
+    const searchRes = await fetch(searchUrl, { headers });
+    const search = await searchRes.json();
+    const existing = searchRes.ok ? search?.opportunities?.[0] : undefined;
+
+    if (existing?.id) {
+      const updRes = await fetch(`${GHL_API}/opportunities/${existing.id}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ monetaryValue: order.total }),
+      });
+      if (!updRes.ok) {
+        console.error("GHL: paid order value update failed", updRes.status, await updRes.text());
+      }
+      return;
+    }
+
+    const label = order.name.trim() || order.email || order.phone;
+    const oppRes = await fetch(`${GHL_API}/opportunities/`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        locationId,
+        pipelineId,
+        pipelineStageId: stageId,
+        contactId,
+        name: `${label} - paid online`,
+        status: "open",
+        monetaryValue: order.total,
+        source: "Website cart (paid)",
+      }),
+    });
+    if (!oppRes.ok) {
+      console.error("GHL: paid order opportunity create failed", oppRes.status, await oppRes.text());
+    }
+  } catch (error) {
+    console.error("GHL: paid order exception", error);
+  }
+}

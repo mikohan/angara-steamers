@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       payment_method_types: ["card"],
       line_items: line_items,
       mode: "payment",
+      phone_number_collection: { enabled: true },
       success_url: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/thank-you`,
       cancel_url: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/`,
     });

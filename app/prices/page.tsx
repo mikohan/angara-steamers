@@ -90,6 +90,10 @@ export default function ServiceListingPage() {
         <h1 className="my-8 heading-h2">
           Price for Upholstery and Carpet Professional Cleaning
         </h1>
+      <p className="-mt-4 mb-8 text-base md:text-lg font-semibold text-foreground">
+        Exact prices. What you see is what you pay. Hot steam, no harsh
+        chemicals.
+      </p>
 
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           {/* SIDEBAR LEDGER - STICKY POSITIONING */}

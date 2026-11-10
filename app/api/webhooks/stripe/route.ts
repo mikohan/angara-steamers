@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
+import { sendPaidOrderToGhl } from "@/lib/ghl";
 
 // Initialize Stripe with the secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -51,13 +52,27 @@ export async function POST(req: Request) {
       <p><strong>Total Paid:</strong> $${(session.amount_total! / 100).toFixed(0)}</p>
     `;
 
-    await sendEmail(
-      "New Booking Angara Steamers", // subject
-      emailBody, // html
-      undefined, // meta (not needed here)
-      undefined, // to (uses default env var)
-      undefined, // from (uses default env var)
-    );
+    await Promise.all([
+      sendEmail(
+        "New Booking Angara Steamers", // subject
+        emailBody, // html
+        undefined, // meta (not needed here)
+        undefined, // to (uses default env var)
+        undefined, // from (uses default env var)
+      ),
+      sendPaidOrderToGhl({
+        name: session.customer_details?.name ?? "",
+        email: session.customer_details?.email ?? "",
+        phone: session.customer_details?.phone ?? "",
+        items: lineItems.data.map((item) => ({
+          description: item.description ?? "Item",
+          quantity: item.quantity ?? 1,
+          amount: (item.amount_total ?? 0) / 100,
+        })),
+        total: (session.amount_total ?? 0) / 100,
+        stripeSessionId: session.id,
+      }),
+    ]);
   }
 
   // 4. Always respond with 200 to acknowledge receipt

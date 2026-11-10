@@ -9,6 +9,10 @@ export const Prices = () => (
         <span className="text-couchBlue">Prices</span> for Deep Steam Cleaning
         and Disinfection
       </h2>
+      <p className="mb-8 text-center text-base md:text-lg font-semibold text-foreground">
+        Exact prices. What you see is what you pay. Hot steam, no harsh
+        chemicals.
+      </p>
 
       {/* MiniCart added once here at the top of the price content */}
       <div className="mb-12">

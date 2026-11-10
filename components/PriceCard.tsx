@@ -9,7 +9,7 @@ interface PriceCardProps {
   img: StaticImageData;
   category: string;
   item: string;
-  priceBefore: number;
+  size?: string;
   priceAfter: number;
 }
 
@@ -17,7 +17,7 @@ export const PriceCard = ({
   img,
   category,
   item,
-  priceBefore,
+  size,
   priceAfter,
 }: PriceCardProps) => {
   const [quantity, setQuantity] = useState<number>(1);
@@ -27,9 +27,6 @@ export const PriceCard = ({
   const discount = parseFloat(
     process.env.NEXT_PUBLIC_PRICE_AFTER_DISCOUNT || "0",
   );
-  const finalPriceBefore = discount
-    ? priceBefore - priceBefore * discount
-    : priceBefore;
   const finalPriceAfter = discount
     ? priceAfter - priceAfter * discount
     : priceAfter;
@@ -57,14 +54,15 @@ export const PriceCard = ({
       </div>
 
       <div className="bg-background rounded-xl py-4 px-4 border border-muted/20">
-        <div className="text-xl font-black mb-4 truncate">{item}</div>
+        <div className="text-xl font-black truncate">{item}</div>
+        <div className="text-sm text-muted mb-4">{size ?? "\u00A0"}</div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="line-through text-red-600 text-base font-semibold">
-              ${finalPriceBefore.toFixed(0)}
-            </span>
             <span className="text-2xl text-primary font-black">
               ${(finalPriceAfter * quantity).toFixed(0)}
+            </span>
+            <span className="text-xs font-semibold text-muted">
+              Exact price
             </span>
           </div>
           <div className="flex items-center gap-1 border border-muted/20 rounded-lg p-1">

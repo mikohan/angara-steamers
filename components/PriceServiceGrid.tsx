@@ -58,14 +58,15 @@ function BigServiceCard({ service }: { service: IPrice }) {
         <h3 className="font-extrabold text-lg text-foreground truncate">
           {service.item}
         </h3>
+        {service.size && (
+          <p className="text-sm text-muted mt-1">{service.size}</p>
+        )}
         <div className="mt-6 pt-4 border-t border-muted/10 flex items-center justify-between">
-          <div className="flex flex-row gap-2 items-center">
-            <div className="text-base font-black text-red-600 line-through tabular-nums">
-              ${(service.priceBefore * quantity).toFixed(0)}
-            </div>
+          <div className="flex flex-col">
             <div className="text-2xl font-black text-price-green tabular-nums">
               ${(service.priceAfter * quantity).toFixed(0)}
             </div>
+            <div className="text-xs font-semibold text-muted">Exact price</div>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center border border-muted/20 bg-background rounded-lg p-0.5">
