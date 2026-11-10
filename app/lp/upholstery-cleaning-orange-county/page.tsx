@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title:
     "Upholstery Cleaning in Orange County — Safe for Kids & Pets | Angara Steamers",
   description:
-    "Professional upholstery cleaning in Orange County, steamed at 200°F with shampoos safe for kids and pets. If a stain comes back, we re-clean it free. Book now.",
+    "Professional upholstery cleaning in Orange County, steamed at 200°F with shampoos safe for kids and pets. Exact price before we start, re-clean on the spot before we leave. Book now.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_COMPANY_WEBSITE || "https://angarasteamers.com",
   ),
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title:
       "Upholstery Cleaning in Orange County — Safe for Kids & Pets | Angara Steamers",
     description:
-      "Professional upholstery cleaning in Orange County, steamed at 200°F with shampoos safe for kids and pets. If a stain comes back, we re-clean it free. Book now.",
+      "Professional upholstery cleaning in Orange County, steamed at 200°F with shampoos safe for kids and pets. Exact price before we start, re-clean on the spot before we leave. Book now.",
     url: process.env.NEXT_PUBLIC_COMPANY_WEBSITE,
     siteName: process.env.NEXT_PUBLIC_COMPANY_NAME,
     images: [
@@ -73,7 +73,7 @@ export default function HomePage() {
         <Hero
           video={true}
           header="Odors, Dust, Stains, and Dander — Removal. Upholstery & Carpet Cleaning."
-          subheader="Cleaned with safe shampoos, gentle enough for kids and pets. Guaranteed — if the stain comes back, we re-clean it free."
+          subheader="Cleaned with safe shampoos, gentle enough for kids and pets. Exact price before we start, and we re-clean any spot on the spot before we leave."
         />
       </section>
       <section className="py-8 md:py-16">

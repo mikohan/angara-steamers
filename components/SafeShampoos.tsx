@@ -79,8 +79,8 @@ export default function SafeShampoos() {
             <p className="text-foreground">
               <strong className="block text-primary">Soft to the Touch:</strong>
               Beyond just looking clean, your upholstery will feel gentle and
-              soft under your hands. It’s the kind of clean that makes your home
-              feel brand new again.
+              soft under your hands. It’s the kind of clean you feel every time
+              you sit down.
             </p>
           </div>
 

@@ -26,7 +26,7 @@ const perks = [
   },
   {
     icon: Sparkles,
-    title: "3. Furniture That Looks Like New in Just One Visit",
+    title: "3. Visibly Fresher Furniture in One Visit",
     description:
       "We remove deeply embedded dirt and stains, restoring freshness and a well-maintained appearance to your fabrics. You'll see for yourself just how many hidden contaminants we've extracted.",
   },
