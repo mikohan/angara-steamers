@@ -5,14 +5,21 @@ import { useCart, PROTECTION_LABEL } from "@/store/useCart";
 import { Plus, Minus, ShoppingBag, Check } from "lucide-react";
 import { addOns, IAddOn } from "@/data/addons";
 
-export function AddOns({ className = "" }: { className?: string }) {
+export function AddOns({
+  className = "",
+  only,
+}: {
+  className?: string;
+  only?: string[]; // add-on names to show; all when omitted
+}) {
+  const list = only ? addOns.filter((a) => only.includes(a.item)) : addOns;
   return (
     <div className={`space-y-6 ${className}`}>
       <h3 className="text-2xl font-black text-foreground uppercase tracking-wider border-b border-foreground/10 pb-2">
         Add-ons
       </h3>
       <div className="grid md:grid-cols-2 gap-6">
-        {addOns.map((addOn) => (
+        {list.map((addOn) => (
           <AddOnCard key={addOn.item} addOn={addOn} />
         ))}
         <ProtectionCard />

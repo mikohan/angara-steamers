@@ -10,6 +10,8 @@ import { fetchStrapi } from "@/lib/strapi";
 import { StrapiResponse, ServiceHub } from "@/types";
 import { NavbarClient } from "@/components/NavbarClient";
 import { Footer } from "@/components/common/Footer";
+import { HideOnPaths } from "@/components/common/HideOnPaths";
+import { NO_CHROME_PATHS } from "@/data/landing";
 import { STATIC_PAGES } from "@/data/links";
 import ScrollToTop from "@/components/common/ScrollToTop";
 
@@ -68,10 +70,19 @@ export default function RootLayout({
         <LoadingBar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SmoothScroll>
-            <NavbarClient staticItems={STATIC_PAGES} navItems={navData.data} />
+            <HideOnPaths paths={NO_CHROME_PATHS}>
+              <NavbarClient
+                staticItems={STATIC_PAGES}
+                navItems={navData.data}
+              />
+            </HideOnPaths>
             <main className="flex-1">{children}</main>
-            <Footer navItems={navData.data} />
-            <ScrollToTop />
+            <HideOnPaths paths={NO_CHROME_PATHS}>
+              <Footer navItems={navData.data} />
+            </HideOnPaths>
+            <HideOnPaths paths={NO_CHROME_PATHS}>
+              <ScrollToTop />
+            </HideOnPaths>
           </SmoothScroll>
         </ThemeProvider>
         <div id="portal-root"></div>
