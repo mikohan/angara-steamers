@@ -65,7 +65,7 @@ function Hero({
             <GoogleStars
               starsCount={5}
               rating={BUSINESS_CONFIG.rating}
-              text={`(${BUSINESS_CONFIG.review_count}+ Reviews)`}
+              text=""
             />
           </div>
 
