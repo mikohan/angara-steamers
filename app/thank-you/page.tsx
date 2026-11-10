@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/store/useCart";
+import { useCart, cartTotals } from "@/store/useCart";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import familyPhoto from "@/public/images/family.webp"; // Replace with your generated image path
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 export default function ThankYouPage() {
-  const { cart } = useCart();
-  const total = cart.reduce((sum, i) => sum + i.priceAfter * i.quantity, 0);
+  const { cart, protection } = useCart();
+  const { total } = cartTotals(cart, protection);
 
   const breadcrumbSegments = [
     { label: "Home", path: "/" },

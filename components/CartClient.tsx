@@ -1,7 +1,7 @@
 // app/cart/CartClient.tsx
 "use client";
 
-import { useCart } from "@/store/useCart";
+import { useCart, cartTotals, PROTECTION_LABEL } from "@/store/useCart";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowLeft, CreditCard } from "lucide-react";
@@ -9,7 +9,14 @@ import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 
 export default function CartClient() {
   const [hasHydrated, setHasHydrated] = useState<boolean>(false);
-  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const {
+    cart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    protection,
+    setProtection,
+  } = useCart();
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = async () => {
@@ -24,7 +31,7 @@ export default function CartClient() {
     const response = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items }),
+      body: JSON.stringify({ items, protection }),
     });
 
     const { url } = await response.json();
@@ -50,11 +57,7 @@ export default function CartClient() {
     );
   }
 
-  const subtotal = cart.reduce(
-    (sum, entry) => sum + entry.priceAfter * entry.quantity,
-    0,
-  );
-  const total = subtotal;
+  const { subtotal, protectionCost, total } = cartTotals(cart, protection);
 
   const breadcrumbSegments = [
     { label: "Home", path: "/" },
@@ -168,6 +171,28 @@ export default function CartClient() {
                   ${subtotal.toFixed(0)}
                 </span>
               </div>
+              <label className="flex items-start justify-between gap-3 cursor-pointer">
+                <span className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 accent-teal-700"
+                    checked={protection}
+                    onChange={(e) => setProtection(e.target.checked)}
+                  />
+                  <span>
+                    <span className="font-semibold text-foreground">
+                      {PROTECTION_LABEL}
+                    </span>
+                    <span className="block text-xs text-muted">
+                      Spills bead up on the surface, so you can wipe them off.
+                      30% of your order.
+                    </span>
+                  </span>
+                </span>
+                <span className="font-semibold tabular-nums">
+                  {protection ? `$${protectionCost.toFixed(0)}` : "Add"}
+                </span>
+              </label>
             </div>
 
             <div className="flex justify-between items-baseline font-bold text-lg text-foreground">

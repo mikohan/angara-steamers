@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCart } from "@/store/useCart";
+import { useCart, PROTECTION_LABEL } from "@/store/useCart";
 import { Plus, Minus, ShoppingBag, Check } from "lucide-react";
 import { addOns, IAddOn } from "@/data/addons";
 
@@ -15,6 +15,44 @@ export function AddOns({ className = "" }: { className?: string }) {
         {addOns.map((addOn) => (
           <AddOnCard key={addOn.item} addOn={addOn} />
         ))}
+        <ProtectionCard />
+      </div>
+    </div>
+  );
+}
+
+function ProtectionCard() {
+  const protection = useCart((state) => state.protection);
+  const setProtection = useCart((state) => state.setProtection);
+
+  return (
+    <div className="flex flex-col rounded-2xl bg-background border border-muted/20 p-5 shadow-sm md:col-span-2">
+      <h4 className="font-extrabold text-lg text-foreground">
+        {PROTECTION_LABEL}
+      </h4>
+      <p className="text-sm text-muted mt-1">
+        Applied after the steam clean. Spills bead up on the surface, so you
+        can wipe them off.
+      </p>
+      <div className="mt-4 pt-4 border-t border-muted/10 flex items-center justify-between">
+        <div className="flex flex-col">
+          <div className="text-2xl font-black text-price-green">30%</div>
+          <div className="text-xs font-semibold text-muted">
+            of your order total
+          </div>
+        </div>
+        <button
+          onClick={() => setProtection(!protection)}
+          className={`h-11 px-4 flex items-center justify-center gap-2 rounded-lg font-bold ${protection ? "bg-price-green text-white" : "bg-foreground text-background"}`}
+        >
+          {protection ? (
+            <>
+              Added <Check className="h-5 w-5" />
+            </>
+          ) : (
+            "Add to order"
+          )}
+        </button>
       </div>
     </div>
   );

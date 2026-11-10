@@ -1,15 +1,12 @@
 "use client";
 
-import { useCart } from "@/store/useCart";
+import { useCart, cartTotals, PROTECTION_LABEL } from "@/store/useCart";
 import { Trash2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export function SidebarLedger() {
-  const { cart, removeFromCart } = useCart();
-  const total = cart.reduce(
-    (sum, item) => sum + item.priceAfter * item.quantity,
-    0,
-  );
+  const { cart, removeFromCart, protection } = useCart();
+  const { protectionCost, total } = cartTotals(cart, protection);
 
   // We return null or a placeholder if the cart is empty,
   // but we must be consistent with the layout grid.
@@ -50,6 +47,11 @@ export function SidebarLedger() {
           </div>
 
           <div className="pt-6">
+            {protectionCost > 0 && (
+              <p className="text-foreground/70 text-xs mb-2">
+                {PROTECTION_LABEL}: ${protectionCost.toFixed(0)}
+              </p>
+            )}
             <p className="text-foreground/70 text-[10px] font-bold uppercase">
               Grand Total
             </p>

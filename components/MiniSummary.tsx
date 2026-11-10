@@ -1,11 +1,11 @@
 "use client";
 
-import { useCart } from "@/store/useCart";
+import { useCart, cartTotals } from "@/store/useCart";
 import { ShoppingBag, Trash2 } from "lucide-react";
 
 export const MiniCartSummary = () => {
-  const { cart, removeFromCart } = useCart();
-  const cartTotal = cart.reduce((sum, i) => sum + i.priceAfter * i.quantity, 0);
+  const { cart, removeFromCart, protection } = useCart();
+  const { total: cartTotal } = cartTotals(cart, protection);
   const cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
 
   if (cart.length === 0) return null;

@@ -10,11 +10,11 @@ export const addOns: IAddOn[] = [
   {
     item: "Pet hair removal",
     description: "We pull the fur out of the fabric before the steam clean.",
-    price: 30,
+    price: 50,
   },
   {
     item: "Pill removal",
     description: "We shave off the fuzz balls so the fabric looks smooth again.",
-    price: 30,
+    price: 50,
   },
 ];

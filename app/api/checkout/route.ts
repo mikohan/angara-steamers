@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { items } = await req.json(); // Expecting: [{ name: string, price: number, quantity: number }]
+    const { items, protection } = await req.json(); // items: [{ name, price, quantity }], protection: boolean
 
     const line_items = items.map((item: CartItem) => ({
       price_data: {
@@ -24,6 +24,25 @@ export async function POST(req: Request) {
       },
       quantity: item.quantity,
     }));
+
+    // Fabric protection (Scotchgard) = 30% of the items total
+    if (protection === true) {
+      const itemsTotal = (items as CartItem[]).reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      const protectionCost = Math.round(itemsTotal * 0.3);
+      if (protectionCost > 0) {
+        line_items.push({
+          price_data: {
+            currency: "usd",
+            product_data: { name: "Fabric protection (Scotchgard)" },
+            unit_amount: protectionCost * 100,
+          },
+          quantity: 1,
+        });
+      }
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
