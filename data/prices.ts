@@ -13,6 +13,7 @@ import BedImage from "@/public/oldMedia/couch/prices/bed.png";
 import BedFrameImage from "@/public/media/pricing-v2/bed-frame.png";
 import CarpetImage from "@/public/oldMedia/couch/prices/carpet.png";
 import Carpet3RoomsImage from "@/public/media/pricing-v2/carpet-3-rooms.png";
+import Carpet2RoomsImage from "@/public/media/pricing-v2/carpet-1-room.png";
 import RugImage from "@/public/oldMedia/couch/prices/rug.png";
 import AreaRug5x5Image from "@/public/media/pricing-v2/area-rug-5x5.png";
 
@@ -146,6 +147,15 @@ export const prices: IPrice[] = [
     size: "1 room",
     priceBefore: 170,
     priceAfter: 135,
+  },
+  {
+    img: Carpet2RoomsImage,
+    url: "https://ik.imagekit.io/angara/Couch/prices/carpet.png",
+    category: "Carpets",
+    item: "2 rooms carpet",
+    size: "2 rooms",
+    priceBefore: 280,
+    priceAfter: 210,
   },
   {
     img: Carpet3RoomsImage,
