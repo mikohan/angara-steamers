@@ -8,7 +8,7 @@ export const BUSINESS_CONFIG = {
   founding_location: "Los Angeles, CA",
   phone:
     formatPhoneForSchema(process.env.NEXT_PUBLIC_COMPANY_PHONE || "") ||
-    "(213)-598-7763",
+    "(213)-759-0708",
   email: process.env.NEXT_PUBLIC_COMPANY_EMAIL || "hello@angaracleaning.com",
   same_as: [
     process.env.NEXT_PUBLIC_COMPANY_IG ||

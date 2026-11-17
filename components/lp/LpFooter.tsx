@@ -3,8 +3,8 @@ import Link from "next/link";
 // Minimal footer for ad landing pages: who we are, how to reach us, policy.
 export function LpFooter() {
   const phoneHref =
-    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12135987763";
-  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 598-7763";
+    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12137590708";
+  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 759-0708";
   const email = process.env.NEXT_PUBLIC_COMPANY_EMAIL || "info@angarasteamers.com";
 
   return (

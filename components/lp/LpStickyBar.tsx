@@ -13,7 +13,7 @@ export function LpStickyBar() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const phoneHref =
-    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12135987763";
+    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12137590708";
 
   if (!mounted) return null;
 

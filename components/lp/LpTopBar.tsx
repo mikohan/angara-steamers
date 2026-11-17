@@ -8,8 +8,8 @@ import ASLogo from "@/public/images/logo_as_drops.webp";
 // Slim header for ad landing pages: logo, phone, one button. No menu.
 export function LpTopBar() {
   const phoneHref =
-    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12135987763";
-  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 598-7763";
+    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12137590708";
+  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 759-0708";
 
   return (
     <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md shadow-sm">

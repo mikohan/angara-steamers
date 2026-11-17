@@ -22,8 +22,8 @@ export function NavbarClient({ navItems }: NavbarProps) {
   );
 
   const phoneHref =
-    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12135987763";
-  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 598-7763";
+    process.env.NEXT_PUBLIC_COMPANY_PHONE_LINK || "+12137590708";
+  const phoneTitle = process.env.NEXT_PUBLIC_COMPANY_PHONE || "(213) 759-0708";
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md shadow-sm ">
