@@ -11,7 +11,9 @@ export function generateLocationsListSeo(
   response: StrapiResponse<LocationPage>,
   baseUrl: string,
 ) {
-  const locations = response.data;
+  const locations = response.data.filter(
+    (loc: LocationPage) => !BUSINESS_CONFIG.hidden_locations.includes(loc.slug),
+  );
   const canonical = baseUrl;
 
   // 1. Next.js Metadata
