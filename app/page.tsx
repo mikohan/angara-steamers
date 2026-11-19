@@ -58,12 +58,18 @@ export default function HomePage() {
               addressRegion: "CA",
               addressCountry: "US",
             },
-            areaServed: { "@type": "City", name: "Los Angeles" },
+            areaServed: [
+              { "@type": "AdministrativeArea", name: "Los Angeles County, CA" },
+              { "@type": "AdministrativeArea", name: "Orange County, CA" },
+              { "@type": "City", name: "Los Angeles" },
+            ],
             priceRange: "$$",
             sameAs: [
-              process.env.NEXT_PUBLIC_COMPANY_FB,
               process.env.NEXT_PUBLIC_COMPANY_IG,
-            ],
+              process.env.NEXT_PUBLIC_COMPANY_FB,
+              process.env.NEXT_PUBLIC_COMPANY_YT,
+              process.env.NEXT_PUBLIC_COMPANY_GMB,
+            ].filter(Boolean),
           }),
         }}
       />

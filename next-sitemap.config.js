@@ -11,6 +11,8 @@ const config = {
     "/styleguide",
     "/cart",
     "/thank-you",
+    "/locations/riverside",
+    "/locations/rancho-cucamonga",
   ],
   robotsTxtOptions: {
     policies: [

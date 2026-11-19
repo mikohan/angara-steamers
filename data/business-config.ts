@@ -16,7 +16,7 @@ export const BUSINESS_CONFIG = {
     process.env.NEXT_PUBLIC_COMPANY_FB ||
       "https://www.facebook.com/angara_steamers",
     process.env.NEXT_PUBLIC_COMPANY_GMB ||
-      "https://share.google/t8Hz0LTlyNlNw1pqO",
+      "https://www.google.com/maps?cid=3436468599603043178",
   ],
   opening_hours: [
     { dayOfWeek: "Tuesday", opens: "08:00", closes: "20:00" },
@@ -30,7 +30,7 @@ export const BUSINESS_CONFIG = {
   knowsAbout: [
     "Restoration of stained or worn upholstery",
     "Removal of pet odors and organic stains",
-    "High-heat truck-mounted extraction",
+    "High-heat (200°F) steam extraction",
     "Rapid-dry textile restoration",
     "Deep-fiber allergen and dust mite extraction",
     "Safe cleaning for luxury and performance fabrics",
@@ -39,7 +39,10 @@ export const BUSINESS_CONFIG = {
     "Professional fabric fiber maintenance",
     "Sanitization of heavily used home furniture",
   ],
-  rating: "4.9",
-  review_count: "597",
+  // Real numbers from Angara Steamers' own Google Business Profile. Update as reviews come in.
+  rating: "5.0",
+  review_count: "2",
   priceRange: "$$",
+  // City pages outside our service area (LA County + Orange County): hidden and redirected.
+  hidden_locations: ["riverside", "rancho-cucamonga"],
 };

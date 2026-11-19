@@ -4,7 +4,7 @@ import BriannaVilla from "@/public/oldMedia/couch/avatars/brianna-villa.png";
 import BankrollBombshell from "@/public/oldMedia/couch/avatars/bankroll-bombshell.png";
 import { BUSINESS_CONFIG } from "@/data/business-config";
 
-// "4.9 on Google" badge: real Angara reviewers' faces (the ones with photos), stars, rating and a
+// Google rating badge: real Angara reviewers' faces (the ones with photos), stars, rating and a
 // link to the Google Business Profile.
 // Google "G" icon: download the official icon from Google's Business Profile
 // marketing kit, save it as public/images/google-g.svg, then import it here
@@ -15,7 +15,7 @@ export function GoogleRatingBadge({
   googleIcon?: string;
 }) {
   const gmb =
-    process.env.NEXT_PUBLIC_COMPANY_GMB || "https://share.google/oDULc3KpCXQC52z9f";
+    process.env.NEXT_PUBLIC_COMPANY_GMB || "https://www.google.com/maps?cid=3436468599603043178";
   const faces = [BriannaVilla, BankrollBombshell];
 
   return (

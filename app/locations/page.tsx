@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/common/BreadCrumbs";
 import { CTA } from "@/components/CTA";
+import { BUSINESS_CONFIG } from "@/data/business-config";
 import { generateLocationsListSeo } from "@/data/meta-data/locations-meta"; // Adjust path accordingly
 import { fetchStrapi } from "@/lib/strapi"; // Your fetch utility
 import { LocationPage } from "@/types";
@@ -72,7 +73,7 @@ export default async function LocationsPage() {
               <h2 className="text-3xl font-bold mb-8 text-primary">{state}</h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {cities.map((loc) => {
+                {cities.filter((loc) => !BUSINESS_CONFIG.hidden_locations.includes(loc.slug)).map((loc) => {
                   const strapiBase =
                     process.env.NEXT_PUBLIC_STRAPI_URL ||
                     "https://cms.angaracleaning.com";

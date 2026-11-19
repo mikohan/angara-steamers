@@ -64,7 +64,7 @@ export function generateHubSeo(
           "@type": "ListItem",
           position: 2,
           name: "Services",
-          item: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/service`,
+          item: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/upholstery`,
         },
         {
           "@type": "ListItem",
@@ -92,7 +92,7 @@ export function generateHubSeo(
             "@type": "ListItem",
             position: index + 1,
             name: service?.title || "Service",
-            url: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/service/${root?.slug}/${service?.slug}`,
+            url: `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/services/${root?.slug}/${service?.slug}`,
             description:
               service?.meta_description ||
               `Professional ${service?.title || ""} cleaning services.`,

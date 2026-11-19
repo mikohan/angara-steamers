@@ -1,4 +1,5 @@
 import { fetchStrapi } from "@/lib/strapi";
+import { notFound } from "next/navigation";
 import { BreadcrumbItem, Project, StrapiResponse } from "@/types";
 import { generateProjectPageSeo } from "@/data/meta-data/meta-project";
 import { GalleryGrid } from "@/components/GalleryGrid";
@@ -109,6 +110,7 @@ export default async function ProjectPage({
     getQuery(project),
   );
 
+  if (!response?.data || response.data.length === 0) notFound();
   const projectInstance = response.data[0];
   const baseUrl = `${process.env.NEXT_PUBLIC_COMPANY_WEBSITE}/projects/${response.data[0].location_page?.slug}/${project}`;
 

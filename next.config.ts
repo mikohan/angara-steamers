@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
         destination: "https://angarasteamers.com/:path*",
         permanent: true,
       },
+      // Old /service/... links (singular) -> /services/...
+      { source: "/service/:path*", destination: "/services/:path*", permanent: true },
+      { source: "/service", destination: "/services/upholstery", permanent: true },
+      { source: "/services", destination: "/services/upholstery", permanent: true },
+      // City pages outside the service area (LA County + Orange County)
+      { source: "/locations/riverside", destination: "/locations", permanent: true },
+      { source: "/locations/rancho-cucamonga", destination: "/locations", permanent: true },
     ];
   },
   images: {

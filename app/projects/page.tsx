@@ -53,7 +53,7 @@ export default async function ProjectsPage() {
             <div className="max-w-3xl">
               <p>
                 At Angara Steamers, we document our results to demonstrate the
-                power of professional, high-heat truck-mounted steam extraction.
+                power of professional, high-heat (200°F) steam extraction.
                 From high-traffic sofas in Beverly Hills to pet-stained
                 upholstery in Playa Vista, our case studies showcase the
                 restoration of luxury fabrics using environmentally safe,
