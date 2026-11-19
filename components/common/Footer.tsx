@@ -3,6 +3,22 @@ import { ServiceHub } from "@/types";
 import { STATIC_PAGES } from "@/data/links";
 import { WaveDivider } from "./WaveDivider";
 
+// Main city pages (LA County + Orange County). Full list on /locations.
+const FOOTER_AREAS = [
+  { slug: "downtown-los-angeles", name: "Downtown Los Angeles" },
+  { slug: "santa-monica", name: "Santa Monica" },
+  { slug: "beverly-hills", name: "Beverly Hills" },
+  { slug: "playa-vista", name: "Playa Vista" },
+  { slug: "marina-del-rey", name: "Marina del Rey" },
+  { slug: "woodland-hills", name: "Woodland Hills" },
+  { slug: "valley-village", name: "Valley Village" },
+  { slug: "santa-clarita-ca", name: "Santa Clarita" },
+  { slug: "torrance", name: "Torrance" },
+  { slug: "rancho-palos-verdes", name: "Rancho Palos Verdes" },
+  { slug: "irvine-central-oc", name: "Irvine" },
+  { slug: "orange-county-coastal", name: "Coastal Orange County" },
+];
+
 interface FooterProps {
   navItems: ServiceHub[];
 }
@@ -12,7 +28,7 @@ export function Footer({ navItems }: FooterProps) {
     <footer className="relative pt-16 md:pt-32 px-12 md:px-4">
       <div className="absolute top-0 left-0 -z-10 h-[30%] w-full bg-linear-180 from-primary/20 to-background"></div>
       <WaveDivider position="top" fill="var(--color-background)" />
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-12">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-12">
         {/* Branding - Full width on mobile */}
         <div className="flex flex-col gap-3">
           <h2 className="font-bold text-xl tracking-tight">Angara Steamers</h2>
@@ -57,6 +73,30 @@ export function Footer({ navItems }: FooterProps) {
                 {hub.title}
               </Link>
             ))}
+          </nav>
+        </div>
+
+        {/* Service Areas */}
+        <div className="flex flex-col gap-4">
+          <h3 className="font-semibold uppercase tracking-widest opacity-70">
+            Service Areas
+          </h3>
+          <nav className="flex flex-col gap-2">
+            {FOOTER_AREAS.map((a) => (
+              <Link
+                key={a.slug}
+                href={`/locations/${a.slug}`}
+                className="py-0.5 hover:text-primary transition-colors text-base"
+              >
+                {a.name}
+              </Link>
+            ))}
+            <Link
+              href="/locations"
+              className="py-0.5 hover:text-primary transition-colors text-base font-semibold"
+            >
+              All service areas
+            </Link>
           </nav>
         </div>
 

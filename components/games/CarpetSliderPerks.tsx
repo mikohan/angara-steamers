@@ -7,7 +7,7 @@ import {
   MouseEvent as ReactMouseEvent,
   TouchEvent as ReactTouchEvent,
 } from "react";
-import { Leaf, Clock, Zap } from "lucide-react";
+import { Leaf, Clock, Zap, ShieldCheck } from "lucide-react";
 
 const perks = [
   {
@@ -25,6 +25,11 @@ const perks = [
     icon: Zap,
     title: "Powerful Extraction",
     description: "High-pressure equipment that leaves your carpet almost dry.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Re-clean Guarantee",
+    description: "If a stain we cleaned comes back, we come back and clean it again for free.",
   },
 ];
 

@@ -11,6 +11,8 @@ import { Metadata } from "next";
 import { LogoTicker } from "@/components/LogoTicker";
 import { CarpetSliderPerks } from "@/components/games/CarpetSliderPerks";
 import { CTA } from "@/components/CTA";
+import { FAQSection } from "@/components/FAQSection";
+import { HOME_FAQ } from "@/data/faq-home";
 
 export const metadata: Metadata = {
   title:
@@ -41,6 +43,20 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="mx-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: HOME_FAQ.map((f) => ({
+              "@type": "Question",
+              name: f.question,
+              acceptedAnswer: { "@type": "Answer", text: f.answer },
+            })),
+          }),
+        }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -107,6 +123,7 @@ export default function HomePage() {
       <section className="mb-16">
         <VideoReviews />
       </section>
+      <FAQSection />
       <section className="max-w-6xl mx-auto mb-16">
         <CTA />
       </section>
